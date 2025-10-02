@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'node:path';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
@@ -19,8 +20,8 @@ const BUCKET = process.env.R2_BUCKET_NAME!;
 const app = express();
 
 app.use(express.json());
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ ok: true, service: 'medarthub-api' });
 });
 
 console.log(process.env.R2_BUCKET_NAME);
@@ -34,7 +35,7 @@ interface CreateUploadUrlRequestBody {
   contentType: string;
 }
 
-app.post("/createUploadUrl", async (req: express.Request<{}, {}, CreateUploadUrlRequestBody>, res) => {
+app.post("/api/createUploadUrl", async (req: express.Request<{}, {}, CreateUploadUrlRequestBody>, res) => {
   const userId = req.headers["x-user-id"] || "anon";
   const { filename, contentType } = req.body;
 
@@ -62,6 +63,16 @@ app.post("/createUploadUrl", async (req: express.Request<{}, {}, CreateUploadUrl
 
 // Routes
 // app.use('/api/items', itemRoutes);
+
+// --- Static serving (production) ---
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
+
+// SPA catch-all (exclude /api)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
 // Global error handler (should be after routes)
 // app.use(errorHandler);
