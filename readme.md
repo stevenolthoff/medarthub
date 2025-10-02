@@ -2,6 +2,31 @@
 
 A full-stack application with Express API backend and Vite React frontend.
 
+## Setup
+
+### Environment Variables
+
+Create a `.env` file in the project root with your Cloudflare R2 credentials:
+
+```bash
+# Cloudflare R2 Configuration
+R2_BUCKET_NAME=your-bucket-name
+R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=your-access-key-id
+R2_SECRET_ACCESS_KEY=your-secret-access-key
+
+# Server Configuration
+PORT=3001
+```
+
+**To get your R2 credentials:**
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to R2 Object Storage
+3. Create a bucket or use an existing one
+4. Go to "Manage R2 API tokens"
+5. Create a new API token with R2 permissions
+6. Use the token details to fill in the `.env` file
+
 ## Frontend/Backend dev & prod
 
 ### Development
