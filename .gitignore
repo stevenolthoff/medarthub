@@ -33,4 +33,4 @@ $RECYCLE.BIN/
 .npm
 # Optional eslint cache
 .eslintcache
-repomix-output.xml
+repomix-output*

@@ -28,15 +28,31 @@ console.log(process.env.R2_ENDPOINT);
 console.log(process.env.R2_ACCESS_KEY_ID);
 console.log(process.env.R2_SECRET_ACCESS_KEY);
 
-app.post("/createUploadUrl", async (req, res) => {
+// Define an interface for the request body of createUploadUrl
+interface CreateUploadUrlRequestBody {
+  filename: string;
+  contentType: string;
+}
+
+app.post("/createUploadUrl", async (req: express.Request<{}, {}, CreateUploadUrlRequestBody>, res) => {
   const userId = req.headers["x-user-id"] || "anon";
+  const { filename, contentType } = req.body;
+
+  // Basic validation for required fields
+  if (!filename || !contentType) {
+    return res.status(400).json({ error: "filename and contentType are required in the request body." });
+  }
+
   const id = randomUUID();
-  const key = `users/${userId}/images/${id}/original.jpg`;
+  const fileExtension = filename.split('.').pop(); // Extract extension from filename
+  
+  // Construct the S3 key using the derived extension
+  const key = `users/${userId}/images/${id}/original.${fileExtension}`;
 
   const cmd = new PutObjectCommand({
     Bucket: BUCKET,
     Key: key,
-    ContentType: "image/jpeg",
+    ContentType: contentType, // Use the client-provided Content-Type
   });
 
   const url = await getSignedUrl(s3, cmd, { expiresIn: 300 }); // 5 min
