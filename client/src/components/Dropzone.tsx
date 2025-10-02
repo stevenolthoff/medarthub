@@ -57,7 +57,7 @@ export const Dropzone = ({ onUploadSuccess, onUploadError }: DropzoneProps) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // TODO: Replace 'test-user-id' with an actual user ID from your authentication system
+          // TODO: Replace 'x-user-id' with an actual user ID from your authentication system
           'x-user-id': 'test-user-id',
         },
         body: JSON.stringify(payload),
@@ -68,14 +68,12 @@ export const Dropzone = ({ onUploadSuccess, onUploadError }: DropzoneProps) => {
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
-        } catch (jsonError) {
-          // If response is not JSON, try to get text
+        } catch (jsonError: unknown) {
           try {
             const errorText = await response.text();
             errorMessage = errorText || errorMessage;
-          } catch (textError) {
-            // If we can't get text either, use the default message
-            console.error('Could not parse error response:', { jsonError, textError });
+          } catch (textError: unknown) {
+            console.error('Client: Could not parse server error response (JSON or text).', { jsonError, textError });
           }
         }
         throw new Error(errorMessage);
@@ -84,12 +82,34 @@ export const Dropzone = ({ onUploadSuccess, onUploadError }: DropzoneProps) => {
       const { url, key } = await response.json()
 
       // 2. Upload file to R2 using the signed URL
+      // Add detailed logging before the PUT request to R2
+      console.log('Client: Preparing PUT request to R2. File details:', {
+        name: fileWithStatus.name,
+        type: fileWithStatus.type,
+        size: fileWithStatus.size,
+        targetUrl: url,
+        isBlobInstance: fileWithStatus instanceof Blob // Verify it's still a Blob-like object
+      });
+
+      // Explicitly create a Blob from the File object for the request body
+      // This ensures fetch correctly interprets the body as binary data.
+      const blobBody = new Blob([fileWithStatus], { type: fileWithStatus.type });
+      console.log('Client: Blob body created for R2 PUT. Size:', blobBody.size, 'Type:', blobBody.type);
+
+      if (!fileWithStatus.type) {
+        throw new Error('File type is missing, cannot upload to R2.');
+      }
+      
       const uploadResponse = await fetch(url, {
         method: 'PUT',
         headers: {
-          'Content-Type': fileWithStatus.type, // Important: must match the content-type sent to /createUploadUrl
+          'Content-Type': fileWithStatus.type, // Must match what was used for signed URL generation
+          // CRITICAL FIX: Remove x-amz-acl header here.
+          // It was not included in the signed headers by the backend, causing a signature mismatch.
+          // If public access is needed, configure it on the R2 bucket policy.
+          // 'x-amz-acl': 'public-read' // REMOVED
         },
-        body: fileWithStatus, // Send the File object directly
+        body: blobBody, // Use the explicitly created Blob here
       })
 
       if (!uploadResponse.ok) {
@@ -129,31 +149,26 @@ export const Dropzone = ({ onUploadSuccess, onUploadError }: DropzoneProps) => {
 
     // Add new accepted files to the files state with 'pending' status
     const newAcceptedFilesWithStatus: FileWithUploadStatus[] = newAcceptedFiles.map(file => {
-      const fileWithStatus = {
-        ...file,
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        lastModified: file.lastModified,
+      // Ensure the original File object (which is a Blob) is preserved
+      // by directly assigning new properties instead of spreading into a new plain object.
+      const fileWithStatus = Object.assign(file, {
         id: uuidv4(),
         status: 'pending' as const,
-      };
-      console.log('Client: Created fileWithStatus:', { 
+      });
+      console.log('Client: Created fileWithStatus for handling:', { 
         name: fileWithStatus.name, 
         type: fileWithStatus.type, 
         size: fileWithStatus.size,
-        id: fileWithStatus.id 
+        id: fileWithStatus.id,
+        isBlobInstance: fileWithStatus instanceof Blob
       });
       return fileWithStatus;
     })
 
     // Add new rejected files to the files state with 'rejected' status and error messages
     const newRejectedFilesWithStatus: FileWithUploadStatus[] = newFileRejections.map(rejection => ({
+      // Preserve original File properties while adding new ones
       ...rejection.file,
-      name: rejection.file.name,
-      type: rejection.file.type,
-      size: rejection.file.size,
-      lastModified: rejection.file.lastModified,
       id: uuidv4(),
       status: 'rejected' as const,
       errorMessage: rejection.errors.map(e => e.message).join('; '),

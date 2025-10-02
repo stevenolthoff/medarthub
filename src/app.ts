@@ -93,9 +93,16 @@ app.post("/api/createUploadUrl", async (req: express.Request<{}, {}, CreateUploa
       Bucket: BUCKET,
       Key: key,
       ContentType: contentType,
+      // CRITICAL FIX: Explicitly set ChecksumAlgorithm to undefined
+      // to prevent the SDK from adding x-amz-checksum headers to the signed URL.
+      // This ensures R2 does not expect a specific (e.g., empty) checksum.
+      ChecksumAlgorithm: undefined, 
     });
 
-    const url = await getSignedUrl(s3, cmd, { expiresIn: 300 }); // 5 min
+    // It's good practice to explicitly list signed headers, especially if adding
+    // other headers besides 'host'. For 'UNSIGNED-PAYLOAD', 'host' is usually
+    // sufficient if no other custom headers are client-sent and needed for signing.
+    const url = await getSignedUrl(s3, cmd, { expiresIn: 300, signableHeaders: new Set(['host']) }); // 5 min
     console.log('Server: Successfully generated signed URL.');
 
     res.json({ key, url });
