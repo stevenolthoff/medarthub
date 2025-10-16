@@ -125,7 +125,7 @@ app.post("/api/createUploadUrl", async (req: express.Request<{}, {}, CreateUploa
 // app.use('/api/items', itemRoutes);
 
 // --- Static serving (production) ---
-const clientDistPath = path.resolve(__dirname, '../client/dist');
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
 app.use(express.static(clientDistPath));
 
 // SPA catch-all (exclude /api)

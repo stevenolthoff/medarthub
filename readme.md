@@ -1,12 +1,12 @@
 # MedArtHub
 
-A full-stack application with Express API backend and Vite React frontend.
+A full-stack application with Express API backend, Vite React frontend, and Next.js web app.
 
 ## Setup
 
 ### Environment Variables
 
-Create a `.env` file in the project root with your Cloudflare R2 credentials:
+Create a `.env` file in the project root (monorepo root) with your Cloudflare R2 credentials:
 
 ```bash
 # Cloudflare R2 Configuration
@@ -15,8 +15,8 @@ R2_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
 R2_ACCESS_KEY_ID=your-access-key-id
 R2_SECRET_ACCESS_KEY=your-secret-access-key
 
-# Server Configuration
-PORT=3001
+# API Server Configuration
+PORT=3001 # API server listens on this port
 ```
 
 **To get your R2 credentials:**
@@ -27,19 +27,21 @@ PORT=3001
 5. Create a new API token with R2 permissions
 6. Use the token details to fill in the `.env` file
 
-## Frontend/Backend dev & prod
+## Development and Production
 
 ### Development
 
 1. From repo root: `npm run dev`
-2. Visit `http://localhost:5174` → see React page.
-3. In browser console, `fetch('/api/health').then(r=>r.json())` → `{ ok: true, service: 'medarthub-api' }`.
+2. `client` (React) will be available at `http://localhost:5173`.
+3. `web` (Next.js) will be available at `http://localhost:3000`.
+4. `api` (Express) will be available at `http://localhost:3001`.
+5. In the browser console of the client or web app, `fetch('/api/health').then(r=>r.json())` should return `{ ok: true, service: 'medarthub-api' }`.
 
 ### Production
 
 1. From repo root: `npm run build`
 2. `npm start`
-3. Visit `http://localhost:3001` → should serve built SPA; `GET /api/health` still works.
+3. Visit `http://localhost:3001` → This will serve the built `client` (React) SPA, and API routes will also be available under `/api`.
 
 ## Example of how to manually upload image to R2:
 
