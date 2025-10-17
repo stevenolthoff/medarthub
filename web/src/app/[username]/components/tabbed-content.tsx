@@ -165,8 +165,8 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Hover overlay with text */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all duration-200 flex items-end rounded-lg">
-                      <div className="w-full p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-200">
+                    <div className="absolute inset-0 bg-black/60 md:bg-black/0 md:group-hover:bg-black/60 transition-all duration-200 flex items-end rounded-lg">
+                      <div className="w-full p-4 transform translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-200">
                         <h3 className="font-semibold text-white text-sm mb-1 line-clamp-1">
                           {item.title}
                         </h3>
