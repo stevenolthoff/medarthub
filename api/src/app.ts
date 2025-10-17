@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'node:path';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -51,6 +52,14 @@ if (missingVars.length > 0) {
 const BUCKET = process.env.R2_BUCKET_NAME!;
 
 const app: express.Application = express();
+
+// Configure CORS to allow requests from the web app
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow both web and API origins
+  credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
+}));
 
 app.use(express.json());
 app.locals.prisma = prisma; // Make Prisma client available via app.locals
