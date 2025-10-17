@@ -57,10 +57,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     Cookies.remove('auth-token');
     setUser(null);
-    // Invalidate all tRPC queries by refetching
-    refetch();
+    // No need to refetch since we're logging out - the query will be disabled
+    // when there's no token due to the enabled condition
     router.push('/login'); // Redirect to login after logout
-  }, [router, refetch]);
+  }, [router]);
 
   const isLoggedIn = !!user;
 
