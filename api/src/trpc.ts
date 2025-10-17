@@ -33,7 +33,7 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
       // Fetch user from DB to ensure it's still valid and get full user object
       user = await prisma.user.findUnique({
         where: { id: decoded.userId },
-        select: { id: true, email: true, name: true, createdAt: true }, // Select only safe fields
+        select: { id: true, username: true, email: true, name: true, createdAt: true }, // Select only safe fields
       }) as User | null;
     } catch (error) {
       console.error('JWT verification failed:', error);

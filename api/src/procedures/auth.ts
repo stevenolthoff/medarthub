@@ -9,10 +9,11 @@ const BCRYPT_SALT_ROUNDS = process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env
 
 /**
  * Zod schema for user signup input.
- * Includes validation for email format, password length, and password confirmation.
+ * Includes validation for email format, password length, password confirmation, and username.
  */
 const signupInput = z.object({
-  name: z.string().min(1, 'Name is required').optional(),
+  username: z.string().min(3, 'Username must be at least 3 characters long').max(20, 'Username must be at most 20 characters long'),
+  name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   confirmPassword: z.string().min(1, 'Confirm password is required'),
@@ -40,18 +41,31 @@ export const authRouter = router({
   signup: publicProcedure
     .input(signupInput)
     .mutation(async ({ input, ctx }) => {
-      const { name, email, password } = input;
+      const { username, name, email, password } = input;
 
-      // Check if user with this email already exists
-      const existingUser = await ctx.prisma.user.findUnique({
-        where: { email },
+      // Check if user with this email or username already exists
+      const existingUser = await ctx.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email },
+            { username },
+          ],
+        },
       });
 
       if (existingUser) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'User with this email already exists.',
-        });
+        if (existingUser.email === email) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'User with this email already exists.',
+          });
+        }
+        if (existingUser.username === username) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Username is already taken.',
+          });
+        }
       }
 
       // Hash the password
@@ -60,12 +74,14 @@ export const authRouter = router({
       // Create new user
       const newUser = await ctx.prisma.user.create({
         data: {
+          username,
           name,
           email,
           passwordHash,
         },
         select: {
           id: true,
+          username: true,
           email: true,
           name: true,
           createdAt: true,
@@ -128,6 +144,7 @@ export const authRouter = router({
         token, // Return the JWT
         user: {
           id: user.id,
+          username: user.username,
           email: user.email,
           name: user.name,
         },

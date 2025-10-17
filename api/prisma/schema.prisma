@@ -9,7 +9,8 @@ datasource db {
 
 model User {
   id           String    @id @default(uuid())
-  name         String?
+  username     String    @unique
+  name         String
   email        String    @unique
   passwordHash String    // Store hashed password, not plain text
   createdAt    DateTime  @default(now())

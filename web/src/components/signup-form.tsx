@@ -23,6 +23,7 @@ import { FieldError } from "./ui/field";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,8 +44,18 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     e.preventDefault();
     setGeneralError("");
     
-    if (!name || !email || !password || !confirmPassword) {
-      setGeneralError("Please fill in all fields");
+    if (!username || !name || !email || !password || !confirmPassword) {
+      setGeneralError("Please fill in all required fields");
+      return;
+    }
+
+    if (username.length < 3) {
+      setGeneralError("Username must be at least 3 characters long");
+      return;
+    }
+
+    if (username.length > 20) {
+      setGeneralError("Username must be at most 20 characters long");
       return;
     }
 
@@ -58,7 +69,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       return;
     }
 
-    signupMutation.mutate({ name, email, password, confirmPassword });
+    signupMutation.mutate({ username, name, email, password, confirmPassword });
   };
 
   return (
@@ -77,6 +88,20 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <FieldError>{generalError}</FieldError>
               </Field>
             )}
+            <Field>
+              <FieldLabel htmlFor="username">Username</FieldLabel>
+              <Input 
+                id="username" 
+                type="text" 
+                placeholder="johndoe" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required 
+              />
+              <FieldDescription>
+                3-20 characters, must be unique.
+              </FieldDescription>
+            </Field>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
               <Input 

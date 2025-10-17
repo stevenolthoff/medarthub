@@ -2,13 +2,14 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
 import Cookies from "js-cookie";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "../lib/trpc";
 import { useRouter } from "next/navigation";
 // Define the user type based on what auth.me returns
 type AuthenticatedUser = {
   id: string;
+  username: string;
   email: string;
-  name: string | null;
+  name: string;
   createdAt: Date;
 };
 
@@ -36,14 +37,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    const hasToken = !!Cookies.get('auth-token');
+    
+    if (!hasToken) {
+      // No token, user should be logged out
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(queryLoading);
     if (!queryLoading) {
       if (data) {
         setUser(data);
       } else if (isError) {
         console.error("Failed to fetch user:", error?.message);
+        // If we get an auth error, clear the token and user state
+        if (error?.message === 'Not authenticated.') {
+          Cookies.remove('auth-token');
+        }
         setUser(null);
-        Cookies.remove('auth-token'); // Clear token if it's invalid
       }
     }
   }, [data, queryLoading, isError, error]);
@@ -57,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     Cookies.remove('auth-token');
     setUser(null);
-    // No need to refetch since we're logging out - the query will be disabled
-    // when there's no token due to the enabled condition
+    // The query will automatically be disabled since there's no token
+    // and the user state is already set to null
     router.push('/login'); // Redirect to login after logout
   }, [router]);
 
