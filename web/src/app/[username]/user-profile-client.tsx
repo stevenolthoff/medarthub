@@ -71,8 +71,29 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
   }
 
   return (
-    <div className="container mx-auto flex flex-1 flex-col items-center justify-center p-6">
-      <div className="w-full max-w-lg rounded-xl border bg-card p-8 text-center shadow-lg">
+    <div className="flex flex-1 flex-col">
+      {/* Hero Banner - 20% of screen height */}
+      <div className="h-[20vh] w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center relative overflow-hidden">
+        {/* Customizable background pattern or image can go here */}
+        <div className="absolute inset-0 bg-black/20"></div>
+        {/* Decorative elements for visual appeal */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-4 left-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-4 right-4 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+        </div>
+        <div className="relative z-10 text-center text-white px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-2 drop-shadow-lg">@{profileData.username}</h1>
+          <p className="text-base sm:text-lg md:text-xl opacity-90 drop-shadow-md">{profileData.name}</p>
+          {isOwner && (
+            <p className="text-xs sm:text-sm mt-2 opacity-75 drop-shadow-sm">Your customizable hero banner</p>
+          )}
+        </div>
+      </div>
+      
+      {/* Main content */}
+      <div className="container mx-auto flex flex-1 flex-col items-center justify-center p-6">
+        <div className="w-full max-w-lg rounded-xl border bg-card p-8 text-center shadow-lg">
         <Avatar className="mx-auto size-24">
           <Image
             src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(profileData.name || profileData.email || "user")}&flip=true`}
@@ -84,9 +105,6 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
           />
           <AvatarFallback>{getInitials(profileData.name, profileData.email)}</AvatarFallback>
         </Avatar>
-
-        <h1 className="mt-4 text-3xl font-bold">@{profileData.username}</h1>
-        <p className="text-muted-foreground text-lg">{profileData.name}</p>
 
         {isOwner ? (
           <div className="mt-6">
@@ -124,6 +142,7 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
