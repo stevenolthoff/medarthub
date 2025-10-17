@@ -1,16 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const node_path_1 = __importDefault(require("node:path"));
-const client_s3_1 = require("@aws-sdk/client-s3");
-const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
-const crypto_1 = require("crypto");
+import express from 'express';
+import path from 'node:path';
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { randomUUID } from "crypto";
 // import itemRoutes from './routes/itemRoutes';
 // import { errorHandler } from './middlewares/errorHandler'
-const s3 = new client_s3_1.S3Client({
+const s3 = new S3Client({
     region: "auto",
     endpoint: process.env.R2_ENDPOINT,
     credentials: {
@@ -42,8 +37,8 @@ else {
     console.log('✅ All R2 environment variables are present.');
 }
 const BUCKET = process.env.R2_BUCKET_NAME;
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
+const app = express();
+app.use(express.json());
 app.get('/api/health', (req, res) => {
     res.status(200).json({ ok: true, service: 'medarthub-api' });
 });
@@ -61,7 +56,7 @@ app.post("/api/createUploadUrl", async (req, res) => {
         return res.status(400).json({ error: "filename and contentType are required in the request body." });
     }
     try {
-        const id = (0, crypto_1.randomUUID)();
+        const id = randomUUID();
         const fileExtension = filename.split('.').pop();
         // Handle cases where fileExtension might be undefined (e.g., filename without extension)
         // A more robust solution might check and use a default or reject if no extension.
@@ -70,7 +65,7 @@ app.post("/api/createUploadUrl", async (req, res) => {
         // Construct the S3 key
         const key = `users/${userId}/images/${id}/original${finalFileExtension}`;
         console.log('Server: Generated S3 Key:', key);
-        const cmd = new client_s3_1.PutObjectCommand({
+        const cmd = new PutObjectCommand({
             Bucket: BUCKET,
             Key: key,
             ContentType: contentType,
@@ -82,7 +77,7 @@ app.post("/api/createUploadUrl", async (req, res) => {
         // It's good practice to explicitly list signed headers, especially if adding
         // other headers besides 'host'. For 'UNSIGNED-PAYLOAD', 'host' is usually
         // sufficient if no other custom headers are client-sent and needed for signing.
-        const url = await (0, s3_request_presigner_1.getSignedUrl)(s3, cmd, { expiresIn: 300, signableHeaders: new Set(['host']) }); // 5 min
+        const url = await getSignedUrl(s3, cmd, { expiresIn: 300, signableHeaders: new Set(['host']) }); // 5 min
         console.log('Server: Successfully generated signed URL.');
         res.json({ key, url });
     }
@@ -105,15 +100,15 @@ app.post("/api/createUploadUrl", async (req, res) => {
 // Routes
 // app.use('/api/items', itemRoutes);
 // --- Static serving (production) ---
-const clientDistPath = node_path_1.default.resolve(__dirname, '../../client/dist');
-app.use(express_1.default.static(clientDistPath));
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
 // SPA catch-all (exclude /api)
 app.use((req, res, next) => {
     if (req.path.startsWith('/api'))
         return next();
-    res.sendFile(node_path_1.default.join(clientDistPath, 'index.html'));
+    res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 // Global error handler (should be after routes)
 // app.use(errorHandler);
-exports.default = app;
+export default app;
 //# sourceMappingURL=app.js.map

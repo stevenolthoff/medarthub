@@ -2,13 +2,14 @@
   "name": "api",
   "version": "1.0.0",
   "description": "Express API for MedicalArtists",
+  "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "preinstall": "npm_config_yes=true npx only-allow bun || true",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "lint": "eslint 'src/**/*.ts'"
+    "preinstall": "bun x only-allow bun || true",
+    "dev": "bun --hot src/server.ts",
+    "build": "bun run tsc",
+    "start": "bun dist/server.js",
+    "lint": "bun x eslint 'src/**/*.ts'"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.901.0",
@@ -17,12 +18,16 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3", 
-    "@types/node": "^24.6.2", 
+    "@eslint/js": "^9.37.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.6.2",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3",
-    "eslint": "^9.36.0"
+    "typescript": "^5.9.3"
   },
   "packageManager": "bun@1.1.20",
   "ts-node": {
