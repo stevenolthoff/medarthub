@@ -91,20 +91,28 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
         </div>
       </div>
       
+      {/* Profile Avatar - positioned to overlap banner */}
+      <div className="relative -mt-24 md:-mt-28">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex justify-center md:justify-start">
+            <Avatar className="size-32 md:size-40 border-2 border-white bg-white shadow-xl">
+              <Image
+                src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(profileData.name || profileData.email || "user")}&flip=true`}
+                alt="User Avatar"
+                width={160}
+                height={160}
+                className="rounded-full"
+                unoptimized
+              />
+              <AvatarFallback className="text-2xl">{getInitials(profileData.name, profileData.email)}</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+      </div>
+      
       {/* Main content */}
       <div className="container mx-auto flex flex-1 flex-col items-center justify-center p-6">
-        <div className="w-full max-w-lg rounded-xl border bg-card p-8 text-center shadow-lg">
-        <Avatar className="mx-auto size-24">
-          <Image
-            src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(profileData.name || profileData.email || "user")}&flip=true`}
-            alt="User Avatar"
-            width={96}
-            height={96}
-            className="rounded-full"
-            unoptimized
-          />
-          <AvatarFallback>{getInitials(profileData.name, profileData.email)}</AvatarFallback>
-        </Avatar>
+        <div className="w-full max-w-lg rounded-xl border bg-card p-8 text-center shadow-lg mt-8">
 
         {isOwner ? (
           <div className="mt-6">
