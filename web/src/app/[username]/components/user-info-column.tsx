@@ -19,7 +19,7 @@ export function UserInfoColumn({
   isLoggedIn 
 }: UserInfoColumnProps) {
   return (
-    <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start">
+    <div className="w-full lg:w-1/6 flex flex-col items-center lg:items-start">
       {/* User Name */}
       <h1 className="text-3xl md:text-4xl font-bold text-center lg:text-left mb-4">{name}</h1>
       
