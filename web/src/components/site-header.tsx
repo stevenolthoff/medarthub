@@ -48,11 +48,12 @@ export function SiteHeader() {
                     {/* Placeholder avatar image or initials */}
                     {/* If you have a user avatar URL, use <Image src={user.avatarUrl} alt="User Avatar" fill /> */}
                     <Image
-                      src="https://api.dicebear.com/8.x/lorelei/svg?seed=Steven&flip=true" // Example placeholder avatar
+                      src="https://api.dicebear.com/8.x/lorelei/svg?seed=Steven&flip=true"
                       alt="User Avatar"
                       width={36}
                       height={36}
                       className="rounded-full"
+                      unoptimized
                     />
                     <AvatarFallback>{getInitials(user?.name, user?.email)}</AvatarFallback>
                   </Avatar>
