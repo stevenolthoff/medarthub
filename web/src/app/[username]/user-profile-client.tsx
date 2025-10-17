@@ -82,13 +82,6 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
           <div className="absolute bottom-4 right-4 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
         </div>
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-2 drop-shadow-lg">@{profileData.username}</h1>
-          <p className="text-base sm:text-lg md:text-xl opacity-90 drop-shadow-md">{profileData.name}</p>
-          {isOwner && (
-            <p className="text-xs sm:text-sm mt-2 opacity-75 drop-shadow-sm">Your customizable hero banner</p>
-          )}
-        </div>
       </div>
       
       {/* Profile Avatar - positioned to overlap banner */}
