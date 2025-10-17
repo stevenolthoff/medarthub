@@ -32,12 +32,12 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center space-x-2">
           {/* Your logo here if any */}
           <span className="inline-block font-bold">Medical Artists</span>
         </Link>
-        <nav className="flex items-center space-x-4">
+        <nav className="flex items-center space-x-6">
           {isLoading ? (
             <div className="size-8 animate-pulse rounded-full bg-muted" />
           ) : isLoggedIn ? (
@@ -93,7 +93,7 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button asChild variant="outline">
                 <Link href="/login">Login</Link>
               </Button>
