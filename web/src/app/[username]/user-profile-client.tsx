@@ -72,7 +72,7 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
       />
       
       {/* Main content area */}
-      <div className="w-full px-4 md:px-6 lg:px-8 mt-8">
+      <div className="w-full px-4 md:px-6 lg:px-8 mt-8 pb-32">
         <div className="flex flex-col lg:flex-row gap-8">
           <UserInfoColumn
             name={profileData.name}
