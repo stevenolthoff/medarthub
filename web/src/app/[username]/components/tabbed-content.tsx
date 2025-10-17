@@ -111,12 +111,12 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
     <div className="w-full">
       {/* Tabs */}
       <div className="border-b border-border mb-6">
-        <nav className="flex space-x-8">
+        <nav className="flex space-x-8 overflow-x-auto scrollbar-hide">
           {defaultTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.id
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
