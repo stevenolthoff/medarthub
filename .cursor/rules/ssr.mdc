@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+It's important to optimize for SSR for public profile views.

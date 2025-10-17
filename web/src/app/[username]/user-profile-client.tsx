@@ -103,46 +103,100 @@ export function UserProfileClient({ publicProfile, profileUsername }: UserProfil
         </div>
       </div>
       
-      {/* Main content */}
-      <div className="container mx-auto flex flex-1 flex-col items-center justify-center p-6">
-        <div className="w-full max-w-lg rounded-xl border bg-card p-8 text-center shadow-lg mt-8">
+      {/* Main content area */}
+      <div className="container mx-auto px-4 md:px-6 mt-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column - User Info */}
+          <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start">
+            {/* User Name */}
+            <h1 className="text-3xl md:text-4xl font-bold text-center lg:text-left mb-4">{profileData.name}</h1>
+            
+            {/* Professional Details */}
+            <div className="w-full space-y-3 mb-6">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="w-4 h-4 bg-green-500 rounded-full flex-shrink-0"></div>
+                <span>Available for Freelance</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <span>Creative Professional</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="w-4 h-4 bg-purple-500 rounded-full flex-shrink-0"></div>
+                <span>MedArtHub Member</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="w-4 h-4 bg-orange-500 rounded-full flex-shrink-0"></div>
+                <span>Joined {new Date(profileData.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
 
-        {isOwner ? (
-          <div className="mt-6">
-            <p className="mb-2 text-foreground">This is your private profile view.</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Email: <span className="font-medium">{profileData.email}</span>
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Joined: <span className="font-medium">{new Date(profileData.createdAt).toLocaleDateString()}</span>
-            </p>
-            <div className="mt-6 flex justify-center gap-4">
-              <Button asChild>
-                <Link href="/settings">Edit Profile</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/project-briefs">View Your Projects</Link>
-              </Button>
+            {/* Action Buttons */}
+            <div className="w-full space-y-3 mb-6">
+              {isOwner ? (
+                <>
+                  <Button className="w-full" asChild>
+                    <Link href="/settings">Edit Profile</Link>
+                  </Button>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/project-briefs">View Your Projects</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {isLoggedIn ? (
+                    <Button className="w-full" asChild>
+                      <Link href={`mailto:${profileData.email}`}>Contact {profileData.name}</Link>
+                    </Button>
+                  ) : (
+                    <Button className="w-full" asChild>
+                      <Link href="/login">Log in to Contact</Link>
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Additional Info */}
+            <div className="w-full text-sm text-muted-foreground">
+              <p className="mb-2">Email: {profileData.email}</p>
+              <p>Username: @{profileData.username}</p>
             </div>
           </div>
-        ) : (
-          <div className="mt-6">
-            <p className="mb-2 text-muted-foreground">This is a public profile view.</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Joined: <span className="font-medium">{new Date(profileData.createdAt).toLocaleDateString()}</span>
-            </p>
-            {isLoggedIn && ( // Only show contact button if logged in
-              <Button asChild className="mt-6">
-                <Link href={`mailto:${profileData.email}`}>Contact {profileData.name}</Link>
-              </Button>
-            )}
-            {!isLoggedIn && ( // Suggest login if not logged in
-              <p className="mt-4 text-sm text-muted-foreground">
-                <Link href="/login" className="underline underline-offset-4 hover:text-primary">Log in</Link> to interact.
-              </p>
-            )}
+
+          {/* Right Column - Main Content */}
+          <div className="w-full lg:w-2/3">
+            <div className="rounded-xl border bg-card p-8 shadow-lg">
+              {isOwner ? (
+                <div className="text-center">
+                  <p className="mb-4 text-foreground">This is your private profile view.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    You can customize your profile and manage your projects from here.
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <Button asChild>
+                      <Link href="/settings">Edit Profile</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/project-briefs">View Your Projects</Link>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="mb-4 text-muted-foreground">This is a public profile view.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    This is how others see your profile.
+                  </p>
+                  {!isLoggedIn && (
+                    <p className="text-sm text-muted-foreground">
+                      <Link href="/login" className="underline underline-offset-4 hover:text-primary">Log in</Link> to interact with this profile.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        )}
         </div>
       </div>
     </div>
