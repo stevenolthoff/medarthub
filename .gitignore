@@ -37,3 +37,4 @@ $RECYCLE.BIN/
 # Optional eslint cache
 .eslintcache
 repomix-output*
+bun.lockb

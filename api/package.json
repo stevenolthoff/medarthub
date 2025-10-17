@@ -4,6 +4,7 @@
   "description": "Express API for MedicalArtists",
   "main": "dist/server.js",
   "scripts": {
+    "preinstall": "npm_config_yes=true npx only-allow bun || true",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
@@ -16,13 +17,14 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.6.2",
+    "@types/express": "^5.0.3", 
+    "@types/node": "^24.6.2", 
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
     "eslint": "^9.36.0"
   },
+  "packageManager": "bun@1.1.20",
   "ts-node": {
     "esm": true
   }

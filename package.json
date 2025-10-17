@@ -5,35 +5,26 @@
   "license": "ISC",
   "author": "",
   "main": "index.ts",
+  "packageManager": "bun@1.1.20",
   "scripts": {
-    "dev:api": "npm --prefix api run dev",
-    "dev:web": "npm --prefix web run dev",
-    "dev:client": "npm --prefix client run dev",
-    "dev": "concurrently -k -n API,WEB,CLIENT \"npm:dev:api\" \"npm:dev:web\" \"npm:dev:client\"",
-
-    "build:client": "npm --prefix client run build",
-    "build:web": "npm --prefix web run build",
-    "build:api": "npm --prefix api run build",
-    "build": "npm run build:client && npm run build:web && npm run build:api",
-
-    "start": "npm --prefix api run start",
-    "lint": "npm --prefix api run lint && npm --prefix client run lint && npm --prefix web run lint",
-    "format": "prettier --write . && npm --prefix web run format"
+    "dev:api": "bun --cwd api run dev",
+    "dev:web": "bun --cwd web run dev",
+    "dev:client": "bun --cwd client run dev",
+    "dev": "concurrently -k -n API,WEB,CLIENT \"bun run dev:api\" \"bun run dev:web\" \"bun run dev:client\"",
+    "build:client": "bun --cwd client run build",
+    "build:web": "bun --cwd web run build",
+    "build:api": "bun --cwd api run build",
+    "build": "bun run build:client && bun run build:web && bun run build:api",
+    "start": "bun --cwd api run start",
+    "lint": "bun --cwd api run lint && bun --cwd client run lint && bun --cwd web run lint",
+    "format": "prettier --write . && bun --cwd web run format"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.6.2",
     "concurrently": "^9.2.1",
-    "npm": "^11.6.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.3",
-    "@types/dotenv": "^6.1.1",
-    "@types/node-fetch": "^2.6.11"
+    "typescript": "^5.9.3"
   },
   "ts-node": {
     "esm": true
-  },
-  "dependencies": {
-    "crypto": "^1.0.1"
   }
 }
