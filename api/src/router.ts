@@ -1,6 +1,7 @@
 import { router } from './trpc';
 import { healthRouter } from './procedures/health';
 import { authRouter } from './procedures/auth';
+import { userRouter } from './procedures/user'; // Import the new user router
 
 /**
  * The main tRPC application router.
@@ -9,12 +10,13 @@ import { authRouter } from './procedures/auth';
  * Example usage:
  * - `trpc.auth.signup.mutate()`
  * - `trpc.health.check.query()`
+ * - `trpc.user.getByUsername.query()` // New
  */
 export const appRouter = router({
   health: healthRouter, // Mount the healthRouter under the 'health' namespace
   auth: authRouter, // Mount the authentication router
+  user: userRouter, // Mount the new user router under the 'user' namespace
   // Add other feature-specific routers here as your API grows, e.g.:
-  // users: userRouter,
   // items: itemRouter,
 });
 
