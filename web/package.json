@@ -11,6 +11,8 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
@@ -18,16 +20,19 @@
     "@trpc/client": "11.6.0",
     "@trpc/react-query": "11.6.0",
     "@trpc/server": "11.6.0",
+    "@types/js-cookie": "^3.0.6",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.546.0",
     "next": "15.5.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "api": "workspace:^"
   },
   "packageManager": "bun@1.1.20",
   "devDependencies": {

@@ -19,24 +19,26 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { FieldError } from "./ui/field";
+import { useAuth } from "@/hooks/use-auth"; // Import useAuth
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const { login: authLogin } = useAuth(); // Get the global login function
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      router.push("/"); // Redirect to home on successful login
-      // You might want to refresh session/context here if using next-auth or similar
+    onSuccess: (data: { token: string }) => {
+      authLogin(data.token); // Store token and update auth state
+      // No explicit router.push here, as authLogin handles redirection
     }, 
-    onError: (error) => {
+    onError: (error: { message: SetStateAction<string> }) => {
       setFormError(error.message);
       console.error("Login failed:", error);
     },

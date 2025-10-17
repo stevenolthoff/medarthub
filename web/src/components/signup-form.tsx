@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { FieldError } from "./ui/field";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -33,7 +33,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     onSuccess: () => {
       router.push("/login?signupSuccess=true"); // Redirect to login on success
     },
-    onError: (error) => {
+    onError: (error: { message: SetStateAction<string> }) => {
       setGeneralError(error.message);
       console.error("Signup failed:", error);
     },

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "@/lib/trpc-provider";
+import { SiteHeader } from "@/components/site-header"; // Import the new header
+import { AuthProvider } from "@/hooks/use-auth"; // Import the AuthProvider
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +31,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TRPCReactProvider>
-          {children}
+          <AuthProvider> {/* Wrap children with AuthProvider */}
+            <div className="flex min-h-svh flex-col">
+              <SiteHeader /> {/* Render the header */}
+              <main className="flex flex-1 flex-col">
+                {children}
+              </main>
+            </div>
+          </AuthProvider>
         </TRPCReactProvider>
       </body>
     </html>

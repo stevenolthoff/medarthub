@@ -1,7 +1,8 @@
 import { httpBatchLink, loggerLink } from '@trpc/client';
-import { createTRPCReact } from '@trpc/react-query'; // Use createTRPCReact
-import { type AppRouter } from '../../../api/src/router'; // Path to your API's AppRouter type
+import { createTRPCReact } from '@trpc/react-query';
 import superjson from 'superjson';
+import Cookies from 'js-cookie';
+import { type AppRouter } from 'api';
 
 // Function to get the correct URL for the tRPC API
 function getBaseUrl() {
@@ -36,14 +37,17 @@ export const createTRPCClient = () => {
           (opts.direction === 'down' && opts.result instanceof Error),
       }),
       httpBatchLink({
-        url: `${getBaseUrl()}/api/trpc`, // tRPC endpoint on the API server
-        transformer: superjson, // Use superjson for advanced serialization
-        // You can add custom headers here, e.g., for authentication
-        // headers() {
-        //   return {
-        //     authorization: getAuthToken(), // Replace with actual auth token logic
-        //   };
-        // },
+        url: `${getBaseUrl()}/api/trpc`,
+        transformer: superjson,
+        headers() {
+          const token = Cookies.get('auth-token');
+          if (token) {
+            return {
+              authorization: `Bearer ${token}`,
+            };
+          }
+          return {};
+        },
       }),
     ],
   });

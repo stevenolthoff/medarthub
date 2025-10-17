@@ -1,6 +1,29 @@
+"use client"; // Make this a client component for useAuth and useRouter
+
 import Image from "next/image";
+import { useAuth } from "@/hooks/use-auth"; // Import useAuth
+import { useRouter } from "next/navigation"; // Import useRouter
+import { useEffect } from "react";
 
 export default function Home() {
+  const { isLoggedIn, isLoading } = useAuth();
+  const router = useRouter();
+
+  // Client-side redirect if not logged in
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoading, isLoggedIn, router]);
+
+  // Only render content if logged in and not loading
+  if (isLoading || !isLoggedIn) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        Loading...
+      </div>
+    ); // Or a full-page loader
+  }
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">

@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { TRPCError } from '@trpc/server';
-import { publicProcedure, router } from '../trpc';
+import jwt, { SignOptions } from 'jsonwebtoken'; // Import jsonwebtoken
+import { publicProcedure, router, protectedProcedure } from '../trpc';
+import config from '../../config/config'; // Import config for JWT secret and expiry
 
 const BCRYPT_SALT_ROUNDS = process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : 10;
 
@@ -78,8 +80,7 @@ export const authRouter = router({
 
   /**
    * Procedure for user login.
-   * Verifies credentials and simulates a successful login.
-   * (In a real app, this would generate a session token or JWT).
+   * Verifies credentials, generates a JWT, and returns it.
    */
   login: publicProcedure
     .input(loginInput)
@@ -108,10 +109,16 @@ export const authRouter = router({
         });
       }
 
-      // Successful login
-      // In a real application, you would create a session or issue a JWT here.
+      // Generate JWT
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        config.jwtSecret,
+        { expiresIn: config.jwtExpiresIn } as SignOptions
+      );
+
       return {
         message: 'Logged in successfully!',
+        token, // Return the JWT
         user: {
           id: user.id,
           email: user.email,
@@ -119,4 +126,12 @@ export const authRouter = router({
         },
       };
     }),
+  
+  /**
+   * Procedure to get the currently authenticated user's details.
+   */
+  me: protectedProcedure.query(({ ctx }) => {
+    // The user object is already attached to ctx by the isAuthed middleware
+    return ctx.user;
+  }),
 });

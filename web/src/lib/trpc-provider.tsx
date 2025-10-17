@@ -11,7 +11,7 @@ import { trpc, createTRPCClient } from './trpc'; // Import both trpc and the fac
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   // Instantiate the tRPC client using the factory function from trpc.ts
-  const [trpcClient] = useState(createTRPCClient);
+  const [trpcClient] = useState(() => createTRPCClient());
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
