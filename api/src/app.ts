@@ -67,6 +67,12 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ ok: true, service: 'medarthub-api' });
 });
 
+// Test endpoint to verify server is receiving requests
+app.post('/api/test-login', (req, res) => {
+  console.log('🧪 [TEST] Received test login request:', req.body);
+  res.json({ message: 'Test endpoint working', received: req.body });
+});
+
 // Add tRPC middleware
 app.use(
   '/api/trpc', // Mount tRPC router under /api/trpc
