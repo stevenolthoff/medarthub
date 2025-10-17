@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, Folder } from "lucide-react"; // Icons
+import { LogOut, Settings, Folder, User } from "lucide-react"; // Icons
 
 export function SiteHeader() {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
@@ -62,17 +62,26 @@ export function SiteHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
+                  <Link 
+                    href={`/${user?.username}`} 
+                    className="flex flex-col space-y-1 hover:bg-accent hover:text-accent-foreground rounded-sm p-1 -m-1 transition-colors cursor-pointer"
+                  >
                     <p className="text-sm font-medium leading-none">
                       {user?.name || user?.email}
                     </p>
                     <p className="text-muted-foreground text-xs leading-none">
                       {user?.email}
                     </p>
-                  </div>
+                  </Link>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/${user?.username}`} className="cursor-pointer">
+                      <User className="mr-2 size-4" />
+                      <span>View Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/project-briefs" className="cursor-pointer">
                       <Folder className="mr-2 size-4" />
