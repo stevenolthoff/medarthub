@@ -42,7 +42,7 @@ if (missingVars.length > 0) {
 
 const BUCKET = process.env.R2_BUCKET_NAME!;
 
-const app = express();
+const app: express.Application = express();
 
 app.use(express.json());
 app.get('/api/health', (req, res) => {
