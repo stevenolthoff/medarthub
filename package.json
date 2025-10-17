@@ -1,28 +1,42 @@
 {
   "name": "medicalartists",
   "version": "1.0.0",
-  "description": "",
+  "description": "MedicalArtists Monorepo",
   "license": "ISC",
   "author": "",
   "main": "index.ts",
   "packageManager": "bun@1.1.20",
+  "workspaces": [
+    "api",
+    "web", 
+    "client"
+  ],
   "scripts": {
-    "dev:api": "bun --cwd api run dev",
-    "dev:web": "bun --cwd web run dev",
-    "dev:client": "bun --cwd client run dev",
+    "dev:api": "bun --cwd api dev",
+    "dev:web": "bun --cwd web dev",
+    "dev:client": "bun --cwd client dev",
     "dev": "concurrently -k -n API,WEB,CLIENT \"bun run dev:api\" \"bun run dev:web\" \"bun run dev:client\"",
-    "build:client": "bun --cwd client run build",
-    "build:web": "bun --cwd web run build",
-    "build:api": "bun --cwd api run build",
+    "build:client": "bun --cwd client build",
+    "build:web": "bun --cwd web build",
+    "build:api": "bun --cwd api build",
     "build": "bun run build:client && bun run build:web && bun run build:api",
-    "start": "bun --cwd api run start",
-    "lint": "bun --cwd api run lint && bun --cwd client run lint && bun --cwd web run lint",
-    "format": "prettier --write . && bun --cwd web run format"
+    "start": "bun --cwd api start",
+    "start:web": "bun --cwd web start",
+    "start:client": "bun --cwd client preview",
+    "lint": "bun --cwd api lint && bun --cwd client lint && bun --cwd web lint",
+    "lint:fix": "bun --cwd api lint --fix && bun --cwd client lint --fix && bun --cwd web lint --fix",
+    "format": "prettier --write . && bun --cwd web format",
+    "clean": "bun --cwd api clean && bun --cwd web clean && bun --cwd client clean",
+    "type-check": "bun --cwd api type-check && bun --cwd web type-check && bun --cwd client type-check",
+    "install:all": "bun install",
+    "test": "bun --cwd api test && bun --cwd web test && bun --cwd client test"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@types/node": "^24.6.2",
+    "cross-env": "^7.0.3"
   },
   "ts-node": {
     "esm": true
