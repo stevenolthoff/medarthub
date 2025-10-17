@@ -6,6 +6,10 @@ import { randomUUID } from "crypto";
 import { PrismaClient } from '@prisma/client';
 // import itemRoutes from './routes/itemRoutes';
 // import { errorHandler } from './middlewares/errorHandler'
+// TRPC Imports
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import { appRouter } from './router'; // Import the main tRPC router
+import { createContext } from './trpc'; // Import the context factory
 const s3 = new S3Client({
     region: "auto",
     endpoint: process.env.R2_ENDPOINT,
@@ -45,6 +49,19 @@ app.locals.prisma = prisma; // Make Prisma client available via app.locals
 app.get('/api/health', (req, res) => {
     res.status(200).json({ ok: true, service: 'medarthub-api' });
 });
+// Add tRPC middleware
+app.use('/api/trpc', // Mount tRPC router under /api/trpc
+createExpressMiddleware({
+    router: appRouter,
+    createContext,
+    onError: ({ path, error }) => {
+        console.error(`❌ tRPC failed on path ${path || 'unknown'}: ${error.message}`);
+        // Log full error in development, or to a separate error logging system in production
+        if (process.env.NODE_ENV === 'development') {
+            console.error(error.stack);
+        }
+    },
+}));
 app.post("/api/createUploadUrl", async (req, res) => {
     const userId = req.headers["x-user-id"] || "anon";
     const { filename, contentType } = req.body;
@@ -88,14 +105,21 @@ app.post("/api/createUploadUrl", async (req, res) => {
         console.error('Server: Error generating signed URL or interacting with R2:', error);
         // Provide a more specific error message to the client, but keep sensitive details server-side
         let clientErrorMessage = 'Failed to generate upload URL due to a server error.';
-        if (error.Code === 'InvalidAccessKeyId' || error.Code === 'SignatureDoesNotMatch') {
-            clientErrorMessage = 'Authentication failed with R2. Check your R2 credentials.';
+        // Type guard to check if error has the expected properties
+        if (error && typeof error === 'object' && 'Code' in error) {
+            const awsError = error;
+            if (awsError.Code === 'InvalidAccessKeyId' || awsError.Code === 'SignatureDoesNotMatch') {
+                clientErrorMessage = 'Authentication failed with R2. Check your R2 credentials.';
+            }
+            else if (awsError.Code === 'NoSuchBucket') {
+                clientErrorMessage = 'The specified R2 bucket does not exist or you do not have access.';
+            }
         }
-        else if (error.Code === 'NoSuchBucket') {
-            clientErrorMessage = 'The specified R2 bucket does not exist or you do not have access.';
-        }
-        else if (error.message.includes('Network Error')) { // Basic check for network issues
-            clientErrorMessage = 'Server could not connect to R2 storage. Check network configuration.';
+        if (error && typeof error === 'object' && 'message' in error) {
+            const errorWithMessage = error;
+            if (errorWithMessage.message.includes('Network Error')) { // Basic check for network issues
+                clientErrorMessage = 'Server could not connect to R2 storage. Check network configuration.';
+            }
         }
         res.status(500).json({ error: clientErrorMessage });
     }
