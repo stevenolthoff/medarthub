@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EmptyGalleryState } from "./empty-gallery-state";
 
 type Tab = {
   id: string;
@@ -85,7 +86,7 @@ const placeholderWorkItems: WorkItem[] = [
 
 // Default tabs - users will be able to customize these later
 const defaultTabs: Tab[] = [
-  { id: "work", label: "Work", count: placeholderWorkItems.length },
+  { id: "work", label: "Work", count: 0 },
   { id: "moodboards", label: "Moodboards", count: 0 },
   { id: "appreciations", label: "Appreciations", count: 0 }
 ];
@@ -99,7 +100,8 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
 
   const getWorkItemsForTab = (tabId: string) => {
     if (tabId === "work") {
-      return placeholderWorkItems;
+      // Return empty array to show empty state
+      return [];
     }
     // For other tabs, return empty array for now
     return [];
@@ -137,16 +139,7 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
       <div className="min-h-[400px]">
         {activeTab === "work" && (
           <div>
-            {isOwner ? (
-              <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">
-                  This is your work gallery. You can organize your projects into different categories.
-                </p>
-                <Button size="sm" variant="outline">
-                  Add New Project
-                </Button>
-              </div>
-            ) : (
+            {!isOwner && currentWorkItems.length > 0 && (
               <div className="mb-6">
                 <p className="text-sm text-muted-foreground">
                   Viewing {currentWorkItems.length} projects
@@ -155,8 +148,9 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
             )}
 
             {/* Gallery Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {currentWorkItems.map((item) => (
+            {currentWorkItems.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {(currentWorkItems as WorkItem[]).map((item) => (
                 <div key={item.id} className="group relative overflow-hidden cursor-pointer rounded-lg">
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <img
@@ -192,13 +186,10 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {currentWorkItems.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No projects found in this category.</p>
+                ))}
               </div>
+            ) : (
+              <EmptyGalleryState isOwner={isOwner} />
             )}
           </div>
         )}
