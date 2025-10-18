@@ -25,19 +25,19 @@ export function UserInfoColumn({
       
       {/* Professional Details */}
       <div className="w-full space-y-3 mb-6">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-green-500 rounded-full flex-shrink-0"></div>
           <span>Available for Freelance</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
           <span>Creative Professional</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-purple-500 rounded-full flex-shrink-0"></div>
           <span>MedArtHub Member</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-orange-500 rounded-full flex-shrink-0"></div>
           <span>Joined {new Date(createdAt).toLocaleDateString()}</span>
         </div>
@@ -70,7 +70,7 @@ export function UserInfoColumn({
       </div>
 
       {/* Additional Info */}
-      <div className="w-full text-sm text-muted-foreground">
+      <div className="w-full text-sm text-foreground">
         <p className="mb-2">Email: {email}</p>
         <p>Username: @{username}</p>
       </div>
