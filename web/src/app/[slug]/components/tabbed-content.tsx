@@ -25,16 +25,19 @@ type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
-  artworks: Artwork[];
+  artistSlug: string;
   artistName: string;
 };
 
-export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, artistName }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: TabbedContentProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams<{ slug: string }>();
-  const artistSlug = params?.slug;
   const [activeTab, setActiveTab] = useState("work");
+  
+  // Fetch artist data using tRPC query
+  const { data: artistProfile, isLoading } = trpc.artist.getBySlug.useQuery({
+    slug: artistSlug,
+  });
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false); // Renamed for clarity
   const [artworkToEdit, setArtworkToEdit] = useState<Artwork | undefined>(undefined);
 
@@ -42,7 +45,9 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedArtworkIdForLightbox, setSelectedArtworkIdForLightbox] = useState<string | null>(null);
 
-  const currentWorkItems = initialArtworks.filter(artwork => 
+  // Get artworks from query data, with loading state
+  const artworks = artistProfile?.artworks || [];
+  const currentWorkItems = artworks.filter(artwork => 
     isOwner ? true : artwork.status === 'PUBLISHED'
   ).map(artwork => ({
     ...artwork,
@@ -83,7 +88,8 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
 
   const deleteArtworkMutation = trpc.artist.deleteArtwork.useMutation({
     onSuccess: () => {
-      router.refresh();
+      // Invalidate the artist query to refetch the data
+      utils.artist.getBySlug.invalidate({ slug: artistSlug });
     },
     onError: (error) => {
       console.error("Failed to delete artwork:", error.message);
@@ -96,8 +102,11 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
     }
   };
 
+  const utils = trpc.useUtils();
+  
   const handleArtworkSaved = () => {
-    router.refresh();
+    // Invalidate the artist query to refetch the data
+    utils.artist.getBySlug.invalidate({ slug: artistSlug });
   };
 
   // Open lightbox handler
@@ -111,6 +120,17 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
     setIsLightboxOpen(false);
     setSelectedArtworkIdForLightbox(null);
   };
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

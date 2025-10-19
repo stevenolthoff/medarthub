@@ -225,6 +225,8 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
             const result = await createArtworkMutation.mutateAsync(dataToSave);
             currentArtworkIdRef.current = result.artwork.id; // CRITICAL: Store the new ID
             console.log("Artwork autosaved (create)! New ID:", result.artwork.id);
+            // Notify parent to refetch when new artwork is created via autosave
+            onArtworkSaved();
           }
           isDirtyRef.current = false; // Reset dirty state after successful autosave
         } catch (error) {
@@ -365,35 +367,6 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
               />
             </Field>
 
-            <div className="space-y-4 text-muted-foreground text-sm">
-              <p className="font-semibold text-foreground">Project Tags <span className="text-xs">(limit of 10)</span></p>
-              <Input placeholder="Add up to 10 keywords to help people discover your project" disabled />
-              <p className="font-semibold text-foreground">Tools Used</p>
-              <Input placeholder="What software, hardware, or materials did you use?" disabled />
-              <p className="font-semibold text-foreground">How Would You Categorize This Project? <span className="text-xs">(required)</span></p>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {['Graphic Design', 'Interaction Design', 'Architecture', 'Illustration', 'Fashion', 'Advertising', 'Photography', 'Product Design'].map(cat => (
-                  <div key={cat} className="flex items-center space-x-2">
-                    <input type="checkbox" id={cat} className="size-4 rounded border-gray-300 text-primary focus:ring-primary" disabled />
-                    <label htmlFor={cat}>{cat}</label>
-                  </div>
-                ))}
-                <Button variant="link" size="sm" className="justify-start px-0" disabled>View All Fields...</Button>
-              </div>
-              <p className="font-semibold text-foreground">Behance Visibility <span className="text-xs">(required)</span></p>
-              <select className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" disabled>
-                <option>Everyone</option>
-              </select>
-              <p className="font-semibold text-foreground">Copyright & License</p>
-              <p>All Rights Reserved <Button variant="link" size="sm" className="px-0" disabled>Edit</Button></p>
-              <Field>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="adultContent" className="size-4 rounded border-gray-300 text-primary focus:ring-primary" disabled />
-                  <label htmlFor="adultContent">This project contains adult content</label>
-                </div>
-                <Button variant="link" size="sm" className="justify-start px-0" disabled>Add co-owners, credits, and more...</Button>
-              </Field>
-            </div>
           </div>
         </div>
 
