@@ -132,6 +132,18 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
               <EmptyGalleryState isOwner={isOwner} onAddArtwork={handleOpenAddArtworkModal} />
             ) : currentWorkItems.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {isOwner && (
+                  <button
+                    onClick={handleOpenAddArtworkModal}
+                    className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-6 bg-gray-50/50 cursor-pointer hover:border-gray-400 hover:bg-gray-100/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="Add new artwork"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
+                      <Plus className="w-8 h-8 text-blue-600" strokeWidth={3} />
+                    </div>
+                    <span className="mb-3 text-gray-700 font-medium text-xs">Add New Artwork</span>
+                  </button>
+                )}
                 {(currentWorkItems as (Artwork & { imageUrl: string; likes: number; views: number })[]).map((item) => (
                 <div key={item.id} className="group relative overflow-hidden cursor-pointer rounded-lg">
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
@@ -196,18 +208,6 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
                   </div>
                 </div>
                 ))}
-                {isOwner && (
-                  <button
-                    onClick={handleOpenAddArtworkModal}
-                    className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-6 bg-gray-50/50 cursor-pointer hover:border-gray-400 hover:bg-gray-100/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    aria-label="Add new artwork"
-                  >
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
-                      <Plus className="w-8 h-8 text-blue-600" strokeWidth={3} />
-                    </div>
-                    <span className="mb-3 text-gray-700 font-medium text-xs">Add New Artwork</span>
-                  </button>
-                )}
               </div>
             ) : (
               <EmptyGalleryState isOwner={isOwner} onAddArtwork={handleOpenAddArtworkModal} />
