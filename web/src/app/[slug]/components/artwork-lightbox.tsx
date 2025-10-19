@@ -8,6 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
+  DialogOverlay,
+  DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -75,10 +77,12 @@ export function ArtworkLightbox({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-none max-h-none w-screen h-screen p-0 m-0 rounded-none border-0 bg-black">
-        <DialogTitle className="sr-only">Artwork Lightbox - {currentArtwork.title}</DialogTitle>
-        {/* Full-screen artwork with overlay */}
-        <div className="relative w-full h-full bg-black">
+      <DialogPortal>
+        <DialogOverlay className="bg-transparent" />
+        <DialogContent className="max-w-none max-h-none w-screen h-screen p-0 m-0 rounded-none border-0 bg-transparent">
+          <DialogTitle className="sr-only">Artwork Lightbox - {currentArtwork.title}</DialogTitle>
+          {/* Full-screen artwork with overlay */}
+          <div className="relative w-full h-full bg-transparent">
           {/* Full-screen artwork */}
           <Image
             src={currentArtwork.imageUrl}
@@ -148,7 +152,8 @@ export function ArtworkLightbox({
             </div>
           </div>
         </div>
-      </DialogContent>
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 }
