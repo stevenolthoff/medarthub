@@ -20,10 +20,10 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
   req: CreateExpressContextOptions['req'];
   res: CreateExpressContextOptions['res'];
   prisma: typeof prisma;
-  user: User | null;
+  user: (User & { artist?: { id: string; slug: string } | null }) | null;
 }> => { 
 
-  let user: User | null = null;
+  let user: (User & { artist?: { id: string; slug: string } | null }) | null = null;
   const token = req.headers.authorization?.split(' ')[1]; // Expecting "Bearer <token>"
 
   if (token) {
@@ -40,11 +40,12 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
           createdAt: true,
           artist: {
             select: {
-              slug: true
+              id: true,
+              slug: true,
             }
           }
-        }, // Select only safe fields including artist slug
-      }) as User | null;
+        },
+      }) as (User & { artist?: { id: string; slug: string } | null }) | null;
     } catch (error) {
       console.error('JWT verification failed:', error);
       // Token is invalid or expired, user remains null

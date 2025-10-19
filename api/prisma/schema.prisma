@@ -33,14 +33,21 @@ model Artist {
 }
 
 model Artwork {
-  id          String   @id @default(uuid())
-  slug        String   @unique
+  id          String       @id @default(uuid())
+  slug        String       @unique
   title       String
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      ArtworkStatus @default(DRAFT)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   artistId    String
-  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artist      Artist       @relation(fields: [artistId], references: [id], onDelete: Cascade)
 
   @@map("artworks")
+}
+
+enum ArtworkStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

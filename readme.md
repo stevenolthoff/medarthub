@@ -1,6 +1,13 @@
 # MedArtHub
 
-A full-stack application with Express API backend, Vite React frontend, and Next.js web app.
+A full-stack application with tRPC API backend, Vite React testing client, and Next.js web UI.
+
+## Architecture
+
+- **web** - The main UI (Next.js application)
+- **client** - Testing ground (Vite React application) 
+- **api** - tRPC backend with shared types
+- **types** - Connected between web and tRPC for type safety
 
 ## Setup
 
