@@ -63,7 +63,7 @@ export function SiteHeader() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <Link 
-                    href={`/${user?.username}`} 
+                    href={`/${user?.artist?.slug}`} 
                     className="flex flex-col space-y-1 hover:bg-accent hover:text-accent-foreground rounded-sm p-1 -m-1 transition-colors cursor-pointer"
                   >
                     <p className="text-sm font-medium leading-none">
@@ -77,7 +77,7 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link href={`/${user?.username}`} className="cursor-pointer">
+                    <Link href={`/${user?.artist?.slug}`} className="cursor-pointer">
                       <User className="mr-2 size-4" />
                       <span>View Profile</span>
                     </Link>
