@@ -8,13 +8,39 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  username     String    @unique
+  id           String   @id @default(uuid())
+  username     String   @unique
   name         String
-  email        String    @unique
-  passwordHash String    // Store hashed password, not plain text
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  artist       Artist?
 
-  @@map("users") // Optional: Map model name to a different table name
+  @@map("users")
+}
+
+model Artist {
+  id        String    @id @default(uuid())
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artworks  Artwork[]
+
+  @@map("artists")
+}
+
+model Artwork {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@map("artworks")
 }

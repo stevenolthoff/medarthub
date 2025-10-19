@@ -5,6 +5,19 @@ import jwt, { SignOptions } from 'jsonwebtoken'; // Import jsonwebtoken
 import { publicProcedure, router, protectedProcedure } from '../trpc';
 import config from '../../config/config'; // Import config for JWT secret and expiry
 
+/**
+ * Utility function to create a clean slug from a name
+ */
+function createSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 const BCRYPT_SALT_ROUNDS = process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) : 10;
 
 /**
@@ -12,7 +25,10 @@ const BCRYPT_SALT_ROUNDS = process.env.BCRYPT_SALT_ROUNDS ? parseInt(process.env
  * Includes validation for email format, password length, password confirmation, and username.
  */
 const signupInput = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters long').max(20, 'Username must be at most 20 characters long'),
+  username: z.string()
+    .min(3, 'Username must be at least 3 characters long')
+    .max(20, 'Username must be at most 20 characters long')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, hyphens, and underscores'),
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
@@ -71,26 +87,48 @@ export const authRouter = router({
       // Hash the password
       const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-      // Create new user
-      const newUser = await ctx.prisma.user.create({
-        data: {
-          username,
-          name,
-          email,
-          passwordHash,
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          name: true,
-          createdAt: true,
-        },
+      // Generate clean slug from user's name
+      const artistSlug = createSlug(name);
+
+      // Create new user and artist in a transaction
+      const result = await ctx.prisma.$transaction(async (tx) => {
+        // Create the user
+        const newUser = await tx.user.create({
+          data: {
+            username,
+            name,
+            email,
+            passwordHash,
+          },
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            name: true,
+            createdAt: true,
+          },
+        });
+
+        // Create the artist for this user
+        const newArtist = await tx.artist.create({
+          data: {
+            slug: artistSlug,
+            userId: newUser.id,
+          },
+          select: {
+            id: true,
+            slug: true,
+            createdAt: true,
+          },
+        });
+
+        return { user: newUser, artist: newArtist };
       });
 
       return {
-        message: 'Account created successfully!',
-        user: newUser,
+        message: 'Account and artist profile created successfully!',
+        user: result.user,
+        artist: result.artist,
       };
     }),
 

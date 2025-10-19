@@ -59,6 +59,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       return;
     }
 
+    // Check if username contains only alphanumeric characters, hyphens, and underscores
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      setGeneralError("Username can only contain letters, numbers, hyphens, and underscores");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setGeneralError("Passwords do not match");
       return;
@@ -99,7 +105,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 required 
               />
               <FieldDescription>
-                3-20 characters, must be unique.
+                3-20 characters, letters, numbers, hyphens, and underscores only. Must be unique.
               </FieldDescription>
             </Field>
             <Field>
