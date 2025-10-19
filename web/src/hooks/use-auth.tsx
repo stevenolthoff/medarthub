@@ -4,14 +4,10 @@ import { createContext, useContext, useEffect, useState, type ReactNode, useCall
 import Cookies from "js-cookie";
 import { trpc } from "../lib/trpc";
 import { useRouter } from "next/navigation";
-// Define the user type based on what auth.me returns
-type AuthenticatedUser = {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  createdAt: Date;
-};
+import { type RouterOutputs } from "../lib/server-trpc";
+
+// Use tRPC inferred types instead of manually defining them
+type AuthenticatedUser = NonNullable<RouterOutputs['auth']['me']>;
 
 interface AuthContextType {
   user: AuthenticatedUser | null;

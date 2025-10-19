@@ -3,6 +3,10 @@ import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from 'api'; // Import the AppRouter type from the API workspace
 import superjson from 'superjson';
 import { headers } from 'next/headers'; // Next.js specific for accessing request headers in Server Components
+import { inferRouterOutputs } from '@trpc/server';
+
+// Export tRPC types for use throughout the app
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 /**
  * Creates a tRPC client for use in Next.js Server Components and API Routes.

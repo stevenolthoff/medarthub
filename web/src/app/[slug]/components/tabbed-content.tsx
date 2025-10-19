@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyGalleryState } from "./empty-gallery-state";
+import { type RouterOutputs } from "@/lib/server-trpc";
 
 type Tab = {
   id: string;
@@ -21,9 +22,13 @@ type WorkItem = {
   category: string;
 };
 
+// Use tRPC inferred types
+type Artwork = NonNullable<RouterOutputs['user']['getBySlug']>['artworks'][0];
+
 type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
+  artworks: Artwork[];
 };
 
 // Placeholder data for work items
@@ -84,14 +89,13 @@ const placeholderWorkItems: WorkItem[] = [
   }
 ];
 
-// Default tabs - users will be able to customize these later
-const defaultTabs: Tab[] = [
-  { id: "work", label: "Work", count: 0 },
-  { id: "moodboards", label: "Moodboards", count: 0 },
-  { id: "appreciations", label: "Appreciations", count: 0 }
-];
-
-export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artworks }: TabbedContentProps) {
+  // Default tabs - users will be able to customize these later
+  const defaultTabs: Tab[] = [
+    { id: "work", label: "Work", count: artworks.length },
+    { id: "moodboards", label: "Moodboards", count: 0 },
+    { id: "appreciations", label: "Appreciations", count: 0 }
+  ];
   const [activeTab, setActiveTab] = useState("work");
 
   const handleTabChange = (tabId: string) => {
@@ -100,8 +104,16 @@ export function TabbedContent({ isOwner, isLoggedIn }: TabbedContentProps) {
 
   const getWorkItemsForTab = (tabId: string) => {
     if (tabId === "work") {
-      // Return empty array to show empty state
-      return [];
+      // Convert artworks to work items format
+      return artworks.map(artwork => ({
+        id: artwork.id,
+        title: artwork.title,
+        description: artwork.description,
+        imageUrl: `https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop&sig=${artwork.id}`, // Placeholder image
+        likes: Math.floor(Math.random() * 500), // Placeholder likes
+        views: Math.floor(Math.random() * 5000), // Placeholder views
+        category: "work"
+      }));
     }
     // For other tabs, return empty array for now
     return [];
