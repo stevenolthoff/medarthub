@@ -67,11 +67,11 @@ export function ArtworkLightbox({
   const handleCopyPermalink = useCallback(async () => {
     if (!currentArtwork) return;
     
-    const permalink = `/${artistSlug}/artworks/${currentArtwork.slug}`;
+    const fullUrl = `${window.location.origin}/${artistSlug}/artworks/${currentArtwork.slug}`;
     
     try {
-      await navigator.clipboard.writeText(permalink);
-      console.log('Permalink copied to clipboard:', permalink);
+      await navigator.clipboard.writeText(fullUrl);
+      console.log('Permalink copied to clipboard:', fullUrl);
     } catch (err) {
       console.error('Failed to copy permalink:', err);
     }
