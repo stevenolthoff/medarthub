@@ -4,19 +4,37 @@ import prisma from './lib/prisma';
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+// Capture the server instance for graceful shutdown
+const server = app.listen(PORT, () => {
   console.log(`API on :${PORT}`);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  await prisma.$disconnect(); // Use the imported singleton prisma
-  process.exit(0);
-});
+const shutdown = async (signal: string) => {
+  console.log(`${signal} received. Shutting down gracefully...`);
+  try {
+    // Close the HTTP server first to stop accepting new connections
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          console.error('Error closing HTTP server:', err);
+          reject(err);
+        } else {
+          console.log('HTTP server closed.');
+          resolve();
+        }
+      });
+    });
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received. Shutting down gracefully...');
-  await prisma.$disconnect(); // Use the imported singleton prisma
-  process.exit(0);
-});
+    // Await Prisma disconnect
+    await prisma.$disconnect();
+    console.log('Prisma client disconnected.');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during graceful shutdown:', error);
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
