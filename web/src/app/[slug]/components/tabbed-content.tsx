@@ -10,7 +10,8 @@ import { ArtworkLightbox } from "./artwork-lightbox";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { Edit, Trash2, Loader2, Plus, ThumbsUp, Eye } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useParams } from "next/navigation";
+import { getArtworkImageUrl } from "@/lib/utils";
 
 type Tab = {
   id: string;
@@ -25,11 +26,13 @@ type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
   artworks: Artwork[];
-  artistSlug: string;
 };
 
-export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, artistSlug }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }: TabbedContentProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams<{ slug: string }>();
+  const artistSlug = params?.slug;
   const [activeTab, setActiveTab] = useState("work");
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false); // Renamed for clarity
   const [artworkToEdit, setArtworkToEdit] = useState<Artwork | undefined>(undefined);
@@ -39,10 +42,17 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
   const [selectedArtworkIdForLightbox, setSelectedArtworkIdForLightbox] = useState<string | null>(null);
 
   const defaultTabs: Tab[] = [
-    { id: "work", label: "Work" }, // Count will be dynamic based on filtered items
+    { id: "work", label: "Work" },
     { id: "moodboards", label: "Moodboards", count: 0 },
     { id: "appreciations", label: "Appreciations", count: 0 }
   ];
+
+  const tabsWithDynamicCounts = defaultTabs.map(tab => {
+    if (tab.id === 'work') {
+      return { ...tab, count: currentWorkItems.length };
+    }
+    return tab;
+  });
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -97,7 +107,6 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
     isOwner ? true : artwork.status === 'PUBLISHED'
   ).map(artwork => ({
     ...artwork,
-    imageUrl: `https://picsum.photos/600/450?random=${artwork.id}`,
     likes: Math.floor(Math.random() * 500),
     views: Math.floor(Math.random() * 5000),
   }));
@@ -107,7 +116,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
       {/* Tabs */}
       <div className="border-b border-border mb-6">
         <nav className="flex space-x-8 overflow-x-auto scrollbar-hide">
-          {defaultTabs.map((tab) => (
+          {tabsWithDynamicCounts.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
@@ -118,12 +127,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
               }`}
             >
               {tab.label}
-              {tab.id === 'work' && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  ({currentWorkItems.length}) {/* Use dynamic count here */}
-                </span>
-              )}
-              {tab.id !== 'work' && tab.count !== undefined && (
+              {tab.count !== undefined && (
                 <span className="ml-2 text-xs text-muted-foreground">
                   ({tab.count})
                 </span>
@@ -162,15 +166,14 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
                     <span className="mb-3 text-gray-700 font-medium text-xs">Add New Artwork</span>
                   </button>
                 )}
-                {(currentWorkItems as (Artwork & { imageUrl: string; likes: number; views: number })[]).map((item) => (
-                // Make the entire card clickable to open the lightbox
+                {(currentWorkItems as (Artwork & { likes: number; views: number })[]).map((item) => (
                 <div key={item.id} 
                      className="group relative overflow-hidden cursor-pointer rounded-lg"
-                     onClick={() => handleOpenLightbox(item.id)} // Click handler to open lightbox
+                     onClick={() => handleOpenLightbox(item.id)}
                 >
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <Image
-                      src={item.imageUrl}
+                      src={getArtworkImageUrl(item.id)}
                       alt={item.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -262,12 +265,12 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, 
         onArtworkSaved={handleArtworkSaved}
       />
 
-      {/* NEW: Artwork Lightbox Component */}
-      {currentWorkItems.length > 0 && ( // Only render if there are items to show
+      {/* Artwork Lightbox Component */}
+      {currentWorkItems.length > 0 && artistSlug && (
         <ArtworkLightbox
           isOpen={isLightboxOpen}
           onClose={handleCloseLightbox}
-          artworks={currentWorkItems as (Artwork & { imageUrl: string })[]} // Pass the enriched artworks
+          artworks={currentWorkItems}
           initialArtworkId={selectedArtworkIdForLightbox}
           artistSlug={artistSlug}
         />
