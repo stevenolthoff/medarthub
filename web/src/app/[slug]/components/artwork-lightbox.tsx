@@ -12,7 +12,7 @@ import {
   DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Link } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
@@ -22,6 +22,7 @@ interface ArtworkLightboxProps {
   onClose: () => void;
   artworks: (Artwork & { imageUrl: string })[]; // Artworks with generated image URLs
   initialArtworkId: string | null;
+  artistSlug: string; // Artist slug for permalink generation
 }
 
 export function ArtworkLightbox({
@@ -29,6 +30,7 @@ export function ArtworkLightbox({
   onClose,
   artworks,
   initialArtworkId,
+  artistSlug,
 }: ArtworkLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(-1);
 
@@ -53,6 +55,21 @@ export function ArtworkLightbox({
       prevIndex === 0 ? artworks.length - 1 : prevIndex - 1
     );
   }, [artworks.length]);
+
+  // Permalink functionality
+  const handleCopyPermalink = useCallback(async () => {
+    if (!currentArtwork) return;
+    
+    const permalink = `/${artistSlug}/artworks/${currentArtwork.slug}`;
+    
+    try {
+      await navigator.clipboard.writeText(permalink);
+      // You could add a toast notification here if you have one
+      console.log('Permalink copied to clipboard:', permalink);
+    } catch (err) {
+      console.error('Failed to copy permalink:', err);
+    }
+  }, [currentArtwork, artistSlug]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -101,9 +118,18 @@ export function ArtworkLightbox({
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                   {currentArtwork.title}
                 </h1>
-                <p className="text-sm md:text-base text-white/80">
+                <p className="text-sm md:text-base text-white/80 mb-3">
                   {currentArtwork.description || "No description provided."}
                 </p>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyPermalink}
+                  className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white"
+                  aria-label="Copy permalink"
+                >
+                  <Link className="h-4 w-4" />
+                </Button>
               </div>
               <DialogClose asChild>
                 <Button 

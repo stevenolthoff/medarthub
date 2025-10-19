@@ -25,9 +25,10 @@ type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
   artworks: Artwork[];
+  artistSlug: string;
 };
 
-export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, artistSlug }: TabbedContentProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("work");
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false); // Renamed for clarity
@@ -268,6 +269,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
           onClose={handleCloseLightbox}
           artworks={currentWorkItems as (Artwork & { imageUrl: string })[]} // Pass the enriched artworks
           initialArtworkId={selectedArtworkIdForLightbox}
+          artistSlug={artistSlug}
         />
       )}
     </div>

@@ -8,12 +8,13 @@ type MainContentColumnProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
   artworks: Artwork[];
+  artistSlug: string;
 };
 
-export function MainContentColumn({ isOwner, isLoggedIn, artworks }: MainContentColumnProps) {
+export function MainContentColumn({ isOwner, isLoggedIn, artworks, artistSlug }: MainContentColumnProps) {
   return (
     <div className="w-full lg:w-5/6">
-      <TabbedContent isOwner={isOwner} isLoggedIn={isLoggedIn} artworks={artworks} />
+      <TabbedContent isOwner={isOwner} isLoggedIn={isLoggedIn} artworks={artworks} artistSlug={artistSlug} />
     </div>
   );
 }
