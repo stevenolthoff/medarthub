@@ -62,13 +62,13 @@ export function ArtworkDetailViewServer({
   return (
     <div className="flex flex-1 flex-col md:flex-row overflow-hidden bg-background max-h-svh w-full mb-32">
       {/* Image Section */}
-      <div className="relative flex-1 bg-black flex items-center justify-center p-2 min-h-[300px] md:min-h-full">
+      <div className="relative flex-1 bg-black flex items-center justify-center p-2 min-h-[400px] md:min-h-[80vh]">
         {artworkImageUrl && (
           <Image
             src={artworkImageUrl}
             alt={`${artwork.title} by ${artistName} - Digital artwork on MedArtHub`}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
             className="object-contain"
             unoptimized
             priority
@@ -103,7 +103,7 @@ export function ArtworkDetailViewServer({
       </div>
 
       {/* Details Section */}
-      <div className="md:w-1/3 p-4 border-t md:border-t-0 md:border-l overflow-y-auto">
+      <div className="md:w-80 p-4 border-t md:border-t-0 md:border-l overflow-y-auto">
         <h2 className="text-lg font-semibold mb-2">{artwork.title}</h2>
         <p className="text-sm text-muted-foreground whitespace-pre-wrap">
           {artwork.description || "No description provided."}
