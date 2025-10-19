@@ -12,7 +12,7 @@ import {
   DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Link } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Link, Check } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { getArtworkImageUrl } from "@/lib/utils";
 
@@ -34,6 +34,7 @@ export function ArtworkLightbox({
   artistSlug,
 }: ArtworkLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // Effect to set the initial artwork when modal opens
   useEffect(() => {
@@ -72,6 +73,14 @@ export function ArtworkLightbox({
     try {
       await navigator.clipboard.writeText(fullUrl);
       console.log('Permalink copied to clipboard:', fullUrl);
+      
+      // Show copied feedback
+      setLinkCopied(true);
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setLinkCopied(false);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy permalink:', err);
     }
@@ -146,10 +155,18 @@ export function ArtworkLightbox({
                   variant="ghost"
                   size="icon"
                   onClick={handleCopyPermalink}
-                  className="h-12 w-12 rounded-full bg-white/20 hover:bg-white/30 text-white"
-                  aria-label="Copy permalink"
+                  className={`h-12 w-12 rounded-full text-white transition-all duration-200 ${
+                    linkCopied 
+                      ? 'bg-green-500/70 hover:bg-green-600/80' 
+                      : 'bg-white/20 hover:bg-white/30'
+                  }`}
+                  aria-label={linkCopied ? "Link copied!" : "Copy permalink"}
                 >
-                  <Link className="h-5 w-5" />
+                  {linkCopied ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    <Link className="h-5 w-5" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -167,10 +184,18 @@ export function ArtworkLightbox({
                   variant="ghost"
                   size="icon"
                   onClick={handleCopyPermalink}
-                  className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white"
-                  aria-label="Copy permalink"
+                  className={`h-8 w-8 rounded-full text-white transition-all duration-200 ${
+                    linkCopied 
+                      ? 'bg-green-500/70 hover:bg-green-600/80' 
+                      : 'bg-white/20 hover:bg-white/30'
+                  }`}
+                  aria-label={linkCopied ? "Link copied!" : "Copy permalink"}
                 >
-                  <Link className="h-4 w-4" />
+                  {linkCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Link className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <DialogClose asChild>
