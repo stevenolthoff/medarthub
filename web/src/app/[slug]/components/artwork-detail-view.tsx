@@ -73,7 +73,7 @@ export function ArtworkDetailView({
   const artworkImageUrl = getArtworkImageUrl(artwork.id);
 
   const containerClassName = isStandalonePage
-    ? "flex flex-1 flex-col md:flex-row overflow-hidden bg-background max-h-svh w-full"
+    ? "flex flex-1 flex-col md:flex-row overflow-hidden bg-background max-h-svh w-full mb-32"
     : "flex-1 flex flex-col md:flex-row overflow-hidden";
   
   const titleClassName = isStandalonePage ? "text-2xl font-bold flex-1 text-left line-clamp-1" : "text-xl font-bold flex-1 text-left line-clamp-1";
