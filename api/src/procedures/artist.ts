@@ -37,6 +37,13 @@ const deleteArtworkInput = z.object({
 });
 
 /**
+ * Zod schema for unpublishing artwork.
+ */
+const unpublishArtworkInput = z.object({
+  artworkId: z.string().min(1, 'Artwork ID is required'),
+});
+
+/**
  * Router for artist-related procedures.
  */
 export const artistRouter = router({
@@ -177,7 +184,12 @@ export const artistRouter = router({
       }
 
       // Prepare update data
-      const updateData: any = {};
+      const updateData: {
+        title?: string;
+        description?: string;
+        status?: ArtworkStatus;
+        slug?: string;
+      } = {};
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;
       if (status !== undefined) updateData.status = status;
@@ -256,6 +268,50 @@ export const artistRouter = router({
       return {
         message: 'Artwork deleted successfully!',
         artworkId: artworkId,
+      };
+    }),
+
+  /**
+   * Protected procedure to unpublish an artwork (set status to DRAFT) belonging to the authenticated artist.
+   */
+  unpublishArtwork: protectedProcedure
+    .input(unpublishArtworkInput)
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user?.artist?.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have an artist profile.',
+        });
+      }
+
+      const { artworkId } = input;
+      const artistId = ctx.user.artist!.id;
+
+      // Verify the artwork belongs to the authenticated artist
+      const existingArtwork = await ctx.prisma.artwork.findFirst({
+        where: {
+          id: artworkId,
+          artistId: artistId,
+        },
+      });
+
+      if (!existingArtwork) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Artwork not found or does not belong to the user.',
+        });
+      }
+
+      const updatedArtwork = await ctx.prisma.artwork.update({
+        where: { id: artworkId },
+        data: {
+          status: ArtworkStatus.DRAFT,
+        },
+      });
+
+      return {
+        message: 'Artwork unpublished successfully!',
+        artwork: updatedArtwork,
       };
     }),
 });

@@ -150,8 +150,9 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
 
   const createArtworkMutation = trpc.artist.createArtwork.useMutation();
   const updateArtworkMutation = trpc.artist.updateArtwork.useMutation();
+  const unpublishArtworkMutation = trpc.artist.unpublishArtwork.useMutation();
 
-  const isSaving = createArtworkMutation.isPending || updateArtworkMutation.isPending;
+  const isSaving = createArtworkMutation.isPending || updateArtworkMutation.isPending || unpublishArtworkMutation.isPending;
 
   // Initialize refs and states when modal opens or initialArtwork changes
   useEffect(() => {
@@ -242,6 +243,29 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
       debouncedAutosave();
     }
   }, [title, description, statusRef.current, isOpen, debouncedAutosave]); // Dependencies for triggering the autosave
+
+  const handleUnpublish = async () => {
+    const finalArtworkId = currentArtworkIdRef.current;
+
+    if (!finalArtworkId) {
+      setFormError("No artwork to unpublish.");
+      return;
+    }
+
+    setFormError(null);
+
+    try {
+      await unpublishArtworkMutation.mutateAsync({
+        artworkId: finalArtworkId,
+      });
+      console.log("Artwork unpublished!");
+      onArtworkSaved(); // Notify parent to refetch
+      onClose(); // Close the modal on success
+    } catch (error: any) {
+      console.error("Unpublish failed:", error);
+      setFormError(error.message || "An unexpected error occurred.");
+    }
+  };
 
   const handleSubmit = async (submitStatus: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => {
     const finalTitle = titleRef.current.trim();
@@ -382,6 +406,17 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
             Cancel
           </Button>
           <div className="flex gap-2">
+            {initialArtwork?.status === 'PUBLISHED' && (
+              <Button
+                variant="outline"
+                onClick={handleUnpublish}
+                disabled={isSaving}
+                className="text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-300"
+              >
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Unpublish
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => handleSubmit('DRAFT')}
