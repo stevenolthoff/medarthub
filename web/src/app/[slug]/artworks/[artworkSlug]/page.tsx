@@ -102,7 +102,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
               {currentArtwork.title}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Artwork by <Link href={`/${artistProfile.user.username}`} className="hover:underline">@{artistProfile.user.username}</Link>
+              Artwork by <Link href={`/${artistSlug}`} className="hover:underline">@{artistProfile.user.username}</Link>
             </p>
           </div>
           <ArtworkDetailViewServer
