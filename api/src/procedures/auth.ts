@@ -40,9 +40,10 @@ const signupInput = z.object({
 
 /**
  * Zod schema for user login input.
+ * Accepts either email or username for login.
  */
 const loginInput = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  emailOrUsername: z.string().min(1, 'Email or username is required'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -135,23 +136,29 @@ export const authRouter = router({
   /**
    * Procedure for user login.
    * Verifies credentials, generates a JWT, and returns it.
+   * Accepts either email or username for login.
    */
   login: publicProcedure
     .input(loginInput)
     .mutation(async ({ input, ctx }) => {
-      const { email, password } = input;
-      console.log(`[AUTH] Login attempt for email: ${email}`); // LOG 1
+      const { emailOrUsername, password } = input;
+      console.log(`[AUTH] Login attempt for: ${emailOrUsername}`); // LOG 1
 
-      // Find the user by email
-      const user = await ctx.prisma.user.findUnique({
-        where: { email },
+      // Find the user by either email or username
+      const user = await ctx.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: emailOrUsername },
+            { username: emailOrUsername },
+          ],
+        },
       });
-      console.log(`[AUTH] User lookup result for ${email}: ${user ? 'Found' : 'Not Found'}`); // LOG 2
+      console.log(`[AUTH] User lookup result for ${emailOrUsername}: ${user ? 'Found' : 'Not Found'}`); // LOG 2
 
       if (!user) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid email or password.',
+          message: 'Invalid email/username or password.',
         });
       }
 
@@ -163,7 +170,7 @@ export const authRouter = router({
       if (!isPasswordValid) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid email or password.',
+          message: 'Invalid email/username or password.',
         });
       }
 

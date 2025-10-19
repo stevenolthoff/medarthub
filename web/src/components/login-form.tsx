@@ -29,7 +29,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const { login: authLogin } = useAuth(); // Get the global login function
-  const [email, setEmail] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -48,12 +48,12 @@ export function LoginForm({
     e.preventDefault();
     setFormError("");
     
-    if (!email || !password) {
+    if (!emailOrUsername || !password) {
       setFormError("Please fill in all fields");
       return;
     }
 
-    loginMutation.mutate({ email, password });
+    loginMutation.mutate({ emailOrUsername, password });
   };
 
   return (
@@ -62,7 +62,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your email or username below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -74,13 +74,13 @@ export function LoginForm({
                 </Field>
               )}
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="emailOrUsername">Email or Username</FieldLabel>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="emailOrUsername"
+                  type="text"
+                  placeholder="m@example.com or username"
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
                   required
                 />
               </Field>
