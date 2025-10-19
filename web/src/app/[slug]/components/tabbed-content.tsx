@@ -19,7 +19,7 @@ type Tab = {
   count?: number;
 };
 
-// Use inferred type directly
+// Use inferred type directly, now includes coverImage
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 type TabbedContentProps = {
@@ -194,7 +194,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                 >
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <Image
-                      src={getArtworkImageUrl(item.id)}
+                      src={getArtworkImageUrl(item.coverImage?.key)} // Use coverImage.key
                       alt={`${item.title} by ${artistName} - Digital artwork on MedArtHub`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

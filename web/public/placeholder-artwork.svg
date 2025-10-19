@@ -1,0 +1,7 @@
+<svg width="600" height="450" viewBox="0 0 600 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="450" fill="#E5E7EB"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M300 150L450 300H150L300 150ZM300 110L90 330H510L300 110Z" fill="#9CA3AF"/>
+  <path d="M400 240C400 256.569 386.569 270 370 270C353.431 270 340 256.569 340 240C340 223.431 353.431 210 370 210C386.569 210 400 223.431 400 240Z" fill="#9CA3AF"/>
+  <text x="300" y="225" font-family="Arial, sans-serif" font-size="24" fill="#6B7280" text-anchor="middle" alignment-baseline="middle">No Image</text>
+  <text x="300" y="255" font-family="Arial, sans-serif" font-size="16" fill="#6B7280" text-anchor="middle" alignment-baseline="middle">Upload your artwork</text>
+</svg>

@@ -16,7 +16,7 @@ import { ChevronLeft, ChevronRight, X, Link, Check } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { getArtworkImageUrl } from "@/lib/utils";
 
-type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
+type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0]; // Now includes coverImage
 
 interface ArtworkLightboxProps {
   isOpen: boolean;
@@ -119,7 +119,7 @@ export function ArtworkLightbox({
           <div className="relative w-full h-full bg-transparent">
           {/* Full-screen artwork */}
           <Image
-            src={getArtworkImageUrl(currentArtwork.id)}
+            src={getArtworkImageUrl(currentArtwork.coverImage?.key)} // Use coverImage.key
             alt={currentArtwork.title}
             fill
             sizes="100vw"

@@ -42,8 +42,28 @@ model Artwork {
   updatedAt   DateTime     @updatedAt
   artistId    String
   artist      Artist       @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  
+  coverImageId String?      @unique // An artwork has one unique cover image
+  coverImage   Image?       @relation("ArtworkCover", fields: [coverImageId], references: [id], onDelete: SetNull)
 
   @@map("artworks")
+}
+
+model Image {
+  id          String       @id @default(uuid())
+  key         String       @unique // S3/R2 object key, e.g., users/<userId>/images/<imageId>/original.png
+  filename    String       // Original filename uploaded by user
+  contentType String       // e.g., image/png
+  size        Int          // In bytes
+  
+  // Back-reference to the artwork it covers (optional, one-to-one relation)
+  originalArtworkId String? @unique // An image can be the "original cover" for one artwork
+  originalArtwork Artwork? @relation("ArtworkCover")
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("images")
 }
 
 enum ArtworkStatus {

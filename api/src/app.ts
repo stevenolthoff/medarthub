@@ -1,28 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { randomUUID } from "crypto";
-// import itemRoutes from './routes/itemRoutes';
-// import { errorHandler } from './middlewares/errorHandler'
+// Removed S3Client, PutObjectCommand, getSignedUrl, randomUUID from here
+// as they are now handled within the tRPC image procedure.
+// import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+// import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+// import { randomUUID } from "crypto";
 
 // TRPC Imports
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './router'; // Import the main tRPC router
 import { createContext } from './trpc'; // Import the context factory
 
-const s3 = new S3Client({
-  region: "auto",
-  endpoint: process.env.R2_ENDPOINT!,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
+// Removed S3Client instantiation here as it's now in image.ts
 
-
-// Validate required environment variables
+// Validate required environment variables (keep this general as R2 is still used)
 const requiredEnvVars = {
   R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
   R2_ENDPOINT: process.env.R2_ENDPOINT,
@@ -39,22 +31,19 @@ if (missingVars.length > 0) {
   missingVars.forEach(varName => console.error(`  - ${varName}`));
   console.error('\nPlease create a .env file with the required R2 credentials.');
   console.error('See the README for setup instructions.');
-  // Using console.error directly instead of process.exit(1)
-  // to allow the server to start for other routes if needed,
-  // but log a critical error that affects R2 functionality.
-  // In a real production app, you might want to exit for critical config.
 } else {
   console.log('✅ All R2 environment variables are present.');
 }
 
-const BUCKET = process.env.R2_BUCKET_NAME!;
+// Removed BUCKET as it's now used in image.ts
+// const BUCKET = process.env.R2_BUCKET_NAME!;
 
 const app: express.Application = express();
 
-// Configure CORS to allow requests from the web app
+// Configure CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow both web and API origins
-  credentials: true, // Allow cookies and authorization headers
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], // Added Vite client origin
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
 }));
@@ -86,88 +75,15 @@ app.use(
   })
 );
 
-// Remove these specific console.logs here as they are covered by the initial validation
-// console.log(process.env.R2_BUCKET_NAME);
-// console.log(process.env.R2_ENDPOINT);
-// console.log(process.env.R2_ACCESS_KEY_ID);
-// console.log(process.env.R2_SECRET_ACCESS_KEY);
-
-// Define an interface for the request body of createUploadUrl
-interface CreateUploadUrlRequestBody {
-  filename: string;
-  contentType: string;
-}
-
-app.post("/api/createUploadUrl", async (req: express.Request<Record<string, never>, Record<string, never>, CreateUploadUrlRequestBody>, res: express.Response) => {
-  const userId = req.headers["x-user-id"] || "anon";
-  const { filename, contentType } = req.body;
-
-  // Log the received payload on the server
-  console.log('Server: Received /api/createUploadUrl request:');
-  console.log('  - Headers:', req.headers);
-  console.log('  - Raw body:', req.body);
-  console.log('  - Parsed values:', { userId, filename, contentType });
-
-  // Basic validation for required fields
-  if (!filename || !contentType) {
-    console.error('Server: Validation failed: filename or contentType missing/falsy', { filename, contentType });
-    return res.status(400).json({ error: "filename and contentType are required in the request body." });
-  }
-
-  try {
-    const id = randomUUID();
-    const fileExtension = filename.split('.').pop();
-    // Handle cases where fileExtension might be undefined (e.g., filename without extension)
-    // A more robust solution might check and use a default or reject if no extension.
-    // For now, if it's undefined, the key will contain '.undefined', which R2 typically handles fine but is not ideal.
-    const finalFileExtension = fileExtension ? `.${fileExtension}` : ''; // Ensure it's empty or starts with '.'
-    
-    // Construct the S3 key
-    const key = `users/${userId}/images/${id}/original${finalFileExtension}`;
-    console.log('Server: Generated S3 Key:', key);
-
-    const cmd = new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: key,
-      ContentType: contentType,
-      // CRITICAL FIX: Explicitly set ChecksumAlgorithm to undefined
-      // to prevent the SDK from adding x-amz-checksum headers to the signed URL.
-      // This ensures R2 does not expect a specific (e.g., empty) checksum.
-      ChecksumAlgorithm: undefined, 
-    });
-
-    // It's good practice to explicitly list signed headers, especially if adding
-    // other headers besides 'host'. For 'UNSIGNED-PAYLOAD', 'host' is usually
-    // sufficient if no other custom headers are client-sent and needed for signing.
-    const url = await getSignedUrl(s3, cmd, { expiresIn: 300, signableHeaders: new Set(['host']) }); // 5 min
-    console.log('Server: Successfully generated signed URL.');
-
-    res.json({ key, url });
-  } catch (error: unknown) {
-    console.error('Server: Error generating signed URL or interacting with R2:', error);
-    // Provide a more specific error message to the client, but keep sensitive details server-side
-    let clientErrorMessage = 'Failed to generate upload URL due to a server error.';
-    
-    // Type guard to check if error has the expected properties
-    if (error && typeof error === 'object' && 'Code' in error) {
-      const awsError = error as { Code: string; message?: string };
-      if (awsError.Code === 'InvalidAccessKeyId' || awsError.Code === 'SignatureDoesNotMatch') {
-        clientErrorMessage = 'Authentication failed with R2. Check your R2 credentials.';
-      } else if (awsError.Code === 'NoSuchBucket') {
-        clientErrorMessage = 'The specified R2 bucket does not exist or you do not have access.';
-      }
-    }
-    
-    if (error && typeof error === 'object' && 'message' in error) {
-      const errorWithMessage = error as { message: string };
-      if (errorWithMessage.message.includes('Network Error')) { // Basic check for network issues
-        clientErrorMessage = 'Server could not connect to R2 storage. Check network configuration.';
-      }
-    }
-    
-    res.status(500).json({ error: clientErrorMessage });
-  }
-});
+// Removed the direct Express endpoint for R2 signed URL generation
+// as it's now handled by tRPC's `imageRouter.createUploadUrl`.
+// interface CreateUploadUrlRequestBody {
+//   filename: string;
+//   contentType: string;
+// }
+// app.post("/api/createUploadUrl", async (req: express.Request<Record<string, never>, Record<string, never>, CreateUploadUrlRequestBody>, res: express.Response) => {
+//   // ... (removed content)
+// });
 
 // Routes
 // app.use('/api/items', itemRoutes);

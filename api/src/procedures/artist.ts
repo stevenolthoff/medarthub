@@ -17,6 +17,7 @@ const createArtworkInput = z.object({
   title: z.string().min(1, 'Title cannot be empty'),
   description: z.string().optional(),
   status: z.nativeEnum(ArtworkStatus).default(ArtworkStatus.DRAFT),
+  coverImageId: z.string().uuid('Invalid image ID format').optional().nullable(), // Optional cover image ID
 });
 
 /**
@@ -27,6 +28,7 @@ const updateArtworkInput = z.object({
   title: z.string().min(1, 'Title cannot be empty').optional(),
   description: z.string().optional(),
   status: z.nativeEnum(ArtworkStatus).optional(),
+  coverImageId: z.string().uuid('Invalid image ID format').optional().nullable(), // Optional cover image ID
 });
 
 /**
@@ -78,6 +80,14 @@ export const artistRouter = router({
               description: true,
               createdAt: true,
               status: true,
+              coverImage: { // Include cover image data
+                select: {
+                  id: true,
+                  key: true,
+                  filename: true,
+                  contentType: true,
+                },
+              },
             },
             orderBy: {
               createdAt: 'desc',
@@ -110,7 +120,7 @@ export const artistRouter = router({
         });
       }
 
-      const { title, description, status } = input;
+      const { title, description, status, coverImageId } = input; // Destructure coverImageId
       const artistId = ctx.user.artist!.id;
 
       // Generate a slug for the artwork
@@ -142,8 +152,34 @@ export const artistRouter = router({
           slug: artworkSlug,
           status,
           artistId,
+          coverImageId, // Associate with cover image if provided
+        },
+        // Select necessary fields including image info for the response
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          createdAt: true,
+          status: true,
+          coverImage: {
+            select: {
+              id: true,
+              key: true,
+              filename: true,
+              contentType: true,
+            },
+          },
         },
       });
+
+      // If a coverImageId was provided, update the Image record to link it to this artwork
+      if (coverImageId) {
+        await ctx.prisma.image.update({
+          where: { id: coverImageId },
+          data: { originalArtworkId: newArtwork.id }, // Link Image to the new Artwork
+        });
+      }
 
       return {
         message: 'Artwork created successfully!',
@@ -165,7 +201,7 @@ export const artistRouter = router({
         });
       }
 
-      const { artworkId, title, description, status } = input;
+      const { artworkId, title, description, status, coverImageId } = input; // Destructure coverImageId
       const artistId = ctx.user.artist!.id;
 
       // Verify the artwork belongs to the authenticated artist
@@ -173,6 +209,15 @@ export const artistRouter = router({
         where: {
           id: artworkId,
           artistId: artistId,
+        },
+        select: { // Select coverImageId for proper old/new comparison
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          createdAt: true,
+          status: true,
+          coverImageId: true,
         },
       });
 
@@ -189,10 +234,12 @@ export const artistRouter = router({
         description?: string;
         status?: ArtworkStatus;
         slug?: string;
+        coverImageId?: string | null; // Allow setting to null to remove cover image
       } = {};
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;
       if (status !== undefined) updateData.status = status;
+      if (coverImageId !== undefined) updateData.coverImageId = coverImageId; // Update coverImageId
 
       // Handle title update and slug regeneration if title changes
       if (title && title !== existingArtwork.title) {
@@ -222,7 +269,42 @@ export const artistRouter = router({
       const updatedArtwork = await ctx.prisma.artwork.update({
         where: { id: artworkId },
         data: updateData,
+        // Select necessary fields including image info for the response
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          createdAt: true,
+          status: true,
+          coverImage: {
+            select: {
+              id: true,
+              key: true,
+              filename: true,
+              contentType: true,
+            },
+          },
+        },
       });
+
+      // Handle Image record association changes
+      if (coverImageId !== undefined && coverImageId !== existingArtwork.coverImageId) {
+        // If there was an old cover image, clear its artwork association
+        if (existingArtwork.coverImageId) {
+          await ctx.prisma.image.update({
+            where: { id: existingArtwork.coverImageId },
+            data: { originalArtworkId: null },
+          });
+        }
+        // If a new coverImageId is provided, link it to this artwork
+        if (coverImageId) {
+          await ctx.prisma.image.update({
+            where: { id: coverImageId },
+            data: { originalArtworkId: updatedArtwork.id },
+          });
+        }
+      }
 
       return {
         message: 'Artwork updated successfully!',
@@ -246,11 +328,15 @@ export const artistRouter = router({
       const { artworkId } = input;
       const artistId = ctx.user.artist!.id;
 
-      // Verify the artwork belongs to the authenticated artist
+      // Verify the artwork belongs to the authenticated artist and get its coverImageId
       const existingArtwork = await ctx.prisma.artwork.findFirst({
         where: {
           id: artworkId,
           artistId: artistId,
+        },
+        select: {
+          id: true,
+          coverImageId: true, // Need to get this to potentially delete the associated image
         },
       });
 
@@ -261,8 +347,17 @@ export const artistRouter = router({
         });
       }
 
-      await ctx.prisma.artwork.delete({
-        where: { id: artworkId },
+      // Delete the artwork and, if it has a cover image, delete that image record too.
+      // (Actual R2 file deletion would be a separate, more complex process, e.g., via lifecycle rules or background job).
+      await ctx.prisma.$transaction(async (tx) => {
+        if (existingArtwork.coverImageId) {
+          await tx.image.delete({
+            where: { id: existingArtwork.coverImageId },
+          });
+        }
+        await tx.artwork.delete({
+          where: { id: artworkId },
+        });
       });
 
       return {

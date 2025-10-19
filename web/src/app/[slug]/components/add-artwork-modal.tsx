@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
+// Removed usePathname and Image from here, as ImageUploadZone handles it
+// import { usePathname } from "next/navigation";
+// import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -15,12 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field";
-import { Loader2, Plus, ThumbsUp, Eye, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react"; // Removed Plus, ThumbsUp, Eye, Trash2 as they are in ImageUploadZone
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
-import { type RouterOutputs } from "@/lib/server-trpc"; // For ArtworkData type
+import { type RouterOutputs } from "@/lib/server-trpc";
+import { ImageUploadZone } from "@/components/ImageUploadZone"; // Import the new ImageUploadZone component
 
-// Use inferred type directly
+// Use inferred type directly for artwork, now includes coverImage
 type ArtworkData = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 // Simple debounce utility
@@ -39,93 +41,7 @@ type AddArtworkModalProps = {
   onArtworkSaved: () => void;
 };
 
-interface ImageUploadPlaceholderProps {
-  imageUrl?: string;
-  onImageChange: (url: string) => void;
-  onRemoveImage: () => void;
-  isLoading?: boolean;
-}
-
-const ImageUploadPlaceholder = ({ imageUrl, onImageChange, onRemoveImage, isLoading }: ImageUploadPlaceholderProps) => {
-  const [tempImageUrl, setTempImageUrl] = useState(imageUrl || "");
-
-  useEffect(() => {
-    setTempImageUrl(imageUrl || "");
-  }, [imageUrl]);
-
-  const handleManualUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTempImageUrl(e.target.value);
-    onImageChange(e.target.value);
-  };
-
-  const handleRemove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    onRemoveImage();
-    setTempImageUrl("");
-  };
-
-  return (
-    <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-      <h3 className="text-base font-semibold mb-3">Project Cover (required)</h3>
-      {imageUrl ? (
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg mb-4 group">
-          <Image
-            src={imageUrl}
-            alt="Artwork cover"
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleRemove}
-              aria-label="Remove cover image"
-            >
-              <Trash2 className="size-4 mr-2" /> Remove Image
-            </Button>
-          </div>
-          <div className="absolute bottom-3 left-3 text-white text-sm">
-            <p className="font-semibold">Untitled Project</p>
-            <p className="text-xs">Steven Olthoff</p> 
-          </div>
-          <div className="absolute bottom-3 right-3 flex items-center space-x-3 text-white text-xs">
-            <span className="flex items-center"><ThumbsUp className="size-3 mr-1" /> 0</span>
-            <span className="flex items-center"><Eye className="size-3 mr-1" /> 0</span>
-          </div>
-        </div>
-      ) : (
-        <div className="aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-6 bg-gray-50/50 cursor-pointer hover:border-gray-400 hover:bg-gray-100/50 transition-all duration-200 mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-4">
-            {isLoading ? (
-              <Loader2 className="animate-spin size-8 text-blue-600" />
-            ) : (
-              <Plus className="w-8 h-8 text-blue-600" />
-            )}
-          </div>
-          <p className="text-gray-600 text-sm mb-1">Click to upload or drag & drop</p>
-          <p className="text-gray-500 text-xs">Recommended size: 1400x1050px</p>
-        </div>
-      )}
-      <Field>
-        <FieldLabel htmlFor="imageUrlInput">Image URL (Placeholder)</FieldLabel>
-        <Input
-          id="imageUrlInput"
-          type="url"
-          placeholder="Enter image URL (e.g., https://picsum.photos/600/450)"
-          value={tempImageUrl}
-          onChange={handleManualUrlChange}
-          className="w-full"
-        />
-        <FieldDescription>
-          For now, manually enter an image URL. Actual upload coming soon.
-        </FieldDescription>
-      </Field>
-    </div>
-  );
-};
+// Removed ImageUploadPlaceholderProps and ImageUploadPlaceholder component
 
 export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSaved }: AddArtworkModalProps) {
   const { user, isLoggedIn } = useAuth();
@@ -134,7 +50,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
   const titleRef = useRef(initialArtwork?.title || "");
   const descriptionRef = useRef(initialArtwork?.description || "");
   const statusRef = useRef<'DRAFT' | 'PUBLISHED' | 'ARCHIVED'>(initialArtwork?.status || 'DRAFT');
-  const imageUrlRef = useRef<string>(initialArtwork?.id ? `https://picsum.photos/600/450?random=${initialArtwork.id}` : "");
+  const coverImageIdRef = useRef<string | null>(initialArtwork?.coverImage?.id || null); // New ref for cover image ID
   const isDirtyRef = useRef(false);
 
   // This ref will store the ID of the artwork being actively edited/created.
@@ -144,7 +60,6 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
   // Use states to trigger re-renders of controlled components in the UI
   const [title, _setTitle] = useState(initialArtwork?.title || "");
   const [description, _setDescription] = useState(initialArtwork?.description || "");
-  const [imageUrl, _setImageUrl] = useState<string>(imageUrlRef.current);
 
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -159,21 +74,20 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
     titleRef.current = initialArtwork?.title || "";
     descriptionRef.current = initialArtwork?.description || "";
     statusRef.current = initialArtwork?.status || 'DRAFT';
-    imageUrlRef.current = initialArtwork?.id ? `https://picsum.photos/600/450?random=${initialArtwork.id}` : "";
+    coverImageIdRef.current = initialArtwork?.coverImage?.id || null; // Initialize coverImageId ref
     currentArtworkIdRef.current = initialArtwork?.id;
     isDirtyRef.current = false;
 
     // Update state to trigger re-render of controlled inputs
     _setTitle(titleRef.current);
     _setDescription(descriptionRef.current);
-    _setImageUrl(imageUrlRef.current);
 
     setFormError(null);
   }, [initialArtwork, isOpen]);
 
   // Unified change handler for all form fields
   const handleFieldChange = useCallback((
-    ref: React.MutableRefObject<string | 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'>,
+    ref: React.MutableRefObject<string | 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | null>, // Update ref type
     setState: React.Dispatch<React.SetStateAction<string>>,
     value: string | 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   ) => {
@@ -182,15 +96,8 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
     isDirtyRef.current = true;
   }, []);
 
-  const handleImageChange = useCallback((url: string) => {
-    imageUrlRef.current = url;
-    _setImageUrl(url);
-    isDirtyRef.current = true;
-  }, []);
-
-  const handleRemoveImage = useCallback(() => {
-    imageUrlRef.current = "";
-    _setImageUrl("");
+  const handleImageSelected = useCallback((imageId: string | null, r2Key: string | null) => {
+    coverImageIdRef.current = imageId; // Update the ref with the new image ID
     isDirtyRef.current = true;
   }, []);
 
@@ -202,6 +109,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
         const currentTitle = titleRef.current.trim();
         const currentDescription = descriptionRef.current.trim();
         const currentStatus = statusRef.current;
+        const currentCoverImageId = coverImageIdRef.current; // Get the cover image ID
         const currentArtworkId = currentArtworkIdRef.current; // Get the artwork ID
 
         if (!isDirtyRef.current || !currentTitle) return; // Only autosave if dirty and title exists
@@ -210,6 +118,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
           title: currentTitle,
           description: currentDescription,
           status: currentStatus,
+          coverImageId: currentCoverImageId, // Include coverImageId in autosave
         };
 
         try {
@@ -223,10 +132,11 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
           } else if (user?.artist?.id) {
             // Create new artwork
             const result = await createArtworkMutation.mutateAsync(dataToSave);
-            currentArtworkIdRef.current = result.artwork.id; // CRITICAL: Store the new ID
-            console.log("Artwork autosaved (create)! New ID:", result.artwork.id);
-            // Notify parent to refetch when new artwork is created via autosave
-            onArtworkSaved();
+            currentArtworkIdRef.current = result.artwork.id; // CRITICAL: Store the new Artwork ID
+            // Also update the coverImageIdRef if it was set during this creation for the new artwork
+            coverImageIdRef.current = result.artwork.coverImage?.id || null; 
+            console.log("Artwork autosaved (create)! New Artwork ID:", result.artwork.id);
+            onArtworkSaved(); // Notify parent to refetch when new artwork is created via autosave
           }
           isDirtyRef.current = false; // Reset dirty state after successful autosave
         } catch (error) {
@@ -244,7 +154,12 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
     if (isDirtyRef.current && isOpen) {
       debouncedAutosave();
     }
-  }, [title, description, statusRef.current, isOpen, debouncedAutosave]); // Dependencies for triggering the autosave
+    // Cleanup function for object URLs created by dropzone if modal closes or component unmounts
+    return () => {
+      // Any logic for revoking object URLs should be handled by ImageUploadZone.
+      // This modal doesn't directly manage `previewUrl` via `URL.createObjectURL`.
+    };
+  }, [title, description, statusRef.current, coverImageIdRef.current, isOpen, debouncedAutosave]); // Dependencies for triggering the autosave
 
   const handleUnpublish = async () => {
     const finalArtworkId = currentArtworkIdRef.current;
@@ -272,10 +187,16 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
   const handleSubmit = async (submitStatus: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => {
     const finalTitle = titleRef.current.trim();
     const finalDescription = descriptionRef.current.trim();
+    const finalCoverImageId = coverImageIdRef.current; // Get the cover image ID
     const finalArtworkId = currentArtworkIdRef.current;
 
     if (!finalTitle) {
       setFormError("Title is required.");
+      return;
+    }
+    // A cover image is now required for an artwork.
+    if (!finalCoverImageId && submitStatus === 'PUBLISHED') {
+      setFormError("A cover image is required to publish an artwork.");
       return;
     }
     setFormError(null);
@@ -284,6 +205,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
       title: finalTitle,
       description: finalDescription,
       status: submitStatus,
+      coverImageId: finalCoverImageId, // Include coverImageId in manual save
     };
 
     try {
@@ -294,13 +216,10 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
         });
         console.log("Artwork updated!");
       } else {
-        await createArtworkMutation.mutateAsync(dataToSend);
+        const result = await createArtworkMutation.mutateAsync(dataToSend);
+        currentArtworkIdRef.current = result.artwork.id; // Update artwork ID if it was a new creation
+        coverImageIdRef.current = result.artwork.coverImage?.id || null;
         console.log("Artwork created!");
-      }
-      // After manual save, also ensure the currentArtworkIdRef is updated if it was a new creation
-      // The createArtworkMutation.onSuccess handles this already, but double-checking here for explicit full saves.
-      if (!finalArtworkId && createArtworkMutation.data?.artwork.id) {
-        currentArtworkIdRef.current = createArtworkMutation.data.artwork.id;
       }
       onArtworkSaved(); // Notify parent to refetch
       onClose(); // Close the modal on success
@@ -330,10 +249,9 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
         
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-6">
           <div>
-            <ImageUploadPlaceholder
-              imageUrl={imageUrl}
-              onImageChange={handleImageChange}
-              onRemoveImage={handleRemoveImage}
+            <ImageUploadZone
+              currentArtworkCoverImage={initialArtwork?.coverImage}
+              onImageSelected={handleImageSelected}
             />
           </div>
 
@@ -400,7 +318,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
             </Button>
             <Button
               onClick={() => handleSubmit('PUBLISHED')}
-              disabled={isSaving || !titleRef.current.trim()} // Use ref for title
+              disabled={isSaving || !titleRef.current.trim() || !coverImageIdRef.current} // Require title AND image to publish
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

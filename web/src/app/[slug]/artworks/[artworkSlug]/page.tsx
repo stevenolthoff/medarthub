@@ -46,19 +46,19 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
     openGraph: {
       title: `${artwork.title} by ${artistProfile.user.name}`,
       description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
-      images: [
+      images: artwork.coverImage?.key ? [ // Use coverImage.key
         {
-          url: getArtworkImageUrl(artwork.id),
+          url: getArtworkImageUrl(artwork.coverImage.key), // Use coverImage.key
           alt: artwork.title,
         },
-      ],
+      ] : undefined,
       type: "article",
     },
     twitter: {
       card: "summary_large_image",
       title: `${artwork.title} by ${artistProfile.user.name}`,
       description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
-      images: [getArtworkImageUrl(artwork.id)],
+      images: artwork.coverImage?.key ? [getArtworkImageUrl(artwork.coverImage.key)] : undefined, // Use coverImage.key
     },
     alternates: {
       canonical: `/${artistSlug}/artworks/${artworkSlug}`,
