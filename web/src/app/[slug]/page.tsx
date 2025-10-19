@@ -4,7 +4,7 @@ import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc"; // Import th
 import { UserProfileClient } from "./user-profile-client"; // Import the new client component
 
 // Use tRPC inferred types instead of manually defining them
-type Artist = NonNullable<RouterOutputs['user']['getBySlug']>;
+type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
 
 interface ArtistProfilePageProps {
   params: Promise<{
@@ -22,7 +22,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
   }
 
   // Fetch public artist profile data on the server using the server-side tRPC client
-  const artistProfile: Artist | null = await serverTrpc.user.getBySlug.query({
+  const artistProfile: Artist | null = await serverTrpc.artist.getBySlug.query({
     slug: profileSlug,
   });
 

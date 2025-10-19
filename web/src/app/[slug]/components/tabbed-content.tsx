@@ -23,7 +23,7 @@ type WorkItem = {
 };
 
 // Use tRPC inferred types
-type Artwork = NonNullable<RouterOutputs['user']['getBySlug']>['artworks'][0];
+type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 type TabbedContentProps = {
   isOwner: boolean;

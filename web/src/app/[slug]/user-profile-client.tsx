@@ -12,7 +12,7 @@ import { MainContentColumn } from "./components/main-content-column";
 import { type RouterOutputs } from "@/lib/server-trpc";
 
 // Use tRPC inferred types instead of manually defining them
-type Artist = NonNullable<RouterOutputs['user']['getBySlug']>;
+type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
 
 interface UserProfileClientProps {
   artistProfile: Artist; // Artist profile data fetched on the server

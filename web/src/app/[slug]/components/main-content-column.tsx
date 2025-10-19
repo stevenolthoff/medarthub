@@ -2,7 +2,7 @@ import { TabbedContent } from "./tabbed-content";
 import { type RouterOutputs } from "@/lib/server-trpc";
 
 // Use tRPC inferred types
-type Artwork = NonNullable<RouterOutputs['user']['getBySlug']>['artworks'][0];
+type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 type MainContentColumnProps = {
   isOwner: boolean;

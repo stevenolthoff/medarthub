@@ -2,6 +2,7 @@ import { router } from './trpc';
 import { healthRouter } from './procedures/health';
 import { authRouter } from './procedures/auth';
 import { userRouter } from './procedures/user'; // Import the new user router
+import { artistRouter } from './procedures/artist'; // Import the new artist router
 
 /**
  * The main tRPC application router.
@@ -16,6 +17,7 @@ export const appRouter = router({
   health: healthRouter, // Mount the healthRouter under the 'health' namespace
   auth: authRouter, // Mount the authentication router
   user: userRouter, // Mount the new user router under the 'user' namespace
+  artist: artistRouter, // Mount the new artist router under the 'artist' namespace
   // Add other feature-specific routers here as your API grows, e.g.:
   // items: itemRouter,
 });
