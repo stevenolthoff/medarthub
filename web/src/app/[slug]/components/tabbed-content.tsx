@@ -41,6 +41,14 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedArtworkIdForLightbox, setSelectedArtworkIdForLightbox] = useState<string | null>(null);
 
+  const currentWorkItems = initialArtworks.filter(artwork => 
+    isOwner ? true : artwork.status === 'PUBLISHED'
+  ).map(artwork => ({
+    ...artwork,
+    likes: Math.floor(Math.random() * 500),
+    views: Math.floor(Math.random() * 5000),
+  }));
+
   const defaultTabs: Tab[] = [
     { id: "work", label: "Work" },
     { id: "moodboards", label: "Moodboards", count: 0 },
@@ -91,25 +99,17 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
     router.refresh();
   };
 
-  // New: Open lightbox handler
+  // Open lightbox handler
   const handleOpenLightbox = (artworkId: string) => {
     setSelectedArtworkIdForLightbox(artworkId);
     setIsLightboxOpen(true);
   };
 
-  // New: Close lightbox handler
+  // Close lightbox handler
   const handleCloseLightbox = () => {
     setIsLightboxOpen(false);
     setSelectedArtworkIdForLightbox(null);
   };
-
-  const currentWorkItems = initialArtworks.filter(artwork => 
-    isOwner ? true : artwork.status === 'PUBLISHED'
-  ).map(artwork => ({
-    ...artwork,
-    likes: Math.floor(Math.random() * 500),
-    views: Math.floor(Math.random() * 5000),
-  }));
 
   return (
     <div className="w-full">
