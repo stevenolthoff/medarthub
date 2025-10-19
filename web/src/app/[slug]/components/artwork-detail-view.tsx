@@ -17,7 +17,7 @@ interface ArtworkDetailViewProps {
   currentArtworkIndex: number;
   artistSlug: string;
   isStandalonePage: boolean;
-  onNavigateArtwork: (newIndex: number) => void;
+  onNavigateArtwork?: (newIndex: number) => void;
   onClose?: () => void;
 }
 
@@ -37,7 +37,7 @@ export function ArtworkDetailView({
     const newIndex = (currentArtworkIndex + 1) % allArtworks.length;
     if (isStandalonePage) {
       router.push(`/${artistSlug}/artworks/${allArtworks[newIndex].slug}`);
-    } else {
+    } else if (onNavigateArtwork) {
       onNavigateArtwork(newIndex);
     }
   }, [currentArtworkIndex, allArtworks, isStandalonePage, artistSlug, onNavigateArtwork, router]);
@@ -46,7 +46,7 @@ export function ArtworkDetailView({
     const newIndex = currentArtworkIndex === 0 ? allArtworks.length - 1 : currentArtworkIndex - 1;
     if (isStandalonePage) {
       router.push(`/${artistSlug}/artworks/${allArtworks[newIndex].slug}`);
-    } else {
+    } else if (onNavigateArtwork) {
       onNavigateArtwork(newIndex);
     }
   }, [currentArtworkIndex, allArtworks, isStandalonePage, artistSlug, onNavigateArtwork, router]);

@@ -84,14 +84,6 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
     notFound();
   }
 
-  // No-op for a standalone page as navigation is handled by router.push directly
-  // from ArtworkDetailView, not by an internal state change
-  const handleNavigateArtworkPage = (newIndex: number) => {
-    // This function will be called by ArtworkDetailView when next/prev is clicked
-    // but the actual navigation is done within ArtworkDetailView using router.push
-    // when isStandalonePage is true. So this function itself doesn't need to do anything.
-  };
-
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-background">
       <div className="w-full max-w-screen-xl flex-1 flex flex-col pt-4">
@@ -109,7 +101,6 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
           currentArtworkIndex={currentArtworkIndex}
           artistSlug={artistSlug}
           isStandalonePage={true}
-          onNavigateArtwork={handleNavigateArtworkPage}
         />
       </div>
     </div>
