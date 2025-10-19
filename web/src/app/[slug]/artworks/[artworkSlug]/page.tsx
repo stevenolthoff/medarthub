@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc";
-import { ArtworkDetailView } from "../../components/artwork-detail-view";
+import { ArtworkDetailViewServer } from "../../components/artwork-detail-view-server";
 import Link from "next/link";
 import { Metadata } from "next";
 import { getArtworkImageUrl } from "@/lib/utils";
+import { ArtworkStructuredData } from "@/components/structured-data";
 
 // Define types for params
 interface ArtworkPageParams {
@@ -59,6 +60,9 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
       description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
       images: [getArtworkImageUrl(artwork.id)],
     },
+    alternates: {
+      canonical: `/${artistSlug}/artworks/${artworkSlug}`,
+    },
   };
 }
 
@@ -85,24 +89,31 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-background">
-      <div className="w-full max-w-screen-xl flex-1 flex flex-col pt-4">
-        <div className="px-4 pb-4 border-b">
-          <h1 className="text-2xl font-bold text-foreground">
-            {currentArtwork.title}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Artwork by <Link href={`/${artistProfile.user.username}`} className="hover:underline">@{artistProfile.user.username}</Link>
-          </p>
+    <>
+      <ArtworkStructuredData 
+        artwork={currentArtwork}
+        artist={artistProfile}
+        baseUrl={process.env.NEXT_PUBLIC_BASE_URL || 'https://medarthub.com'}
+      />
+      <div className="flex flex-1 flex-col items-center justify-center bg-background">
+        <div className="w-full max-w-screen-xl flex-1 flex flex-col pt-4">
+          <div className="px-4 pb-4 border-b">
+            <h1 className="text-2xl font-bold text-foreground">
+              {currentArtwork.title}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Artwork by <Link href={`/${artistProfile.user.username}`} className="hover:underline">@{artistProfile.user.username}</Link>
+            </p>
+          </div>
+          <ArtworkDetailViewServer
+            artwork={currentArtwork}
+            allArtworks={artistProfile.artworks}
+            currentArtworkIndex={currentArtworkIndex}
+            artistSlug={artistSlug}
+            artistName={artistProfile.user.name}
+          />
         </div>
-        <ArtworkDetailView
-          artwork={currentArtwork}
-          allArtworks={artistProfile.artworks}
-          currentArtworkIndex={currentArtworkIndex}
-          artistSlug={artistSlug}
-          isStandalonePage={true}
-        />
       </div>
-    </div>
+    </>
   );
 }

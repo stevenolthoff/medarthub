@@ -26,9 +26,10 @@ type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
   artworks: Artwork[];
+  artistName: string;
 };
 
-export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks, artistName }: TabbedContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ slug: string }>();
@@ -174,7 +175,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <Image
                       src={getArtworkImageUrl(item.id)}
-                      alt={item.title}
+                      alt={`${item.title} by ${artistName} - Digital artwork on MedArtHub`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

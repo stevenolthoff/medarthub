@@ -82,6 +82,7 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
             isOwner={isOwner}
             isLoggedIn={isLoggedIn}
             artworks={artistProfile.artworks}
+            artistName={profileData.name}
           />
         </div>
       </div>

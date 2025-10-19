@@ -2,6 +2,8 @@
 import { notFound } from "next/navigation";
 import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc"; // Import the server-side tRPC client and types
 import { UserProfileClient } from "./user-profile-client"; // Import the new client component
+import { Metadata } from "next";
+import { ArtistStructuredData } from "@/components/structured-data";
 
 // Use tRPC inferred types instead of manually defining them
 type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
@@ -10,6 +12,58 @@ interface ArtistProfilePageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+// Dynamic metadata for SEO
+export async function generateMetadata({ params }: ArtistProfilePageProps): Promise<Metadata> {
+  const { slug: profileSlug } = await params;
+
+  if (!profileSlug) {
+    return {
+      title: "Artist Profile Not Found - MedArtHub",
+      description: "The requested artist profile could not be found.",
+    };
+  }
+
+  // Fetch artist profile data for metadata
+  const artistProfile: Artist | null = await serverTrpc.artist.getBySlug.query({
+    slug: profileSlug,
+  });
+
+  if (!artistProfile) {
+    return {
+      title: "Artist Profile Not Found - MedArtHub",
+      description: "The requested artist profile could not be found.",
+    };
+  }
+
+  const publishedArtworks = artistProfile.artworks.filter(artwork => artwork.status === 'PUBLISHED');
+  const artworkCount = publishedArtworks.length;
+  
+  return {
+    title: `${artistProfile.user.name} (@${artistProfile.user.username}) - MedArtHub`,
+    description: `View ${artistProfile.user.name}'s art portfolio on MedArtHub. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available. Discover digital art, illustrations, and creative works.`,
+    openGraph: {
+      title: `${artistProfile.user.name} (@${artistProfile.user.username})`,
+      description: `View ${artistProfile.user.name}'s art portfolio on MedArtHub. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available.`,
+      type: "profile",
+      images: publishedArtworks.length > 0 ? [
+        {
+          url: `/api/artwork-image/${publishedArtworks[0].id}`,
+          alt: `${publishedArtworks[0].title} by ${artistProfile.user.name}`,
+        },
+      ] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${artistProfile.user.name} (@${artistProfile.user.username})`,
+      description: `View ${artistProfile.user.name}'s art portfolio on MedArtHub. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available.`,
+      images: publishedArtworks.length > 0 ? [`/api/artwork-image/${publishedArtworks[0].id}`] : undefined,
+    },
+    alternates: {
+      canonical: `/${profileSlug}`,
+    },
+  };
 }
 
 export default async function ArtistProfilePage({ params }: ArtistProfilePageProps) {
@@ -35,9 +89,15 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
   // The client component will then handle client-side auth (via useAuth)
   // and render the appropriate private/public view.
   return (
-    <UserProfileClient 
-      artistProfile={artistProfile} 
-      profileSlug={profileSlug} 
-    />
+    <>
+      <ArtistStructuredData 
+        artist={artistProfile} 
+        baseUrl={process.env.NEXT_PUBLIC_BASE_URL || 'https://medarthub.com'} 
+      />
+      <UserProfileClient 
+        artistProfile={artistProfile} 
+        profileSlug={profileSlug} 
+      />
+    </>
   );
 }
