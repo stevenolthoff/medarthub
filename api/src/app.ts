@@ -4,7 +4,6 @@ import path from 'node:path';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
-import { PrismaClient } from '@prisma/client';
 // import itemRoutes from './routes/itemRoutes';
 // import { errorHandler } from './middlewares/errorHandler'
 
@@ -22,7 +21,6 @@ const s3 = new S3Client({
   },
 });
 
-const prisma = new PrismaClient();
 
 // Validate required environment variables
 const requiredEnvVars = {
@@ -62,7 +60,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.locals.prisma = prisma; // Make Prisma client available via app.locals
 app.get('/api/health', (req, res) => {
   res.status(200).json({ ok: true, service: 'medarthub-api' });
 });

@@ -1,9 +1,10 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { type CreateExpressContextOptions } from '@trpc/server/adapters/express';
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
+import prisma from './lib/prisma';
 
 // Define the JWT payload type
 interface JwtPayload {
@@ -18,11 +19,9 @@ interface JwtPayload {
 export const createContext = async ({ req, res }: CreateExpressContextOptions): Promise<{
   req: CreateExpressContextOptions['req'];
   res: CreateExpressContextOptions['res'];
-  prisma: PrismaClient;
+  prisma: typeof prisma;
   user: User | null;
-}> => {
-  // Access Prisma client from app.locals, assuming it's initialized in app.ts
-  const prisma = req.app.locals.prisma as PrismaClient; 
+}> => { 
 
   let user: User | null = null;
   const token = req.headers.authorization?.split(' ')[1]; // Expecting "Bearer <token>"
@@ -44,7 +43,7 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
   return {
     req,
     res,
-    prisma,
+    prisma, // Provide the imported singleton prisma object in the context
     user, // Provide the user object in the context
   };
 };
