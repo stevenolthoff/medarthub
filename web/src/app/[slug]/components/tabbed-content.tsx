@@ -17,7 +17,7 @@ type Tab = {
   count?: number;
 };
 
-// Infer Artwork type from tRPC endpoint that returns artwork data
+// Use inferred type directly
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 type TabbedContentProps = {

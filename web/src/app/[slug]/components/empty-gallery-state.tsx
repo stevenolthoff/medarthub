@@ -16,7 +16,7 @@ export function EmptyGalleryState({ isOwner, onAddArtwork }: EmptyGalleryStatePr
   }
 
   return (
-    <div className="flex justify-start">
+    <div className="grid grid-cols-1"> {/* Ensures it takes available grid space */}
       <button
         onClick={onAddArtwork}
         className="aspect-[4/3] w-64 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center p-6 bg-gray-50/50 cursor-pointer hover:border-gray-400 hover:bg-gray-100/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -27,10 +27,10 @@ export function EmptyGalleryState({ isOwner, onAddArtwork }: EmptyGalleryStatePr
           <Plus className="w-8 h-8 text-blue-600" strokeWidth={3} />
         </div>
         
-        {/* Create Project Button (now just text, as the parent div is the button) */}
-        <div className="mb-3 text-gray-900 text-xs font-medium">
+        {/* Create Project Text (as the parent is the button) */}
+        <span className="mb-3 text-gray-900 text-xs font-medium">
           Create a Project
-        </div>
+        </span>
         
         {/* Descriptive Text */}
         <div className="text-center">
