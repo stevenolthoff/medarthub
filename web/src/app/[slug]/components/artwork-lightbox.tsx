@@ -112,8 +112,42 @@ export function ArtworkLightbox({
           />
           
           {/* Top overlay with title and close button */}
-          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-6">
-            <div className="flex items-center justify-between">
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 md:p-6">
+            {/* Mobile layout: X button top right, content below */}
+            <div className="md:hidden">
+              <div className="flex justify-end mb-4">
+                <DialogClose asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white" 
+                    aria-label="Close lightbox"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </DialogClose>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white mb-2">
+                  {currentArtwork.title}
+                </h1>
+                <p className="text-sm text-white/80 mb-4">
+                  {currentArtwork.description || "No description provided."}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyPermalink}
+                  className="h-12 w-12 rounded-full bg-white/20 hover:bg-white/30 text-white"
+                  aria-label="Copy permalink"
+                >
+                  <Link className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Desktop layout: side by side */}
+            <div className="hidden md:flex items-center justify-between">
               <div className="flex-1">
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                   {currentArtwork.title}
