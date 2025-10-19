@@ -17,15 +17,8 @@ type Tab = {
   count?: number;
 };
 
-// Use tRPC inferred types
-type Artwork = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  createdAt: Date;
-};
+// Infer Artwork type from tRPC endpoint that returns artwork data
+type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 type TabbedContentProps = {
   isOwner: boolean;

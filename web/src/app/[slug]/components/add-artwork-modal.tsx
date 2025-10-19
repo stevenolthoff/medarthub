@@ -14,17 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field";
-import { Loader2, Plus, Edit, ThumbsUp, Eye, Trash2 } from "lucide-react";
+import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field";
+import { Loader2, Plus, ThumbsUp, Eye, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
+import { type RouterOutputs } from "@/lib/server-trpc";
 
-// Define ArtworkStatus enum locally since @prisma/client is not available in web workspace
-enum ArtworkStatus {
-  DRAFT = 'DRAFT',
-  PUBLISHED = 'PUBLISHED',
-  ARCHIVED = 'ARCHIVED'
-}
+// Infer Artwork type from tRPC endpoint that returns artwork data
+type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
 // Simple debounce utility
 const debounce = (func: (...args: any[]) => void, delay: number) => {
@@ -38,17 +35,8 @@ const debounce = (func: (...args: any[]) => void, delay: number) => {
 type AddArtworkModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  initialArtwork?: ArtworkData;
+  initialArtwork?: Artwork;
   onArtworkSaved: () => void;
-};
-
-type ArtworkData = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  status: ArtworkStatus;
-  createdAt: Date;
 };
 
 interface ImageUploadPlaceholderProps {
@@ -144,7 +132,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
   const router = usePathname();
   const [title, setTitle] = useState(initialArtwork?.title || "");
   const [description, setDescription] = useState(initialArtwork?.description || "");
-  const [status, setStatus] = useState<ArtworkStatus>(initialArtwork?.status || ArtworkStatus.DRAFT);
+  const [status, setStatus] = useState<Artwork['status']>(initialArtwork?.status || 'DRAFT');
   const [imageUrl, setImageUrl] = useState<string>(
     initialArtwork?.id ? `https://picsum.photos/600/450?random=${initialArtwork.id}` : ""
   );
@@ -165,7 +153,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
     } else {
       setTitle("");
       setDescription("");
-      setStatus(ArtworkStatus.DRAFT);
+      setStatus('DRAFT');
       setImageUrl("");
     }
     setFormError(null);
@@ -195,7 +183,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
         const dataToSave = {
           title: title.trim(),
           description: description.trim(),
-          status: ArtworkStatus.DRAFT,
+          status: 'DRAFT' as const,
         };
 
         try {
@@ -223,7 +211,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
     }
   }, [title, description, isDirty, debouncedAutosave]);
 
-  const handleSubmit = async (submitStatus: ArtworkStatus) => {
+  const handleSubmit = async (submitStatus: Artwork['status']) => {
     if (!title.trim()) {
       setFormError("Title is required.");
       return;
@@ -359,14 +347,14 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => handleSubmit(ArtworkStatus.DRAFT)}
+              onClick={() => handleSubmit('DRAFT')}
               disabled={isSaving || !isDirty || !title.trim()}
             >
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save as Draft
             </Button>
             <Button
-              onClick={() => handleSubmit(ArtworkStatus.PUBLISHED)}
+              onClick={() => handleSubmit('PUBLISHED')}
               disabled={isSaving || !title.trim()}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
