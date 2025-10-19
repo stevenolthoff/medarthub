@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { ArtworkDetailView } from "./artwork-detail-view";
-import { useRouter, usePathname } from "next/navigation";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
@@ -31,49 +30,28 @@ export function ArtworkLightbox({
   initialArtworkId,
   artistSlug,
 }: ArtworkLightboxProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const [currentIndex, setCurrentIndex] = useState(-1);
 
-  // Effect to set the initial artwork and update URL when modal opens
+  // Effect to set the initial artwork when modal opens
   useEffect(() => {
     if (isOpen && initialArtworkId) {
       const initialIndex = artworks.findIndex((a) => a.id === initialArtworkId);
-      const artwork = artworks[initialIndex];
-      if (initialIndex !== -1 && artwork) {
+      if (initialIndex !== -1) {
         setCurrentIndex(initialIndex);
-        const targetUrl = `/${artistSlug}/artworks/${artwork.slug}`;
-        // Push the new URL to history, allowing back button to close lightbox
-        if (pathname !== targetUrl) {
-          router.push(targetUrl, { scroll: false });
-        }
       } else {
         // Fallback if initialArtworkId is not found, default to first or close
         setCurrentIndex(0); 
-        if (artworks.length > 0) {
-          const targetUrl = `/${artistSlug}/artworks/${artworks[0].slug}`;
-          if (pathname !== targetUrl) {
-            router.push(targetUrl, { scroll: false });
-          }
-        } else {
+        if (artworks.length === 0) {
           onClose();
         }
       }
-    } else if (!isOpen && pathname.includes('/artworks/')) {
-      // If closing modal and current URL is an artwork page, go back to artist profile
-      router.back();
     }
-  }, [isOpen, initialArtworkId, artworks, artistSlug, router, pathname, onClose]);
+  }, [isOpen, initialArtworkId, artworks, onClose]);
 
-  // Handle internal lightbox navigation and update URL via router.replace
+  // Handle internal lightbox navigation (no URL changes in lightbox mode)
   const handleNavigateArtwork = useCallback((newIndex: number) => {
     setCurrentIndex(newIndex);
-    const newArtwork = artworks[newIndex];
-    if (newArtwork) {
-      const newUrl = `/${artistSlug}/artworks/${newArtwork.slug}`;
-      router.replace(newUrl, { scroll: false });
-    }
-  }, [artworks, artistSlug, router]);
+  }, []);
 
   const currentArtwork = artworks[currentIndex];
 
