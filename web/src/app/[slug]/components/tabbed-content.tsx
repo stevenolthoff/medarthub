@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyGalleryState } from "./empty-gallery-state";
 import { AddArtworkModal } from "./add-artwork-modal";
+import { ArtworkLightbox } from "./artwork-lightbox";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { Edit, Trash2, Loader2, Plus, ThumbsUp, Eye } from "lucide-react";
 import { trpc } from "@/lib/trpc";
@@ -29,11 +30,15 @@ type TabbedContentProps = {
 export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }: TabbedContentProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("work");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false); // Renamed for clarity
   const [artworkToEdit, setArtworkToEdit] = useState<Artwork | undefined>(undefined);
 
+  // State for the new lightbox modal
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [selectedArtworkIdForLightbox, setSelectedArtworkIdForLightbox] = useState<string | null>(null);
+
   const defaultTabs: Tab[] = [
-    { id: "work", label: "Work", count: initialArtworks.length },
+    { id: "work", label: "Work" }, // Count will be dynamic based on filtered items
     { id: "moodboards", label: "Moodboards", count: 0 },
     { id: "appreciations", label: "Appreciations", count: 0 }
   ];
@@ -44,16 +49,16 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
 
   const handleOpenAddArtworkModal = () => {
     setArtworkToEdit(undefined);
-    setIsModalOpen(true);
+    setIsAddEditModalOpen(true);
   };
 
   const handleCloseAddArtworkModal = () => {
-    setIsModalOpen(false);
+    setIsAddEditModalOpen(false);
   };
 
   const handleEditArtwork = (artwork: Artwork) => {
     setArtworkToEdit(artwork);
-    setIsModalOpen(true);
+    setIsAddEditModalOpen(true);
   };
 
   const deleteArtworkMutation = trpc.artist.deleteArtwork.useMutation({
@@ -73,6 +78,18 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
 
   const handleArtworkSaved = () => {
     router.refresh();
+  };
+
+  // New: Open lightbox handler
+  const handleOpenLightbox = (artworkId: string) => {
+    setSelectedArtworkIdForLightbox(artworkId);
+    setIsLightboxOpen(true);
+  };
+
+  // New: Close lightbox handler
+  const handleCloseLightbox = () => {
+    setIsLightboxOpen(false);
+    setSelectedArtworkIdForLightbox(null);
   };
 
   const currentWorkItems = initialArtworks.filter(artwork => 
@@ -102,7 +119,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
               {tab.label}
               {tab.id === 'work' && (
                 <span className="ml-2 text-xs text-muted-foreground">
-                  ({initialArtworks.length})
+                  ({currentWorkItems.length}) {/* Use dynamic count here */}
                 </span>
               )}
               {tab.id !== 'work' && tab.count !== undefined && (
@@ -145,7 +162,11 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
                   </button>
                 )}
                 {(currentWorkItems as (Artwork & { imageUrl: string; likes: number; views: number })[]).map((item) => (
-                <div key={item.id} className="group relative overflow-hidden cursor-pointer rounded-lg">
+                // Make the entire card clickable to open the lightbox
+                <div key={item.id} 
+                     className="group relative overflow-hidden cursor-pointer rounded-lg"
+                     onClick={() => handleOpenLightbox(item.id)} // Click handler to open lightbox
+                >
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <Image
                       src={item.imageUrl}
@@ -234,11 +255,21 @@ export function TabbedContent({ isOwner, isLoggedIn, artworks: initialArtworks }
       </div>
 
       <AddArtworkModal
-        isOpen={isModalOpen}
+        isOpen={isAddEditModalOpen} // Use the specific state for add/edit modal
         onClose={handleCloseAddArtworkModal}
         initialArtwork={artworkToEdit}
         onArtworkSaved={handleArtworkSaved}
       />
+
+      {/* NEW: Artwork Lightbox Component */}
+      {currentWorkItems.length > 0 && ( // Only render if there are items to show
+        <ArtworkLightbox
+          isOpen={isLightboxOpen}
+          onClose={handleCloseLightbox}
+          artworks={currentWorkItems as (Artwork & { imageUrl: string })[]} // Pass the enriched artworks
+          initialArtworkId={selectedArtworkIdForLightbox}
+        />
+      )}
     </div>
   );
 }
