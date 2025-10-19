@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect } from "react";
 import { getArtworkImageUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
@@ -22,12 +26,38 @@ export function ArtworkDetailViewServer({
   artistSlug,
   artistName,
 }: ArtworkDetailViewServerProps) {
+  const router = useRouter();
   const isFirstArtwork = currentArtworkIndex === 0;
   const isLastArtwork = currentArtworkIndex === allArtworks.length - 1;
   const artworkImageUrl = getArtworkImageUrl(artwork.id);
   
   const prevArtwork = isFirstArtwork ? allArtworks[allArtworks.length - 1] : allArtworks[currentArtworkIndex - 1];
   const nextArtwork = isLastArtwork ? allArtworks[0] : allArtworks[currentArtworkIndex + 1];
+
+  const handleNext = useCallback(() => {
+    const newIndex = (currentArtworkIndex + 1) % allArtworks.length;
+    router.push(`/${artistSlug}/artworks/${allArtworks[newIndex].slug}`);
+  }, [currentArtworkIndex, allArtworks, artistSlug, router]);
+
+  const handlePrev = useCallback(() => {
+    const newIndex = currentArtworkIndex === 0 ? allArtworks.length - 1 : currentArtworkIndex - 1;
+    router.push(`/${artistSlug}/artworks/${allArtworks[newIndex].slug}`);
+  }, [currentArtworkIndex, allArtworks, artistSlug, router]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight" && currentArtworkIndex < allArtworks.length - 1) {
+        handleNext();
+      } else if (event.key === "ArrowLeft" && currentArtworkIndex > 0) {
+        handlePrev();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentArtworkIndex, allArtworks.length, handleNext, handlePrev]);
 
   return (
     <div className="flex flex-1 flex-col md:flex-row overflow-hidden bg-background max-h-svh w-full mb-32">
@@ -49,28 +79,24 @@ export function ArtworkDetailViewServer({
         {allArtworks.length > 1 && (
           <>
             <Button
-              asChild
               variant="ghost"
               size="icon-lg"
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full size-10"
+              onClick={handlePrev}
               disabled={isFirstArtwork}
               aria-label="Previous artwork"
             >
-              <Link href={`/${artistSlug}/artworks/${prevArtwork.slug}`}>
-                <ChevronLeft className="h-6 w-6" />
-              </Link>
+              <ChevronLeft className="h-6 w-6" />
             </Button>
             <Button
-              asChild
               variant="ghost"
               size="icon-lg"
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full size-10"
+              onClick={handleNext}
               disabled={isLastArtwork}
               aria-label="Next artwork"
             >
-              <Link href={`/${artistSlug}/artworks/${nextArtwork.slug}`}>
-                <ChevronRight className="h-6 w-6" />
-              </Link>
+              <ChevronRight className="h-6 w-6" />
             </Button>
           </>
         )}
@@ -86,26 +112,6 @@ export function ArtworkDetailViewServer({
           <p>Created: {new Date(artwork.createdAt).toLocaleDateString()}</p>
           <p>Status: {artwork.status}</p>
         </div>
-        
-        {/* Navigation Links */}
-        {allArtworks.length > 1 && (
-          <div className="mt-6 flex gap-2">
-            {!isFirstArtwork && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${artistSlug}/artworks/${prevArtwork.slug}`}>
-                  ← Previous
-                </Link>
-              </Button>
-            )}
-            {!isLastArtwork && (
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${artistSlug}/artworks/${nextArtwork.slug}`}>
-                  Next →
-                </Link>
-              </Button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
