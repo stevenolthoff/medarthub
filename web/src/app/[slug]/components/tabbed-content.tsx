@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { type RouterOutputs } from "@/lib/server-trpc";
 import { Edit, Trash2, Loader2, Plus, ThumbsUp, Eye } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useRouter, usePathname, useParams } from "next/navigation";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 
 type Tab = {
   id: string;
@@ -28,6 +28,47 @@ type TabbedContentProps = {
   artistSlug: string;
   artistName: string;
 };
+
+// Child component to safely use hooks per item without violating Rules of Hooks
+function OptimizedArtworkImage({
+  item,
+  artistName,
+}: {
+  item: Artwork & { likes: number; views: number };
+  artistName: string;
+}) {
+  const [optimizedSrc, setOptimizedSrc] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const loadOptimized = async () => {
+      if (item.coverImage?.key) {
+        const url = await generateOptimizedImageUrl(item.coverImage.key, {
+          width: 400,
+          height: 300,
+          format: 'webp',
+          quality: 70,
+        });
+        setOptimizedSrc(url);
+      } else {
+        setOptimizedSrc('/placeholder-artwork.svg');
+      }
+    };
+    loadOptimized();
+  }, [item.coverImage?.key]);
+
+  if (!optimizedSrc) return null;
+
+  return (
+    <Image
+      src={optimizedSrc}
+      alt={`${item.title} by ${artistName} - Digital artwork on MedArtHub`}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+      className="object-cover group-hover:scale-105 transition-transform duration-300"
+      priority
+    />
+  );
+}
 
 export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: TabbedContentProps) {
   const router = useRouter();
@@ -188,21 +229,13 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                   </button>
                 )}
                 {(currentWorkItems as (Artwork & { likes: number; views: number })[]).map((item) => {
-                  console.log('TabbedContent: Rendering artwork:', { id: item.id, title: item.title, coverImage: item.coverImage });
                   return (
                 <div key={item.id} 
                      className="group relative overflow-hidden cursor-pointer rounded-lg"
                      onClick={() => handleOpenLightbox(item.id)}
                 >
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
-                    <Image
-                      src={getArtworkImageUrl(item.coverImage?.key)} // Use coverImage.key
-                      alt={`${item.title} by ${artistName} - Digital artwork on Medical Artists`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      unoptimized
-                    />
+                    <OptimizedArtworkImage item={item} artistName={artistName} />
                     {/* Status indicator for drafts */}
                     {isOwner && item.status === 'DRAFT' && (
                       <span className="absolute top-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs font-semibold rounded-full z-10">DRAFT</span>

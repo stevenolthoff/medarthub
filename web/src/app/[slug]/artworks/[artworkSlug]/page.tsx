@@ -3,7 +3,7 @@ import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc";
 import { ArtworkDetailViewServer } from "../../components/artwork-detail-view-server";
 import Link from "next/link";
 import { Metadata } from "next";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 import { ArtworkStructuredData } from "@/components/structured-data";
 
 // Define types for params
@@ -40,15 +40,24 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
     };
   }
 
+  const ogImageUrl = artwork.coverImage?.key
+    ? await generateOptimizedImageUrl(artwork.coverImage.key, {
+        width: 1200,
+        height: 630,
+        format: 'jpeg',
+        quality: 80,
+      })
+    : undefined;
+
   return {
     title: `${artwork.title} by ${artistProfile.user.name} - Medical Artists`,
     description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
     openGraph: {
       title: `${artwork.title} by ${artistProfile.user.name}`,
       description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
-      images: artwork.coverImage?.key ? [ // Use coverImage.key
+      images: ogImageUrl ? [
         {
-          url: getArtworkImageUrl(artwork.coverImage.key), // Use coverImage.key
+          url: ogImageUrl,
           alt: artwork.title,
         },
       ] : undefined,
@@ -58,7 +67,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
       card: "summary_large_image",
       title: `${artwork.title} by ${artistProfile.user.name}`,
       description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
-      images: artwork.coverImage?.key ? [getArtworkImageUrl(artwork.coverImage.key)] : undefined, // Use coverImage.key
+      images: ogImageUrl ? [ogImageUrl] : undefined,
     },
     alternates: {
       canonical: `/${artistSlug}/artworks/${artworkSlug}`,

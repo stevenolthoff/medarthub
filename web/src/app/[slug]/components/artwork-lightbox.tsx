@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, Link, Check } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0]; // Now includes coverImage
 
@@ -35,6 +35,7 @@ export function ArtworkLightbox({
 }: ArtworkLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [currentOptimizedImageUrl, setCurrentOptimizedImageUrl] = useState<string | null>(null);
 
   // Effect to set the initial artwork when modal opens
   useEffect(() => {
@@ -53,6 +54,28 @@ export function ArtworkLightbox({
   }, [isOpen, initialArtworkId, artworks, onClose]);
 
   const currentArtwork = artworks[currentIndex];
+
+  // Update optimized image URL when current artwork changes
+  useEffect(() => {
+    async function loadOptimized() {
+      if (currentArtwork?.coverImage?.key) {
+        const url = await generateOptimizedImageUrl(currentArtwork.coverImage.key, {
+          width: currentArtwork.coverImage.width || 1920,
+          height: currentArtwork.coverImage.height || 1080,
+          format: 'webp',
+          quality: 90,
+        });
+        setCurrentOptimizedImageUrl(url);
+      } else {
+        setCurrentOptimizedImageUrl('/placeholder-artwork.svg');
+      }
+    }
+    if (currentArtwork) {
+      loadOptimized();
+    } else {
+      setCurrentOptimizedImageUrl(null);
+    }
+  }, [currentArtwork]);
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % artworks.length);
@@ -118,15 +141,18 @@ export function ArtworkLightbox({
           {/* Full-screen artwork with overlay */}
           <div className="relative w-full h-full bg-transparent">
           {/* Full-screen artwork */}
-          <Image
-            src={getArtworkImageUrl(currentArtwork.coverImage?.key)} // Use coverImage.key
-            alt={currentArtwork.title}
-            fill
-            sizes="100vw"
-            className="object-contain"
-            unoptimized
-            priority
-          />
+          {currentOptimizedImageUrl && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Image
+                src={currentOptimizedImageUrl}
+                alt={currentArtwork.title}
+                width={currentArtwork.coverImage?.width || 1920}
+                height={currentArtwork.coverImage?.height || 1080}
+                className="object-contain max-h-full"
+                priority
+              />
+            </div>
+          )}
           
           {/* Top overlay with title and close button */}
           <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 md:p-6">

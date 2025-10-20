@@ -54,6 +54,8 @@ model Image {
   filename          String
   contentType       String
   size              Int
+  width             Int?
+  height            Int?
   originalArtworkId String?  @unique
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

@@ -23,6 +23,8 @@ const createUploadUrlInput = z.object({
     'Only image files are allowed'
   ),
   fileSize: z.number().int().positive('File size must be positive'),
+  width: z.number().int().positive('Width must be positive').optional(),
+  height: z.number().int().positive('Height must be positive').optional(),
 });
 
 // Maximum allowed file size for images (e.g., 10MB)
@@ -36,7 +38,7 @@ export const imageRouter = router({
   createUploadUrl: protectedProcedure
     .input(createUploadUrlInput)
     .mutation(async ({ input, ctx }) => {
-      const { filename, contentType, fileSize } = input;
+      const { filename, contentType, fileSize, width, height } = input;
       const userId = ctx.user?.id; // Get user ID from authenticated context
 
       if (!userId) {
@@ -76,6 +78,8 @@ export const imageRouter = router({
             filename,
             contentType,
             size: fileSize,
+            width,
+            height,
           },
         });
 

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { useRouter, usePathname } from "next/navigation";
-import { useCallback, useEffect } from "react";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
@@ -70,7 +70,24 @@ export function ArtworkDetailView({
 
   const isFirstArtwork = currentArtworkIndex === 0;
   const isLastArtwork = currentArtworkIndex === allArtworks.length - 1;
-  const artworkImageUrl = getArtworkImageUrl(artwork.id);
+  const [artworkImageUrl, setArtworkImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      if (artwork.coverImage?.key) {
+        const url = await generateOptimizedImageUrl(artwork.coverImage.key, {
+          width: artwork.coverImage.width || 1200,
+          height: artwork.coverImage.height || 900,
+          format: 'webp',
+          quality: 80,
+        });
+        setArtworkImageUrl(url);
+      } else {
+        setArtworkImageUrl("/placeholder-artwork.svg");
+      }
+    }
+    load();
+  }, [artwork.coverImage]);
 
   const containerClassName = isStandalonePage
     ? "flex flex-1 flex-col md:flex-row overflow-hidden bg-background max-h-svh w-full mb-32"
@@ -86,10 +103,9 @@ export function ArtworkDetailView({
           <Image
             src={artworkImageUrl}
             alt={artwork.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+            width={artwork.coverImage?.width || 1200}
+            height={artwork.coverImage?.height || 900}
             className="object-contain"
-            unoptimized
             priority
           />
         )}

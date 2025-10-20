@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
@@ -29,7 +29,24 @@ export function ArtworkDetailViewServer({
   const router = useRouter();
   const isFirstArtwork = currentArtworkIndex === 0;
   const isLastArtwork = currentArtworkIndex === allArtworks.length - 1;
-  const artworkImageUrl = getArtworkImageUrl(artwork.coverImage?.key);
+  const [artworkImageUrl, setArtworkImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      if (artwork.coverImage?.key) {
+        const url = await generateOptimizedImageUrl(artwork.coverImage.key, {
+          width: artwork.coverImage.width || 1200,
+          height: artwork.coverImage.height || 900,
+          format: 'webp',
+          quality: 80,
+        });
+        setArtworkImageUrl(url);
+      } else {
+        setArtworkImageUrl("/placeholder-artwork.svg");
+      }
+    }
+    load();
+  }, [artwork.coverImage]);
   
   const prevArtwork = isFirstArtwork ? allArtworks[allArtworks.length - 1] : allArtworks[currentArtworkIndex - 1];
   const nextArtwork = isLastArtwork ? allArtworks[0] : allArtworks[currentArtworkIndex + 1];
@@ -66,11 +83,10 @@ export function ArtworkDetailViewServer({
         {artworkImageUrl && (
           <Image
             src={artworkImageUrl}
-            alt={`${artwork.title} by ${artistName} - Digital artwork on Medical Artists`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+            alt={`${artwork.title} by ${artistName} - Digital artwork on MedArtHub`}
+            width={artwork.coverImage?.width || 1200}
+            height={artwork.coverImage?.height || 900}
             className="object-contain"
-            unoptimized
             priority
           />
         )}

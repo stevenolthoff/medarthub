@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Trash2, CheckCircle, CircleX } from 'lucide-react';
 import { FieldError } from '@/components/ui/field';
 import { trpc } from '@/lib/trpc'; // Import trpc for the mutation
-import { getArtworkImageUrl } from '@/lib/utils'; // For preview
+import { generateOptimizedImageUrl } from '@/lib/utils'; // Use optimized URLs
 import { useAuth } from '@/hooks/use-auth'; // To get userId for R2 key prefix
 
 // Define the new type for files with upload status
@@ -18,12 +18,16 @@ interface FileWithUploadStatus extends File {
   r2Key?: string; // The key in R2 if successfully uploaded
   imageId?: string; // The ID of the Image record in the database
   previewUrl?: string; // URL for local preview (createObjectURL)
+  width?: number;
+  height?: number;
 }
 
 interface ImageUploadZoneProps {
   currentArtworkCoverImage?: {
     id: string;
     key: string;
+    width?: number | null;
+    height?: number | null;
   } | null; // The artwork's current cover image data (if editing)
   onImageSelected: (imageId: string | null, r2Key: string | null) => void;
 }
@@ -44,18 +48,28 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
       // If editing an existing artwork with a cover image, populate the state
       const initialImageKey = currentArtworkCoverImage.key;
       const initialImageId = currentArtworkCoverImage.id;
-
-      setUploadedFile({
-        id: initialImageId, // Use the image's actual ID
-        imageId: initialImageId,
-        r2Key: initialImageKey,
-        name: initialImageKey.split('/').pop() || "existing_artwork_image.png", // Derive name from key
-        type: "image/jpeg", // Placeholder type, ideally fetched from DB
-        size: 0, // Placeholder size, ideally fetched from DB
-        status: 'success', // Assume success for existing images
-        previewUrl: getArtworkImageUrl(initialImageKey),
-      } as FileWithUploadStatus);
-      setInternalPreviewUrl(getArtworkImageUrl(initialImageKey));
+      const initialWidth = currentArtworkCoverImage.width || undefined;
+      const initialHeight = currentArtworkCoverImage.height || undefined;
+      (async () => {
+        const optimizedUrl = await generateOptimizedImageUrl(initialImageKey, {
+          width: initialWidth || 600,
+          height: initialHeight || 450,
+          format: 'webp',
+        });
+        setUploadedFile({
+          id: initialImageId, // Use the image's actual ID
+          imageId: initialImageId,
+          r2Key: initialImageKey,
+          name: initialImageKey.split('/').pop() || "existing_artwork_image.png", // Derive name from key
+          type: "image/jpeg", // Placeholder type, ideally fetched from DB
+          size: 0, // Placeholder size, ideally fetched from DB
+          status: 'success', // Assume success for existing images
+          previewUrl: optimizedUrl,
+          width: initialWidth,
+          height: initialHeight,
+        } as FileWithUploadStatus);
+        setInternalPreviewUrl(optimizedUrl);
+      })();
     } else if (!currentArtworkCoverImage && uploadedFile && uploadedFile.status === 'success') {
       // If modal re-opened for new artwork, but had a previous successful upload, keep it.
       // Do nothing, let the uploadedFile state persist until explicitly removed.
@@ -81,6 +95,8 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
         filename: fileWithStatus.name,
         contentType: fileWithStatus.type,
         fileSize: fileWithStatus.size,
+        width: fileWithStatus.width,
+        height: fileWithStatus.height,
       });
 
       const blobBody = new Blob([fileWithStatus], { type: fileWithStatus.type });
@@ -96,12 +112,19 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
         throw new Error(`Failed to upload to R2: ${uploadResponse.status} - ${errorText}`);
       }
 
+      // Build optimized preview URL
+      const optimizedPreviewUrl = await generateOptimizedImageUrl(r2Key, {
+        width: fileWithStatus.width || 600,
+        height: fileWithStatus.height || 450,
+        format: 'webp',
+      });
+
       const updatedFile: FileWithUploadStatus = {
         ...fileWithStatus,
         status: 'success',
         r2Key,
         imageId: imageRecordId,
-        previewUrl: getArtworkImageUrl(r2Key),
+        previewUrl: optimizedPreviewUrl,
       };
       setUploadedFile(updatedFile);
       setInternalPreviewUrl(updatedFile.previewUrl || null);
@@ -116,7 +139,7 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
   }, [isLoggedIn, user?.id, createUploadUrlMutation, onImageSelected]);
 
 
-  const onDropAccepted = useCallback((acceptedFiles: File[]) => {
+  const onDropAccepted = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       // Clean up previous object URL if any
@@ -124,10 +147,32 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
         URL.revokeObjectURL(uploadedFile.previewUrl);
       }
       
+      // Load image dimensions client-side
+      const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.onload = () => {
+            resolve({ width: img.width, height: img.height });
+            URL.revokeObjectURL(img.src);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(img.src);
+            resolve({ width: 0, height: 0 });
+          };
+          img.src = e.target as any as string;
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => resolve({ width: 0, height: 0 });
+        reader.readAsDataURL(file);
+      });
+
       const fileWithStatus: FileWithUploadStatus = Object.assign(file, {
         id: `${file.name}-${file.size}-${file.lastModified}`, // Simple client-side unique ID
         status: 'pending' as const,
         previewUrl: URL.createObjectURL(file), // Create object URL for local preview
+        width: dimensions.width || undefined,
+        height: dimensions.height || undefined,
       });
       setUploadedFile(fileWithStatus);
       setInternalPreviewUrl(fileWithStatus.previewUrl || null);
@@ -196,7 +241,7 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
-            unoptimized
+            unoptimized={!internalPreviewUrl?.includes('imgproxy')}
           />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
             <Button
