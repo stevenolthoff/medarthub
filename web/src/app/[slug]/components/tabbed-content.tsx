@@ -197,7 +197,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                   <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
                     <Image
                       src={getArtworkImageUrl(item.coverImage?.key)} // Use coverImage.key
-                      alt={`${item.title} by ${artistName} - Digital artwork on MedArtHub`}
+                      alt={`${item.title} by ${artistName} - Digital artwork on Medical Artists`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -75,13 +75,13 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          {/* MedarThub Column */}
+          {/* Medical Artists Column */}
           <div className="space-y-4">
-            <h3 className="font-bold text-lg">MedarThub</h3>
+            <h3 className="font-bold text-lg">Medical Artists</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="#" className="hover:text-gray-300 transition-colors">
-                  About MedarThub
+                  About Medical Artists
                 </Link>
               </li>
               <li>
@@ -180,7 +180,7 @@ export function SiteFooter() {
               <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
                 <span className="text-gray-900 font-bold text-lg">M</span>
               </div>
-              <span className="text-sm">© 2025 MedarThub Inc. All rights reserved.</span>
+              <span className="text-sm">© 2025 Medical Artists Inc. All rights reserved.</span>
             </div>
 
             {/* Right side - Legal links */}

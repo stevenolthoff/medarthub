@@ -26,7 +26,7 @@ export function ArtistStructuredData({ artist, baseUrl }: ArtistStructuredDataPr
     "sameAs": [
       // Add social media links if available in the future
     ],
-    "description": `Digital artist and creator on MedArtHub with ${publishedArtworks.length} published artworks`,
+    "description": `Digital artist and creator on Medical Artists with ${publishedArtworks.length} published artworks`,
     "knowsAbout": ["Digital Art", "Illustration", "Creative Design"],
     "hasOccupation": {
       "@type": "Occupation",
@@ -38,7 +38,7 @@ export function ArtistStructuredData({ artist, baseUrl }: ArtistStructuredDataPr
     },
     "memberOf": {
       "@type": "Organization",
-      "name": "MedArtHub",
+      "name": "Medical Artists",
       "url": baseUrl
     },
     "creator": publishedArtworks.map(artwork => ({
@@ -87,7 +87,7 @@ export function ArtworkStructuredData({ artwork, artist, baseUrl }: ArtworkStruc
     },
     "publisher": {
       "@type": "Organization",
-      "name": "MedArtHub",
+      "name": "Medical Artists",
       "url": baseUrl
     },
     "license": "All Rights Reserved",

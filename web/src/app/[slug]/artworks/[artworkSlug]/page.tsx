@@ -41,11 +41,11 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
   }
 
   return {
-    title: `${artwork.title} by ${artistProfile.user.name} - MedArtHub`,
-    description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
+    title: `${artwork.title} by ${artistProfile.user.name} - Medical Artists`,
+    description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
     openGraph: {
       title: `${artwork.title} by ${artistProfile.user.name}`,
-      description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
+      description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
       images: artwork.coverImage?.key ? [ // Use coverImage.key
         {
           url: getArtworkImageUrl(artwork.coverImage.key), // Use coverImage.key
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
     twitter: {
       card: "summary_large_image",
       title: `${artwork.title} by ${artistProfile.user.name}`,
-      description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on MedArtHub.`,
+      description: artwork.description || `View ${artwork.title} by ${artistProfile.user.name} on Medical Artists.`,
       images: artwork.coverImage?.key ? [getArtworkImageUrl(artwork.coverImage.key)] : undefined, // Use coverImage.key
     },
     alternates: {
@@ -93,7 +93,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       <ArtworkStructuredData 
         artwork={currentArtwork}
         artist={artistProfile}
-        baseUrl={process.env.NEXT_PUBLIC_BASE_URL || 'https://medarthub.com'}
+        baseUrl={process.env.NEXT_PUBLIC_BASE_URL || 'https://Medical Artists.com'}
       />
       <div className="flex flex-1 flex-col items-center justify-center bg-background">
         <div className="w-full max-w-screen-xl flex-1 flex flex-col pt-4">

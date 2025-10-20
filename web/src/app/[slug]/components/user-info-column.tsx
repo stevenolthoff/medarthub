@@ -35,7 +35,7 @@ export function UserInfoColumn({
         </div>
         <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-purple-500 rounded-full flex-shrink-0"></div>
-          <span>MedArtHub Member</span>
+          <span>Medical Artists Member</span>
         </div>
         <div className="flex items-center gap-3 text-sm text-foreground">
           <div className="w-4 h-4 bg-orange-500 rounded-full flex-shrink-0"></div>

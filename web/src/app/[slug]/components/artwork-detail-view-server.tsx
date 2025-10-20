@@ -66,7 +66,7 @@ export function ArtworkDetailViewServer({
         {artworkImageUrl && (
           <Image
             src={artworkImageUrl}
-            alt={`${artwork.title} by ${artistName} - Digital artwork on MedArtHub`}
+            alt={`${artwork.title} by ${artistName} - Digital artwork on Medical Artists`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
             className="object-contain"
