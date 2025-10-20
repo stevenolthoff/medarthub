@@ -29,7 +29,7 @@ export function ArtworkDetailViewServer({
   const router = useRouter();
   const isFirstArtwork = currentArtworkIndex === 0;
   const isLastArtwork = currentArtworkIndex === allArtworks.length - 1;
-  const artworkImageUrl = getArtworkImageUrl(artwork.id);
+  const artworkImageUrl = getArtworkImageUrl(artwork.coverImage?.key);
   
   const prevArtwork = isFirstArtwork ? allArtworks[allArtworks.length - 1] : allArtworks[currentArtworkIndex - 1];
   const nextArtwork = isLastArtwork ? allArtworks[0] : allArtworks[currentArtworkIndex + 1];
