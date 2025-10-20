@@ -8,8 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 export function getArtworkImageUrl(imageKey: string | undefined | null): string {
   // If no image key is provided, use a generic placeholder
   if (!imageKey) {
+    console.log('getArtworkImageUrl: No image key provided, using placeholder');
     return "/placeholder-artwork.svg"; // This file should exist in `web/public/`
   }
+  
+  console.log('getArtworkImageUrl: Processing image key:', imageKey);
   
   // This constructs a URL that simulates R2 storage but uses picsum.photos for dynamic images.
   // In a production Next.js application, `imageKey` would be used with `next/image`'s loader
@@ -24,9 +27,13 @@ export function getArtworkImageUrl(imageKey: string | undefined | null): string 
   if (imageIdPart) {
     // For local development and demonstration, use picsum.photos with the imageId part
     // This allows unique images per artwork based on their stored R2 key/ID.
-    return `https://picsum.photos/600/450?random=${imageIdPart}`;
+    const url = `https://picsum.photos/600/450?random=${imageIdPart}`;
+    console.log('getArtworkImageUrl: Generated URL:', url);
+    return url;
   }
   
   // Fallback if the key format is unexpected, use a generic random image from picsum
-  return `https://picsum.photos/600/450?random=default-artwork`;
+  const fallbackUrl = `https://picsum.photos/600/450?random=default-artwork`;
+  console.log('getArtworkImageUrl: Using fallback URL:', fallbackUrl);
+  return fallbackUrl;
 }

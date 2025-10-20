@@ -187,7 +187,9 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                     <span className="mb-3 text-gray-700 font-medium text-xs">Add New Artwork</span>
                   </button>
                 )}
-                {(currentWorkItems as (Artwork & { likes: number; views: number })[]).map((item) => (
+                {(currentWorkItems as (Artwork & { likes: number; views: number })[]).map((item) => {
+                  console.log('TabbedContent: Rendering artwork:', { id: item.id, title: item.title, coverImage: item.coverImage });
+                  return (
                 <div key={item.id} 
                      className="group relative overflow-hidden cursor-pointer rounded-lg"
                      onClick={() => handleOpenLightbox(item.id)}
@@ -253,7 +255,8 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                     </div>
                   </div>
                 </div>
-                ))}
+                );
+                })}
               </div>
             ) : (
               <EmptyGalleryState isOwner={isOwner} onAddArtwork={handleOpenAddArtworkModal} />

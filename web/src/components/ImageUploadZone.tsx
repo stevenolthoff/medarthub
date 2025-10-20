@@ -130,7 +130,7 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
         previewUrl: URL.createObjectURL(file), // Create object URL for local preview
       });
       setUploadedFile(fileWithStatus);
-      setInternalPreviewUrl(fileWithStatus.previewUrl);
+      setInternalPreviewUrl(fileWithStatus.previewUrl || null);
       uploadFileToR2(fileWithStatus);
     }
   }, [uploadFileToR2, uploadedFile]);
@@ -214,13 +214,13 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
               <Loader2 className="animate-spin mr-2" /> Uploading...
              </div>
           )}
-          {uploadedFile.status === 'error' && (
+          {uploadedFile?.status === 'error' && (
              <div className="absolute inset-0 bg-red-800/70 flex flex-col items-center justify-center text-white text-lg font-bold p-4">
               <CircleX className="size-8 mb-2" /> Upload Failed
               <p className="text-sm font-normal text-center mt-2">{uploadedFile.errorMessage}</p>
              </div>
           )}
-          {uploadedFile.status === 'success' && (
+          {uploadedFile?.status === 'success' && (
             <div className="absolute bottom-3 left-3 flex items-center space-x-2 text-white text-sm bg-black/50 px-2 py-1 rounded-md">
               <CheckCircle className="size-4 text-green-400" /> Image Uploaded
             </div>

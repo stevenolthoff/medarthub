@@ -9,12 +9,12 @@ datasource db {
 
 model User {
   id           String   @id @default(uuid())
-  username     String   @unique
   name         String
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  username     String   @unique
   artist       Artist?
 
   @@map("users")
@@ -33,35 +33,31 @@ model Artist {
 }
 
 model Artwork {
-  id          String       @id @default(uuid())
-  slug        String       @unique
-  title       String
-  description String
-  status      ArtworkStatus @default(DRAFT)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  artistId    String
-  artist      Artist       @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  
-  coverImageId String?      @unique // An artwork has one unique cover image
-  coverImage   Image?       @relation("ArtworkCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  id           String        @id @default(uuid())
+  slug         String        @unique
+  title        String
+  description  String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  artistId     String
+  status       ArtworkStatus @default(DRAFT)
+  coverImageId String?       @unique
+  artist       Artist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  coverImage   Image?        @relation("ArtworkCover", fields: [coverImageId], references: [id])
 
   @@map("artworks")
 }
 
 model Image {
-  id          String       @id @default(uuid())
-  key         String       @unique // S3/R2 object key, e.g., users/<userId>/images/<imageId>/original.png
-  filename    String       // Original filename uploaded by user
-  contentType String       // e.g., image/png
-  size        Int          // In bytes
-  
-  // Back-reference to the artwork it covers (optional, one-to-one relation)
-  originalArtworkId String? @unique // An image can be the "original cover" for one artwork
-  originalArtwork Artwork? @relation("ArtworkCover")
-
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                String   @id @default(uuid())
+  key               String   @unique
+  filename          String
+  contentType       String
+  size              Int
+  originalArtworkId String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  originalArtwork   Artwork? @relation("ArtworkCover")
 
   @@map("images")
 }

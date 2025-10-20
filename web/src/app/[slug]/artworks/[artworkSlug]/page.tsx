@@ -13,12 +13,12 @@ interface ArtworkPageParams {
 }
 
 interface ArtworkPageProps {
-  params: ArtworkPageParams;
+  params: Promise<ArtworkPageParams>;
 }
 
 // Dynamic metadata for SEO
 export async function generateMetadata({ params }: ArtworkPageProps): Promise<Metadata> {
-  const { slug: artistSlug, artworkSlug } = params;
+  const { slug: artistSlug, artworkSlug } = await params;
 
   // Fetch artist and artworks to get details for metadata
   const artistProfile = await serverTrpc.artist.getBySlug.query({ slug: artistSlug });
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
 }
 
 export default async function ArtworkPage({ params }: ArtworkPageProps) {
-  const { slug: artistSlug, artworkSlug } = params;
+  const { slug: artistSlug, artworkSlug } = await params;
 
   if (!artistSlug || !artworkSlug) {
     notFound();

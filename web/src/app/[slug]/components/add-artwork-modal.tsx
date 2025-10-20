@@ -97,6 +97,7 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
   }, []);
 
   const handleImageSelected = useCallback((imageId: string | null, r2Key: string | null) => {
+    console.log('AddArtworkModal: Image selected:', { imageId, r2Key });
     coverImageIdRef.current = imageId; // Update the ref with the new image ID
     isDirtyRef.current = true;
   }, []);
@@ -120,6 +121,8 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
           status: currentStatus,
           coverImageId: currentCoverImageId, // Include coverImageId in autosave
         };
+        
+        console.log('AddArtworkModal: Autosaving with data:', dataToSave);
 
         try {
           if (currentArtworkId) {
@@ -207,6 +210,8 @@ export function AddArtworkModal({ isOpen, onClose, initialArtwork, onArtworkSave
       status: submitStatus,
       coverImageId: finalCoverImageId, // Include coverImageId in manual save
     };
+    
+    console.log('AddArtworkModal: Manual save with data:', dataToSend);
 
     try {
       if (finalArtworkId) {
