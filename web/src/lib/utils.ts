@@ -14,26 +14,27 @@ export function getArtworkImageUrl(imageKey: string | undefined | null): string 
   
   console.log('getArtworkImageUrl: Processing image key:', imageKey);
   
-  // This constructs a URL that simulates R2 storage but uses picsum.photos for dynamic images.
-  // In a production Next.js application, `imageKey` would be used with `next/image`'s loader
-  // configuration, or an API route (e.g., `/api/images/[key]`) to securely fetch and optimize
-  // images from your R2 bucket.
-  
-  // Extract a unique identifier from the R2 key to use with picsum.photos.
-  // Example R2 key format: `users/<userId>/images/<imageId>/original.png`
-  const parts = imageKey.split('/');
-  const imageIdPart = parts.length >= 4 ? parts[3] : undefined; // The UUID part of the image key
+  // Use actual R2 public endpoint and bucket name
+  const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
 
-  if (imageIdPart) {
-    // For local development and demonstration, use picsum.photos with the imageId part
-    // This allows unique images per artwork based on their stored R2 key/ID.
-    const url = `https://picsum.photos/600/450?random=${imageIdPart}`;
-    console.log('getArtworkImageUrl: Generated URL:', url);
+  if (r2PublicEndpoint) {
+    // Construct the direct public URL for the R2 object
+    const url = `${r2PublicEndpoint}/${imageKey}`;
+    console.log('getArtworkImageUrl: Generated R2 public URL:', url);
     return url;
   }
   
-  // Fallback if the key format is unexpected, use a generic random image from picsum
-  const fallbackUrl = `https://picsum.photos/600/450?random=default-artwork`;
-  console.log('getArtworkImageUrl: Using fallback URL:', fallbackUrl);
-  return fallbackUrl;
+  // Fallback to picsum for development if R2 public endpoint/bucket is not configured
+  // This helps to still see *some* image if R2 public access is not fully set up.
+  const parts = imageKey.split('/');
+  const imageIdPart = parts.length >= 4 ? parts[3] : undefined; // The UUID part of the image key
+  if (imageIdPart) {
+    const fallbackUrl = `https://picsum.photos/600/450?random=${imageIdPart}`;
+    console.log('getArtworkImageUrl: R2 public endpoint not configured, using picsum fallback:', fallbackUrl);
+    return fallbackUrl;
+  }
+
+  const genericFallbackUrl = `https://picsum.photos/600/450?random=default-artwork`;
+  console.log('getArtworkImageUrl: Using generic picsum fallback URL:', genericFallbackUrl);
+  return genericFallbackUrl;
 }
