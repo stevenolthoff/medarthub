@@ -58,7 +58,6 @@ model Image {
   size              Int
   width             Int?
   height            Int?
-  originalArtworkId String?  @unique
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   originalArtwork   Artwork? @relation("ArtworkCover")

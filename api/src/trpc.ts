@@ -20,10 +20,10 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
   req: CreateExpressContextOptions['req'];
   res: CreateExpressContextOptions['res'];
   prisma: typeof prisma;
-  user: (User & { artist?: { id: string; slug: string } | null }) | null;
+  user: (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null;
 }> => { 
 
-  let user: (User & { artist?: { id: string; slug: string } | null }) | null = null;
+  let user: (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null = null;
   const token = req.headers.authorization?.split(' ')[1]; // Expecting "Bearer <token>"
 
   if (token) {
@@ -42,10 +42,17 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
             select: {
               id: true,
               slug: true,
+              profilePic: {
+                select: {
+                  key: true,
+                  width: true,
+                  height: true,
+                },
+              },
             }
           }
         },
-      }) as (User & { artist?: { id: string; slug: string } | null }) | null;
+      }) as (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null;
     } catch (error) {
       console.error('JWT verification failed:', error);
       // Token is invalid or expired, user remains null

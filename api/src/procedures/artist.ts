@@ -240,14 +240,6 @@ export const artistRouter = router({
         },
       });
 
-      // If a coverImageId was provided, update the Image record to link it to this artwork
-      if (coverImageId) {
-        await ctx.prisma.image.update({
-          where: { id: coverImageId },
-          data: { originalArtworkId: newArtwork.id }, // Link Image to the new Artwork
-        });
-      }
-
       return {
         message: 'Artwork created successfully!',
         artwork: newArtwork,
@@ -356,24 +348,6 @@ export const artistRouter = router({
           },
         },
       });
-
-      // Handle Image record association changes
-      if (coverImageId !== undefined && coverImageId !== existingArtwork.coverImageId) {
-        // If there was an old cover image, clear its artwork association
-        if (existingArtwork.coverImageId) {
-          await ctx.prisma.image.update({
-            where: { id: existingArtwork.coverImageId },
-            data: { originalArtworkId: null },
-          });
-        }
-        // If a new coverImageId is provided, link it to this artwork
-        if (coverImageId) {
-          await ctx.prisma.image.update({
-            where: { id: coverImageId },
-            data: { originalArtworkId: updatedArtwork.id },
-          });
-        }
-      }
 
       return {
         message: 'Artwork updated successfully!',
@@ -518,17 +492,16 @@ export const artistRouter = router({
           data: { profilePicImageId: imageId },
         });
 
-        if (oldImageId && oldImageId !== imageId) {
-          const oldImage = await tx.image.findUnique({
-            where: { id: oldImageId },
-            select: { originalArtworkId: true }
-          });
-          if (oldImage && !oldImage.originalArtworkId) {
-            await tx.image.delete({
-              where: { id: oldImageId },
-            });
-          }
-        }
+         if (oldImageId && oldImageId !== imageId) {
+           const oldImageInUse = await tx.artwork.findFirst({
+             where: { coverImageId: oldImageId },
+           });
+           if (!oldImageInUse) {
+             await tx.image.delete({
+               where: { id: oldImageId },
+             });
+           }
+         }
       });
 
       return {
@@ -571,17 +544,16 @@ export const artistRouter = router({
           data: { profilePicImageId: null },
         });
 
-        // 3. Delete the old image record if it's not used elsewhere (e.g., as an artwork cover)
-        const oldImage = await tx.image.findUnique({
-          where: { id: oldImageId },
-          select: { originalArtworkId: true }
-        });
+         // 3. Delete the old image record if it's not used elsewhere (e.g., as an artwork cover)
+         const oldImageInUse = await tx.artwork.findFirst({
+           where: { coverImageId: oldImageId },
+         });
 
-        if (oldImage && !oldImage.originalArtworkId) {
-          await tx.image.delete({
-            where: { id: oldImageId },
-          });
-        }
+         if (!oldImageInUse) {
+           await tx.image.delete({
+             where: { id: oldImageId },
+           });
+         }
       });
 
       return {

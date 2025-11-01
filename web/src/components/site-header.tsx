@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,10 +15,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, Folder, User } from "lucide-react"; // Icons
+import { LogOut, Settings, Folder, User } from "lucide-react";
+import { generateOptimizedImageUrl } from "@/lib/utils";
 
 export function SiteHeader() {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState(
+    `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}&flip=true`
+  );
+
+  useEffect(() => {
+    let isActive = true;
+    async function getUrl() {
+      if (user?.artist?.profilePic?.key) {
+        const url = await generateOptimizedImageUrl(user.artist.profilePic.key, {
+          width: 36,
+          height: 36,
+          format: 'webp',
+          quality: 80,
+        });
+        if (isActive) setAvatarUrl(url);
+      } else {
+        const diceBearUrl = `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}&flip=true`;
+        if (isActive) setAvatarUrl(diceBearUrl);
+      }
+    }
+    if (user) {
+      getUrl();
+    }
+    return () => { isActive = false; };
+  }, [user?.artist?.profilePic, user?.name, user?.email]);
 
   const getInitials = (name?: string | null, email?: string) => {
     if (name) {
@@ -30,11 +57,12 @@ export function SiteHeader() {
     return email?.[0]?.toUpperCase() || "NN";
   };
 
+  const isDiceBearAvatar = !user?.artist?.profilePic?.key;
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center space-x-2">
-          {/* Your logo here if any */}
           <span className="inline-block font-bold">Medical Artists</span>
         </Link>
         <nav className="flex items-center space-x-6">
@@ -43,17 +71,15 @@ export function SiteHeader() {
           ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 cursor-pointer">
                   <Avatar className="size-9">
-                    {/* Placeholder avatar image or initials */}
-                    {/* If you have a user avatar URL, use <Image src={user.avatarUrl} alt="User Avatar" fill /> */}
                     <Image
-                      src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}&flip=true`}
+                      src={avatarUrl}
                       alt="User Avatar"
                       width={36}
                       height={36}
-                      className="rounded-full"
-                      unoptimized
+                      className="rounded-full object-cover"
+                      unoptimized={isDiceBearAvatar}
                     />
                     <AvatarFallback>{getInitials(user?.name, user?.email)}</AvatarFallback>
                   </Avatar>

@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-After completing a sizeable chunk of work (e.g., implementing a feature, fixing a bug, adding functionality), I will wait for the user to explicitly say "commit" before committing changes.
+NEVER commit changes unless the user explicitly says "commit". Do not commit automatically, even after completing work.
 
 When the user says "commit":
 1. Use `git add -A` to stage all changes
