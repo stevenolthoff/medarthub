@@ -11,16 +11,29 @@ interface Config {
 }
 
 const config: Config = {
-  port: Number(process.env.PORT) || 3000,
+  port: Number(process.env.PORT) || 3001,
   nodeEnv: process.env.NODE_ENV || 'development',
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://app:app_pw@localhost:5432/app_db',
-  jwtSecret: process.env.JWT_SECRET || 'supersecretjwtkey', // Fallback for dev, but strongly warn
+  databaseUrl: process.env.DATABASE_URL || '',
+  jwtSecret: process.env.JWT_SECRET || '',
   jwtExpiresIn: (process.env.JWT_EXPIRES_IN || '1h') as string,
 };
 
-// Basic validation for critical config
-if (!config.jwtSecret || config.jwtSecret === 'supersecretjwtkey') {
-  console.warn('⚠️ WARNING: JWT_SECRET is not set or using default. Please set a strong secret in your .env file!');
+if (!config.jwtSecret) {
+  const errorMessage = 'FATAL ERROR: JWT_SECRET is not set. Please provide a strong secret in your .env file.';
+  console.error(`❌ ${errorMessage}`);
+  throw new Error(errorMessage);
+}
+
+if (config.nodeEnv === 'production' && config.jwtSecret.length < 32) {
+  const errorMessage = 'FATAL ERROR: JWT_SECRET must be at least 32 characters long in production.';
+  console.error(`❌ ${errorMessage}`);
+  throw new Error(errorMessage);
+}
+
+if (!config.databaseUrl) {
+  const errorMessage = 'FATAL ERROR: DATABASE_URL is not set. Please set it in your .env file.';
+  console.error(`❌ ${errorMessage}`);
+  throw new Error(errorMessage);
 }
 
 export default config;

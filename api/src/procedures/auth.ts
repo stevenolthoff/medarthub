@@ -142,7 +142,6 @@ export const authRouter = router({
     .input(loginInput)
     .mutation(async ({ input, ctx }) => {
       const { emailOrUsername, password } = input;
-      console.log(`[AUTH] Login attempt for: ${emailOrUsername}`); // LOG 1
 
       // Find the user by either email or username
       const user = await ctx.prisma.user.findFirst({
@@ -153,7 +152,6 @@ export const authRouter = router({
           ],
         },
       });
-      console.log(`[AUTH] User lookup result for ${emailOrUsername}: ${user ? 'Found' : 'Not Found'}`); // LOG 2
 
       if (!user) {
         throw new TRPCError({
@@ -163,9 +161,7 @@ export const authRouter = router({
       }
 
       // Compare the provided password with the stored hashed password
-      console.log(`[AUTH] Comparing password for user: ${user.id}`); // LOG 3
       const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-      console.log(`[AUTH] Password comparison result: ${isPasswordValid}`); // LOG 4
 
       if (!isPasswordValid) {
         throw new TRPCError({
@@ -175,15 +171,12 @@ export const authRouter = router({
       }
 
       // Generate JWT
-      console.log(`[AUTH] Generating JWT for user: ${user.id}`); // LOG 5
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         config.jwtSecret,
         { expiresIn: config.jwtExpiresIn } as SignOptions
       );
-      console.log(`[AUTH] JWT generated for user: ${user.id}, token length: ${token.length}`); // LOG 6
 
-      console.log('[AUTH] Login successful, sending response.'); // LOG 7
       return {
         message: 'Logged in successfully!',
         token, // Return the JWT
