@@ -1,7 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { type CreateExpressContextOptions } from '@trpc/server/adapters/express';
-import { User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import prisma from './lib/prisma';
@@ -12,6 +12,33 @@ interface JwtPayload {
   email: string;
 }
 
+// Define select object for reuse and type generation
+const userWithArtistProfileSelect = {
+  id: true,
+  username: true,
+  email: true,
+  name: true,
+  createdAt: true,
+  artist: {
+    select: {
+      id: true,
+      slug: true,
+      profilePic: {
+        select: {
+          key: true,
+          width: true,
+          height: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.UserSelect;
+
+// Define the final type from the select object
+export type UserWithArtistProfile = Prisma.UserGetPayload<{
+  select: typeof userWithArtistProfileSelect;
+}> | null;
+
 /**
  * Creates context for tRPC procedures.
  * This context is available in every tRPC procedure.
@@ -20,10 +47,10 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
   req: CreateExpressContextOptions['req'];
   res: CreateExpressContextOptions['res'];
   prisma: typeof prisma;
-  user: (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null;
+  user: UserWithArtistProfile;
 }> => { 
 
-  let user: (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null = null;
+  let user: UserWithArtistProfile = null;
   const token = req.headers.authorization?.split(' ')[1]; // Expecting "Bearer <token>"
 
   if (token) {
@@ -32,27 +59,8 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
       // Fetch user from DB to ensure it's still valid and get full user object
       user = await prisma.user.findUnique({
         where: { id: decoded.userId },
-        select: { 
-          id: true, 
-          username: true, 
-          email: true, 
-          name: true, 
-          createdAt: true,
-          artist: {
-            select: {
-              id: true,
-              slug: true,
-              profilePic: {
-                select: {
-                  key: true,
-                  width: true,
-                  height: true,
-                },
-              },
-            }
-          }
-        },
-      }) as (User & { artist?: { id: string; slug: string; profilePic?: { key: string; width: number | null; height: number | null } | null } | null }) | null;
+        select: userWithArtistProfileSelect,
+      });
     } catch (error) {
       console.error('JWT verification failed:', error);
       // Token is invalid or expired, user remains null
