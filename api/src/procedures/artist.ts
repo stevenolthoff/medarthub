@@ -68,7 +68,7 @@ const updateProfileInput = z.object({
   company: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
   websiteUrl: z.string().url('Must be a valid URL').or(z.literal('')).nullable().optional(),
-  about: z.string().max(1000, 'About section cannot exceed 1000 characters').nullable().optional(),
+  about: z.string().max(2000, 'About section cannot exceed 2000 characters').nullable().optional(),
 });
 
 /**
@@ -208,8 +208,7 @@ export const artistRouter = router({
   updateProfile: protectedProcedure
     .input(updateProfileInput)
     .mutation(async ({ input, ctx }) => {
-      const { user } = ctx;
-      const artistId = user.artist?.id;
+      const artistId = ctx.user!.artist?.id;
 
       if (!artistId) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'User does not have an artist profile.' });
@@ -229,7 +228,7 @@ export const artistRouter = router({
         // Update User table if name is provided
         if (name) {
           await tx.user.update({
-            where: { id: user.id },
+            where: { id: ctx.user!.id },
             data: { name },
           });
         }

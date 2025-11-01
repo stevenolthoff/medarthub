@@ -121,7 +121,8 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   }
   return next({
     ctx: {
-      user: ctx.user, // Ensure the user object is available in protected procedures
+      ...ctx, // Spread the original context
+      user: ctx.user, // Now, user is correctly typed as non-nullable
     },
   });
 });

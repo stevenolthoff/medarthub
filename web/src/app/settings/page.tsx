@@ -121,6 +121,9 @@ export default function SettingsPage() {
             <Field>
               <FieldLabel htmlFor="about">Description</FieldLabel>
               <Textarea id="about" value={about} onChange={(e) => setAbout(e.target.value)} rows={6} />
+              <div className="text-right mt-2 text-sm text-muted-foreground">
+                {about.length} / 2000
+              </div>
             </Field>
           </CardContent>
         </Card>
