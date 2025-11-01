@@ -11,6 +11,13 @@ const getBySlugInput = z.object({
 });
 
 /**
+ * Zod schema for setting profile picture.
+ */
+const setProfilePictureInput = z.object({
+  imageId: z.string().uuid('Invalid image ID format'),
+});
+
+/**
  * Zod schema for creating artwork.
  */
 const createArtworkInput = z.object({
@@ -105,6 +112,13 @@ export const artistRouter = router({
           id: true,
           slug: true,
           createdAt: true,
+          profilePic: {
+            select: {
+              key: true,
+              width: true,
+              height: true,
+            },
+          },
           user: {
             select: {
               id: true,
@@ -455,6 +469,64 @@ export const artistRouter = router({
       return {
         message: 'Artwork unpublished successfully!',
         artwork: updatedArtwork,
+      };
+    }),
+
+  /**
+   * Protected procedure to set the profile picture for the authenticated artist.
+   */
+  setProfilePicture: protectedProcedure
+    .input(setProfilePictureInput)
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user?.artist?.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have an artist profile.',
+        });
+      }
+
+      const { imageId } = input;
+      const artistId = ctx.user.artist.id;
+
+      const image = await ctx.prisma.image.findUnique({
+        where: { id: imageId },
+      });
+
+      if (!image) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Image not found.',
+        });
+      }
+
+      await ctx.prisma.$transaction(async (tx) => {
+        const currentArtist = await tx.artist.findUnique({
+          where: { id: artistId },
+          select: { profilePicImageId: true },
+        });
+        const oldImageId = currentArtist?.profilePicImageId;
+
+        await tx.artist.update({
+          where: { id: artistId },
+          data: { profilePicImageId: imageId },
+        });
+
+        if (oldImageId && oldImageId !== imageId) {
+          const oldImage = await tx.image.findUnique({
+            where: { id: oldImageId },
+            select: { originalArtworkId: true }
+          });
+          if (oldImage && !oldImage.originalArtworkId) {
+            await tx.image.delete({
+              where: { id: oldImageId },
+            });
+          }
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Profile picture updated successfully.',
       };
     }),
 });

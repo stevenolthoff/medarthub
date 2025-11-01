@@ -64,6 +64,8 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
         name={profileData.name}
         email={profileData.email}
         username={profileData.username}
+        profilePic={artistProfile.profilePic}
+        isOwner={isOwner}
       />
       
       {/* Main content area */}
