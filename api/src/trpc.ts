@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { type CreateExpressContextOptions } from '@trpc/server/adapters/express';
 import { Prisma } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import config from '../config/config';
 import prisma from './lib/prisma';
 
@@ -10,6 +10,8 @@ import prisma from './lib/prisma';
 interface JwtPayload {
   userId: string;
   email: string;
+  iat: number;
+  exp: number;
 }
 
 // Define select object for reuse and type generation
@@ -68,6 +70,29 @@ export const createContext = async ({ req, res }: CreateExpressContextOptions): 
         where: { id: decoded.userId },
         select: userWithArtistProfileSelect,
       });
+
+      if (user) {
+        const now = Date.now() / 1000;
+        const tokenLifetime = decoded.exp - decoded.iat;
+        const tokenAge = now - decoded.iat;
+
+        // Refresh if the token is more than halfway through its life
+        if (tokenAge > tokenLifetime / 2) {
+          const newToken = jwt.sign(
+            { userId: user.id, email: user.email },
+            config.jwtSecret,
+            { expiresIn: config.jwtExpiresIn } as SignOptions
+          );
+          // Set custom header on the response for the client to pick up
+          res.setHeader('X-Refreshed-Token', newToken);
+          
+          // Log token refresh for debugging (remove in production)
+          if (config.nodeEnv === 'development') {
+            const remainingTime = Math.round(tokenLifetime - tokenAge);
+            console.log(`🔄 Token refreshed for user ${user.id}. Old token had ${remainingTime}s remaining.`);
+          }
+        }
+      }
     } catch (error) {
       console.error('JWT verification failed:', error);
       // Token is invalid or expired, user remains null

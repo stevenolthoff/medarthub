@@ -48,6 +48,23 @@ export const createTRPCClient = () => {
           }
           return {};
         },
+        fetch(url, options) {
+          return fetch(url, options).then((response) => {
+            // Check for the 'X-Refreshed-Token' header on each response.
+            // Note: Browser headers are automatically lowercased.
+            const refreshedToken = response.headers.get('x-refreshed-token');
+            if (refreshedToken) {
+              // If a new token is found, update the cookie. This extends the session.
+              Cookies.set('auth-token', refreshedToken, { expires: 7, secure: process.env.NODE_ENV === 'production' });
+              
+              // Log token refresh for debugging (remove in production)
+              if (process.env.NODE_ENV === 'development') {
+                console.log('🔄 Token refreshed automatically - session extended');
+              }
+            }
+            return response;
+          });
+        },
       }),
     ],
   });

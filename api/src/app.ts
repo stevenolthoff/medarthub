@@ -46,6 +46,7 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
+  exposedHeaders: ['X-Refreshed-Token'],
 }));
 
 app.use(express.json());
