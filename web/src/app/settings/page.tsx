@@ -79,15 +79,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-12 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto max-w-3xl py-3 px-4 sm:py-12 sm:px-6 lg:px-8">
       <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>Update your personal details and professional info.</CardDescription>
+        <Card className="border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-sm">
+          <CardHeader className="pb-2 px-0 sm:px-6 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Basic Information</CardTitle>
+            <CardDescription className="hidden sm:block">Update your personal details and professional info.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <FieldGroup>
+          <CardContent className="px-0 sm:px-6">
+            <FieldGroup className="gap-3 sm:gap-7">
               <Field>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -112,15 +112,15 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>About Me</CardTitle>
-            <CardDescription>Write a short bio about yourself.</CardDescription>
+        <Card className="mt-3 border-0 bg-transparent shadow-none sm:mt-8 sm:border sm:bg-card sm:shadow-sm">
+          <CardHeader className="pb-2 px-0 sm:px-6 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">About Me</CardTitle>
+            <CardDescription className="hidden sm:block">Write a short bio about yourself.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 sm:px-6">
             <Field>
               <FieldLabel htmlFor="about">Description</FieldLabel>
-              <Textarea id="about" value={about} onChange={(e) => setAbout(e.target.value)} rows={6} />
+              <Textarea id="about" value={about} onChange={(e) => setAbout(e.target.value)} rows={4} className="sm:rows-6" />
               <div className="text-right mt-2 text-sm text-muted-foreground">
                 {about.length} / 2000
               </div>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-4 sm:mt-8 flex justify-end">
           <Button type="submit" disabled={updateProfileMutation.isPending}>
             {updateProfileMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             Save Changes
