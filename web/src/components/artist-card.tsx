@@ -1,62 +1,60 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { type RouterOutputs } from '@/lib/server-trpc';
-import { generateOptimizedImageUrl } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Dot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { OptimizedAvatarImage } from '@/components/optimized-avatar-image';
 
-type ArtistWithArtworks = RouterOutputs['artist']['list'][0];
+type ArtworkWithUrl = {
+  id: string;
+  slug: string;
+  title: string;
+  coverImageUrl: string;
+  coverImage: {
+    width: number | null;
+    height: number | null;
+  } | null;
+};
 
-function ArtworkImage({ artwork }: { artwork: ArtistWithArtworks['artworks'][0] }) {
-  const [imageUrl, setImageUrl] = useState('/placeholder-artwork.svg');
+type ArtistForCard = {
+  id: string;
+  slug: string;
+  user: { name: string };
+  profilePicUrl: string;
+  artworks: ArtworkWithUrl[];
+};
 
-  useEffect(() => {
-    let isActive = true;
-    async function getUrl() {
-      if (artwork.coverImage?.key) {
-        const url = await generateOptimizedImageUrl(artwork.coverImage.key, {
-          width: 800,
-          height: 600,
-          format: 'webp',
-          quality: 75,
-        });
-        if (isActive) setImageUrl(url);
-      }
-    }
-    getUrl();
-    return () => { isActive = false; };
-  }, [artwork.coverImage]);
-
+function ArtworkImage({ artwork }: { artwork: ArtworkWithUrl }) {
   return (
     <Image
-      src={imageUrl}
+      src={artwork.coverImageUrl}
       alt={artwork.title}
       fill
       sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
       className="object-cover transition-transform duration-300 group-hover:scale-105"
-      priority={imageUrl !== '/placeholder-artwork.svg'}
+      priority
     />
   );
 }
 
-function ArtistAvatar({ artist, artwork }: { artist: ArtistWithArtworks; artwork: ArtistWithArtworks['artworks'][0] }) {
-  const isDiceBearAvatar = !artist.profilePic?.key;
+function ArtistAvatar({ artist, artwork }: { artist: ArtistForCard; artwork: ArtworkWithUrl }) {
+  const isDiceBearAvatar = artist.profilePicUrl.includes('dicebear.com');
 
   return (
     <div className="flex flex-1 flex-col p-4">
       <div className="flex items-center gap-3">
         <div className="flex-shrink-0">
           <Avatar className="size-10 border">
-            <OptimizedAvatarImage
-              imageKey={artist.profilePic?.key}
+            <Image
+              src={artist.profilePicUrl}
               alt={`${artist.user.name}'s avatar`}
-              seed={artist.user.name}
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
               unoptimized={isDiceBearAvatar}
             />
             <AvatarFallback>{artist.user.name.charAt(0)}</AvatarFallback>
@@ -73,7 +71,7 @@ function ArtistAvatar({ artist, artwork }: { artist: ArtistWithArtworks; artwork
   );
 }
 
-export function ArtistCard({ artist }: { artist: ArtistWithArtworks }) {
+export function ArtistCard({ artist }: { artist: ArtistForCard }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {

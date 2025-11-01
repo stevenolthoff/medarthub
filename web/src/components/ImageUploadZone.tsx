@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Trash2, CheckCircle, CircleX } from 'lucide-react';
 import { FieldError } from '@/components/ui/field';
 import { trpc } from '@/lib/trpc'; // Import trpc for the mutation
-import { generateOptimizedImageUrl } from '@/lib/utils'; // Use optimized URLs
+import { generateOptimizedClientUrl } from '@/lib/utils'; // Use optimized URLs
 import { useAuth } from '@/hooks/use-auth'; // To get userId for R2 key prefix
 
 // Define the new type for files with upload status
@@ -51,7 +51,7 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
       const initialWidth = currentArtworkCoverImage.width || undefined;
       const initialHeight = currentArtworkCoverImage.height || undefined;
       (async () => {
-        const optimizedUrl = await generateOptimizedImageUrl(initialImageKey, {
+        const optimizedUrl = await generateOptimizedClientUrl(initialImageKey, {
           width: initialWidth || 600,
           height: initialHeight || 450,
           format: 'webp',
@@ -113,7 +113,7 @@ export function ImageUploadZone({ currentArtworkCoverImage, onImageSelected }: I
       }
 
       // Build optimized preview URL
-      const optimizedPreviewUrl = await generateOptimizedImageUrl(r2Key, {
+      const optimizedPreviewUrl = await generateOptimizedClientUrl(r2Key, {
         width: fileWithStatus.width || 600,
         height: fileWithStatus.height || 450,
         format: 'webp',

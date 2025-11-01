@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { EmptyGalleryState } from "./empty-gallery-state";
 import { AddArtworkModal } from "./add-artwork-modal";
 import { ArtworkLightbox } from "./artwork-lightbox";
@@ -11,7 +10,6 @@ import { type RouterOutputs } from "@/lib/server-trpc";
 import { Edit, Trash2, Loader2, Plus, ThumbsUp, Eye } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useRouter, usePathname, useParams } from "next/navigation";
-import { generateOptimizedImageUrl } from "@/lib/utils";
 
 type Tab = {
   id: string;
@@ -19,14 +17,16 @@ type Tab = {
   count?: number;
 };
 
-// Use inferred type directly, now includes coverImage
+// Use inferred type directly, now includes coverImage and coverImageUrl
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
+type ArtworkWithUrl = Artwork & { coverImageUrl: string };
 
 type TabbedContentProps = {
   isOwner: boolean;
   isLoggedIn: boolean;
   artistSlug: string;
   artistName: string;
+  initialArtworks?: ArtworkWithUrl[];
 };
 
 // Child component to safely use hooks per item without violating Rules of Hooks
@@ -34,33 +34,12 @@ function OptimizedArtworkImage({
   item,
   artistName,
 }: {
-  item: Artwork & { likes: number; views: number };
+  item: ArtworkWithUrl & { likes: number; views: number };
   artistName: string;
 }) {
-  const [optimizedSrc, setOptimizedSrc] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const loadOptimized = async () => {
-      if (item.coverImage?.key) {
-        const url = await generateOptimizedImageUrl(item.coverImage.key, {
-          width: 400,
-          height: 300,
-          format: 'webp',
-          quality: 70,
-        });
-        setOptimizedSrc(url);
-      } else {
-        setOptimizedSrc('/placeholder-artwork.svg');
-      }
-    };
-    loadOptimized();
-  }, [item.coverImage?.key]);
-
-  if (!optimizedSrc) return null;
-
   return (
     <Image
-      src={optimizedSrc}
+      src={item.coverImageUrl}
       alt={`${item.title} by ${artistName} - Digital artwork on MedArtHub`}
       fill
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -70,12 +49,12 @@ function OptimizedArtworkImage({
   );
 }
 
-export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, initialArtworks }: TabbedContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("work");
   
-  // Fetch artist data using tRPC query
+  // Fetch artist data using tRPC query for updates
   const { data: artistProfile, isLoading } = trpc.artist.getBySlug.useQuery({
     slug: artistSlug,
   });
@@ -86,8 +65,8 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedArtworkIdForLightbox, setSelectedArtworkIdForLightbox] = useState<string | null>(null);
 
-  // Get artworks from query data, with loading state
-  const artworks = artistProfile?.artworks || [];
+  // Prefer server-rendered initial artworks, use fetched data for updates
+  const artworks = initialArtworks || artistProfile?.artworks || [];
   const currentWorkItems = artworks.filter(artwork => 
     isOwner ? true : artwork.status === 'PUBLISHED'
   ).map(artwork => ({
@@ -162,8 +141,8 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
     setSelectedArtworkIdForLightbox(null);
   };
 
-  // Show loading state while fetching data
-  if (isLoading) {
+  // Show loading state ONLY if initial data is missing and we are fetching on the client
+  if (isLoading && !initialArtworks) {
     return (
       <div className="w-full">
         <div className="flex items-center justify-center py-12">
@@ -228,7 +207,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName }: T
                     <span className="mb-3 text-gray-700 font-medium text-xs">Add New Artwork</span>
                   </button>
                 )}
-                {(currentWorkItems as (Artwork & { likes: number; views: number })[]).map((item) => {
+                {(currentWorkItems as (ArtworkWithUrl & { likes: number; views: number })[]).map((item) => {
                   return (
                 <div key={item.id} 
                      className="group relative overflow-hidden cursor-pointer rounded-lg"

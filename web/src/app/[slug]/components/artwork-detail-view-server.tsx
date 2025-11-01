@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { generateOptimizedImageUrl } from "@/lib/utils";
+import { generateOptimizedClientUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
 
@@ -34,7 +34,7 @@ export function ArtworkDetailViewServer({
   useEffect(() => {
     async function load() {
       if (artwork.coverImage?.key) {
-        const url = await generateOptimizedImageUrl(artwork.coverImage.key, {
+        const url = await generateOptimizedClientUrl(artwork.coverImage.key, {
           width: artwork.coverImage.width || 1200,
           height: artwork.coverImage.height || 900,
           format: 'webp',

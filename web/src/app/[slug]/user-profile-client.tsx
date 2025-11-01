@@ -14,8 +14,14 @@ import { type RouterOutputs } from "@/lib/server-trpc";
 // Use tRPC inferred types instead of manually defining them
 type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
 
+// Extended type to include pre-generated URLs from server
+type ArtistWithUrls = Artist & {
+  profilePicUrl: string;
+  artworks: Array<Artist['artworks'][0] & { coverImageUrl: string }>;
+};
+
 interface UserProfileClientProps {
-  artistProfile: Artist; // Artist profile data fetched on the server
+  artistProfile: ArtistWithUrls; // Artist profile data with pre-generated URLs
   profileSlug: string; // Artist slug from the URL
 }
 
@@ -64,6 +70,7 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
         name={profileData.name}
         email={profileData.email}
         username={profileData.username}
+        profilePicUrl={artistProfile.profilePicUrl}
         profilePic={artistProfile.profilePic}
         isOwner={isOwner}
       />
@@ -85,6 +92,7 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
             isLoggedIn={isLoggedIn}
             artistSlug={profileSlug}
             artistName={profileData.name}
+            initialArtworks={artistProfile.artworks}
           />
         </div>
       </div>

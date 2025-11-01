@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, Link, Check } from "lucide-react";
 import { type RouterOutputs } from "@/lib/server-trpc";
-import { generateOptimizedImageUrl } from "@/lib/utils";
+import { generateOptimizedClientUrl } from "@/lib/utils";
 
 type Artwork = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0]; // Now includes coverImage
 
@@ -59,7 +59,7 @@ export function ArtworkLightbox({
   useEffect(() => {
     async function loadOptimized() {
       if (currentArtwork?.coverImage?.key) {
-        const url = await generateOptimizedImageUrl(currentArtwork.coverImage.key, {
+        const url = await generateOptimizedClientUrl(currentArtwork.coverImage.key, {
           width: currentArtwork.coverImage.width || 1920,
           height: currentArtwork.coverImage.height || 1080,
           format: 'webp',

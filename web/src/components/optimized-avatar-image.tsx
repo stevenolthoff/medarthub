@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { generateOptimizedImageUrl } from '@/lib/utils';
+import { generateOptimizedClientUrl } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 interface OptimizedAvatarImageProps {
@@ -25,7 +25,7 @@ export function OptimizedAvatarImage({ imageKey, alt, seed, className, unoptimiz
 
     async function getUrl() {
       if (imageKey) {
-        const url = await generateOptimizedImageUrl(imageKey, { width: 160, height: 160, format: 'webp', quality: 80 });
+        const url = await generateOptimizedClientUrl(imageKey, { width: 160, height: 160, format: 'webp', quality: 80 });
         if (isActive) {
           setImageUrl(url);
         }

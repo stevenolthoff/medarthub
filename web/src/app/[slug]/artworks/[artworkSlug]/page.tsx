@@ -3,7 +3,7 @@ import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc";
 import { ArtworkDetailViewServer } from "../../components/artwork-detail-view-server";
 import Link from "next/link";
 import { Metadata } from "next";
-import { generateOptimizedImageUrl } from "@/lib/utils";
+import { generateOptimizedClientUrl } from "@/lib/utils";
 import { ArtworkStructuredData } from "@/components/structured-data";
 
 // Define types for params
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: ArtworkPageProps): Promise<Me
   }
 
   const ogImageUrl = artwork.coverImage?.key
-    ? await generateOptimizedImageUrl(artwork.coverImage.key, {
+    ? await generateOptimizedClientUrl(artwork.coverImage.key, {
         width: 1200,
         height: 630,
         format: 'jpeg',

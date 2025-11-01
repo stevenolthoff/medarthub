@@ -4,7 +4,7 @@ import { serverTrpc, type RouterOutputs } from "@/lib/server-trpc"; // Import th
 import { UserProfileClient } from "./user-profile-client"; // Import the new client component
 import { Metadata } from "next";
 import { ArtistStructuredData } from "@/components/structured-data";
-import { getArtworkImageUrl } from "@/lib/utils";
+import { getArtworkImageUrl, generateOptimizedServerUrl } from "@/lib/utils";
 
 // Use tRPC inferred types instead of manually defining them
 type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
@@ -86,6 +86,20 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
     notFound();
   }
 
+  // Augment the profile with server-generated URLs
+  const augmentedProfile = {
+    ...artistProfile,
+    profilePicUrl: artistProfile.profilePic?.key
+      ? generateOptimizedServerUrl(artistProfile.profilePic.key, { width: 160, height: 160, format: 'webp', quality: 80 })
+      : `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artistProfile.user.name || artistProfile.user.email)}&flip=true`,
+    artworks: artistProfile.artworks.map(art => ({
+      ...art,
+      coverImageUrl: art.coverImage?.key
+        ? generateOptimizedServerUrl(art.coverImage.key, { width: 400, height: 300, format: 'webp', quality: 70 })
+        : '/placeholder-artwork.svg'
+    }))
+  };
+
   // Pass the fetched artist profile data to the client component.
   // The client component will then handle client-side auth (via useAuth)
   // and render the appropriate private/public view.
@@ -96,7 +110,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
         baseUrl={process.env.NEXT_PUBLIC_BASE_URL || 'https://Medical Artists.com'} 
       />
       <UserProfileClient 
-        artistProfile={artistProfile} 
+        artistProfile={augmentedProfile} 
         profileSlug={profileSlug} 
       />
     </>

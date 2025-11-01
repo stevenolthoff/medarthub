@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
 
 const ProfileAvatarEditor = dynamic(() => import("./profile-avatar-editor").then(mod => mod.ProfileAvatarEditor), {
   ssr: false,
@@ -14,6 +14,7 @@ type ProfileAvatarProps = {
   email: string;
   username: string;
   isOwner: boolean;
+  profilePicUrl: string;
   profilePic: {
     key: string;
     width?: number | null;
@@ -21,7 +22,7 @@ type ProfileAvatarProps = {
   } | null;
 };
 
-export function ProfileAvatar({ name, email, username, profilePic, isOwner }: ProfileAvatarProps) {
+export function ProfileAvatar({ name, email, username, profilePicUrl, profilePic, isOwner }: ProfileAvatarProps) {
   const getInitials = (name?: string | null, email?: string) => {
     if (name) {
       const parts = name.split(" ");
@@ -33,7 +34,7 @@ export function ProfileAvatar({ name, email, username, profilePic, isOwner }: Pr
     return email?.[0]?.toUpperCase() || "NN";
   };
 
-  const isDiceBearAvatar = !profilePic?.key;
+  const isDiceBearAvatar = profilePicUrl.includes('dicebear.com');
 
   return (
     <div className="relative -mt-24 md:-mt-28">
@@ -41,11 +42,14 @@ export function ProfileAvatar({ name, email, username, profilePic, isOwner }: Pr
         <div className="flex justify-center md:justify-start">
           <div className="relative">
             <Avatar className="size-32 md:size-40 border-2 border-white bg-white shadow-xl">
-              <OptimizedAvatarImage
-                imageKey={profilePic?.key}
+              <Image
+                src={profilePicUrl}
                 alt={`${name}'s avatar`}
-                seed={name || email || 'user'}
+                width={160}
+                height={160}
+                className="rounded-full object-cover"
                 unoptimized={isDiceBearAvatar}
+                priority
               />
               <AvatarFallback className="text-2xl">{getInitials(name, email)}</AvatarFallback>
             </Avatar>
