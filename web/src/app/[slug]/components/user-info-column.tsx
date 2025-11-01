@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Briefcase, MapPin, Link as LinkIcon, CalendarDays } from "lucide-react";
 
 type UserInfoColumnProps = {
   name: string;
   email: string;
   username: string;
   createdAt: Date;
+  headline?: string | null;
+  company?: string | null;
+  location?: string | null;
+  websiteUrl?: string | null;
   isOwner: boolean;
   isLoggedIn: boolean;
 };
@@ -15,50 +20,58 @@ export function UserInfoColumn({
   email, 
   username, 
   createdAt, 
+  headline,
+  company,
+  location,
+  websiteUrl,
   isOwner, 
   isLoggedIn 
 }: UserInfoColumnProps) {
   return (
     <div className="w-full lg:w-1/6 flex flex-col items-center lg:items-start">
       {/* User Name */}
-      <h1 className="text-3xl md:text-4xl font-bold text-center lg:text-left mb-4">{name}</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-center lg:text-left mb-1 break-words">{name}</h1>
+      {headline && <p className="text-lg text-muted-foreground text-center lg:text-left mb-4">{headline}</p>}
       
       {/* Professional Details */}
-      <div className="w-full space-y-3 mb-6">
+      <div className="w-full space-y-2 mb-6">
+        {company && (
+          <div className="flex items-center gap-3 text-sm text-foreground">
+            <Briefcase className="size-4 text-muted-foreground flex-shrink-0" />
+            <span>{company}</span>
+          </div>
+        )}
+        {location && (
+          <div className="flex items-center gap-3 text-sm text-foreground">
+            <MapPin className="size-4 text-muted-foreground flex-shrink-0" />
+            <span>{location}</span>
+          </div>
+        )}
+        {websiteUrl && (
+          <div className="flex items-center gap-3 text-sm text-foreground">
+            <LinkIcon className="size-4 text-muted-foreground flex-shrink-0" />
+            <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
+              {websiteUrl.replace(/^(https?:\/\/)?(www\.)?/, '')}
+            </a>
+          </div>
+        )}
         <div className="flex items-center gap-3 text-sm text-foreground">
-          <div className="w-4 h-4 bg-green-500 rounded-full flex-shrink-0"></div>
-          <span>Available for Freelance</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-foreground">
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
-          <span>Creative Professional</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-foreground">
-          <div className="w-4 h-4 bg-purple-500 rounded-full flex-shrink-0"></div>
-          <span>Medical Artists Member</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-foreground">
-          <div className="w-4 h-4 bg-orange-500 rounded-full flex-shrink-0"></div>
-          <span>Joined {new Date(createdAt).toLocaleDateString()}</span>
+          <CalendarDays className="size-4 text-muted-foreground flex-shrink-0" />
+          <span>Joined {new Date(createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="w-full space-y-3 mb-6">
         {isOwner ? (
-          <>
-            <Button className="w-full" asChild>
-              <Link href="/settings">Edit Profile</Link>
-            </Button>
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/project-briefs">View Your Projects</Link>
-            </Button>
-          </>
+          <Button className="w-full" asChild>
+            <Link href="/settings">Edit Your Profile</Link>
+          </Button>
         ) : (
           <>
             {isLoggedIn ? (
               <Button className="w-full" asChild>
-                <Link href={`mailto:${email}`}>Contact {name}</Link>
+                <Link href={`mailto:${email}`}>Contact</Link>
               </Button>
             ) : (
               <Button className="w-full" asChild>

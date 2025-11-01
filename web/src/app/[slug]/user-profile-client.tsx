@@ -93,6 +93,10 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
                   email={profileData.email}
                   username={profileData.username}
                   createdAt={profileData.createdAt}
+                  headline={artistProfile.headline}
+                  company={artistProfile.company}
+                  location={artistProfile.location}
+                  websiteUrl={artistProfile.websiteUrl}
                   isOwner={isOwner}
                   isLoggedIn={isLoggedIn}
                 />
@@ -102,6 +106,7 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
                   isLoggedIn={isLoggedIn}
                   artistSlug={profileSlug}
                   artistName={profileData.name}
+                  about={artistProfile.about}
                   initialArtworks={artistProfile.artworks}
                 />
               </div>

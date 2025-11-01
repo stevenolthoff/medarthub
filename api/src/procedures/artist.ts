@@ -60,6 +60,18 @@ const unpublishArtworkInput = z.object({
 });
 
 /**
+ * Zod schema for updating artist profile.
+ */
+const updateProfileInput = z.object({
+  name: z.string().min(1, 'Name cannot be empty').optional(),
+  headline: z.string().nullable().optional(),
+  company: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
+  websiteUrl: z.string().url('Must be a valid URL').or(z.literal('')).nullable().optional(),
+  about: z.string().max(1000, 'About section cannot exceed 1000 characters').nullable().optional(),
+});
+
+/**
  * Router for artist-related procedures.
  */
 export const artistRouter = router({
@@ -125,6 +137,11 @@ export const artistRouter = router({
         select: {
           id: true,
           slug: true,
+          headline: true,
+          company: true,
+          location: true,
+          websiteUrl: true,
+          about: true,
           createdAt: true,
           profilePic: {
             select: {
@@ -183,6 +200,50 @@ export const artistRouter = router({
       }
 
       return artist;
+    }),
+
+  /**
+   * Protected procedure to update artist profile information.
+   */
+  updateProfile: protectedProcedure
+    .input(updateProfileInput)
+    .mutation(async ({ input, ctx }) => {
+      const { user } = ctx;
+      const artistId = user.artist?.id;
+
+      if (!artistId) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'User does not have an artist profile.' });
+      }
+
+      const { name, ...artistData } = input;
+
+      // Convert empty strings to null
+      const cleanedArtistData = Object.fromEntries(
+        Object.entries(artistData).map(([key, value]) => [
+          key,
+          value === '' ? null : value
+        ])
+      );
+
+      await ctx.prisma.$transaction(async (tx) => {
+        // Update User table if name is provided
+        if (name) {
+          await tx.user.update({
+            where: { id: user.id },
+            data: { name },
+          });
+        }
+
+        // Update Artist table with the rest of the data
+        if (Object.keys(cleanedArtistData).length > 0) {
+          await tx.artist.update({
+            where: { id: artistId },
+            data: cleanedArtistData,
+          });
+        }
+      });
+
+      return { success: true, message: 'Profile updated successfully.' };
     }),
 
   /**

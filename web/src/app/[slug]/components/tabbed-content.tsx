@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EmptyGalleryState } from "./empty-gallery-state";
 import { AddArtworkModal } from "./add-artwork-modal";
@@ -26,6 +27,7 @@ type TabbedContentProps = {
   isLoggedIn: boolean;
   artistSlug: string;
   artistName: string;
+  about?: string | null;
   initialArtworks?: ArtworkWithUrl[];
 };
 
@@ -49,7 +51,7 @@ function OptimizedArtworkImage({
   );
 }
 
-export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, initialArtworks }: TabbedContentProps) {
+export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, about, initialArtworks }: TabbedContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("work");
@@ -77,8 +79,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, ini
 
   const defaultTabs: Tab[] = [
     { id: "work", label: "Work" },
-    { id: "moodboards", label: "Moodboards", count: 0 },
-    { id: "appreciations", label: "Appreciations", count: 0 }
+    { id: "about", label: "About" },
   ];
 
   const tabsWithDynamicCounts = defaultTabs.map(tab => {
@@ -179,7 +180,7 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, ini
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[300px]">
         {activeTab === "work" && (
           <div>
             {!isOwner && currentWorkItems.length > 0 && (
@@ -276,20 +277,24 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, ini
           </div>
         )}
 
-        {activeTab === "moodboards" && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Moodboards coming soon...</p>
-            {isOwner && (
-              <Button className="mt-4" size="sm" onClick={handleOpenAddArtworkModal}>
-                Create Moodboard
-              </Button>
+        {activeTab === "about" && (
+          <div className="max-w-2xl">
+            {about ? (
+              <div className="prose prose-neutral dark:prose-invert whitespace-pre-wrap">
+                <p>{about}</p>
+              </div>
+            ) : (
+              <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                <p className="text-muted-foreground">
+                  {isOwner ? "You haven't added a bio yet." : "This artist hasn't added a bio yet."}
+                </p>
+                {isOwner && (
+                  <Button asChild variant="secondary" className="mt-4">
+                    <Link href="/settings">Add Your Bio</Link>
+                  </Button>
+                )}
+              </div>
             )}
-          </div>
-        )}
-
-        {activeTab === "appreciations" && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Appreciations will be shown here.</p>
           </div>
         )}
       </div>

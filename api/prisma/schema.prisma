@@ -23,6 +23,11 @@ model User {
 model Artist {
   id               String    @id @default(uuid())
   slug             String    @unique
+  headline         String?
+  company          String?
+  location         String?
+  websiteUrl       String?
+  about            String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   userId           String    @unique
