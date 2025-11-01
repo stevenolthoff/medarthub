@@ -50,6 +50,48 @@ const unpublishArtworkInput = z.object({
  */
 export const artistRouter = router({
   /**
+   * Public procedure to get a list of all artists with a preview of their work.
+   */
+  list: publicProcedure.query(async ({ ctx }) => {
+    const artists = await ctx.prisma.artist.findMany({
+      select: {
+        id: true,
+        slug: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+          },
+        },
+        artworks: {
+          where: { status: ArtworkStatus.PUBLISHED },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            coverImage: {
+              select: {
+                id: true,
+                key: true,
+                width: true,
+                height: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return artists.filter(artist => artist.artworks.length > 0);
+  }),
+
+  /**
    * Public procedure to get an artist's public profile details by slug.
    */
   getBySlug: publicProcedure
