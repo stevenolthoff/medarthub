@@ -32,6 +32,7 @@ export function ProfileAvatar({ name, email, username }: ProfileAvatarProps) {
               height={160}
               className="rounded-full"
               unoptimized
+              priority
             />
             <AvatarFallback className="text-2xl">{getInitials(name, email)}</AvatarFallback>
           </Avatar>

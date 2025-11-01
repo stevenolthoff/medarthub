@@ -18,6 +18,20 @@ export function getArtworkImageR2Key(imageInfo: ArtworkImageInfo | undefined | n
   return imageInfo?.key || null;
 }
 
+export function getArtworkImageUrl(imageKey: string | null | undefined): string {
+  if (!imageKey) {
+    return "/placeholder-artwork.svg";
+  }
+  
+  const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
+  if (r2PublicEndpoint) {
+    const prefix = r2PublicEndpoint.replace(/\/$/, '');
+    return `${prefix}/${imageKey}`;
+  }
+  
+  return "/placeholder-artwork.svg";
+}
+
 interface ImageOptimizationOptions {
   width?: number;
   height?: number;
