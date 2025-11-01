@@ -79,7 +79,7 @@ export function ArtistCard({ artist }: { artist: ArtistForCard }) {
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? artist.artworks.length - 1 : prev));
+    setCurrentIndex((prev) => (prev === 0 ? artist.artworks.length - 1 : prev - 1));
   };
 
   const currentArtwork = useMemo(() => artist.artworks[currentIndex], [artist.artworks, currentIndex]);
