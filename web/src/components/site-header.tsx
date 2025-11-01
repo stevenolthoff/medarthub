@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -16,35 +14,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, Folder, User } from "lucide-react";
-import { generateOptimizedImageUrl } from "@/lib/utils";
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
 
 export function SiteHeader() {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
-  const [avatarUrl, setAvatarUrl] = useState(
-    `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}&flip=true`
-  );
-
-  useEffect(() => {
-    let isActive = true;
-    async function getUrl() {
-      if (user?.artist?.profilePic?.key) {
-        const url = await generateOptimizedImageUrl(user.artist.profilePic.key, {
-          width: 36,
-          height: 36,
-          format: 'webp',
-          quality: 80,
-        });
-        if (isActive) setAvatarUrl(url);
-      } else {
-        const diceBearUrl = `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(user?.name || user?.email || "user")}&flip=true`;
-        if (isActive) setAvatarUrl(diceBearUrl);
-      }
-    }
-    if (user) {
-      getUrl();
-    }
-    return () => { isActive = false; };
-  }, [user?.artist?.profilePic, user?.name, user?.email]);
 
   const getInitials = (name?: string | null, email?: string) => {
     if (name) {
@@ -67,18 +40,16 @@ export function SiteHeader() {
         </Link>
         <nav className="flex items-center space-x-6">
           {isLoading ? (
-            <div className="size-8 animate-pulse rounded-full bg-muted" />
+            <div className="size-9 animate-pulse rounded-full bg-muted" />
           ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 cursor-pointer">
                   <Avatar className="size-9">
-                    <Image
-                      src={avatarUrl}
+                    <OptimizedAvatarImage
+                      imageKey={user?.artist?.profilePic?.key}
                       alt="User Avatar"
-                      width={36}
-                      height={36}
-                      className="rounded-full object-cover"
+                      seed={user?.name || user?.email || 'user'}
                       unoptimized={isDiceBearAvatar}
                     />
                     <AvatarFallback>{getInitials(user?.name, user?.email)}</AvatarFallback>

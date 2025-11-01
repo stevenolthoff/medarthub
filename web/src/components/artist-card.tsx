@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Dot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { OptimizedAvatarImage } from '@/components/optimized-avatar-image';
 
 type ArtistWithArtworks = RouterOutputs['artist']['list'][0];
 
@@ -45,30 +46,6 @@ function ArtworkImage({ artwork }: { artwork: ArtistWithArtworks['artworks'][0] 
 }
 
 function ArtistAvatar({ artist, artwork }: { artist: ArtistWithArtworks; artwork: ArtistWithArtworks['artworks'][0] }) {
-  const [avatarUrl, setAvatarUrl] = useState(
-    `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}`
-  );
-
-  useEffect(() => {
-    let isActive = true;
-    async function getUrl() {
-      if (artist.profilePic?.key) {
-        const url = await generateOptimizedImageUrl(artist.profilePic.key, {
-          width: 40,
-          height: 40,
-          format: 'webp',
-          quality: 80,
-        });
-        if (isActive) setAvatarUrl(url);
-      } else {
-        const diceBearUrl = `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}`;
-        if (isActive) setAvatarUrl(diceBearUrl);
-      }
-    }
-    getUrl();
-    return () => { isActive = false; };
-  }, [artist.profilePic, artist.user.name]);
-
   const isDiceBearAvatar = !artist.profilePic?.key;
 
   return (
@@ -76,12 +53,10 @@ function ArtistAvatar({ artist, artwork }: { artist: ArtistWithArtworks; artwork
       <div className="flex items-center gap-3">
         <div className="flex-shrink-0">
           <Avatar className="size-10 border">
-            <Image
-              src={avatarUrl}
+            <OptimizedAvatarImage
+              imageKey={artist.profilePic?.key}
               alt={`${artist.user.name}'s avatar`}
-              width={40}
-              height={40}
-              className="rounded-full object-cover"
+              seed={artist.user.name}
               unoptimized={isDiceBearAvatar}
             />
             <AvatarFallback>{artist.user.name.charAt(0)}</AvatarFallback>
