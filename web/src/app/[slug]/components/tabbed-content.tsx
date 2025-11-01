@@ -71,8 +71,8 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, ini
     isOwner ? true : artwork.status === 'PUBLISHED'
   ).map(artwork => ({
     ...artwork,
-    likes: Math.floor(Math.random() * 500),
-    views: Math.floor(Math.random() * 5000),
+    likes: 42,
+    views: 1234,
   }));
 
   const defaultTabs: Tab[] = [
