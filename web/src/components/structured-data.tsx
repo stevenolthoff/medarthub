@@ -2,6 +2,7 @@ import { type RouterOutputs } from "@/lib/server-trpc";
 
 type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
 type Artwork = Artist['artworks'][0];
+type ArtistListItem = RouterOutputs['artist']['list'][0];
 
 interface ArtistStructuredDataProps {
   artist: Artist;
@@ -11,6 +12,11 @@ interface ArtistStructuredDataProps {
 interface ArtworkStructuredDataProps {
   artwork: Artwork;
   artist: Artist;
+  baseUrl: string;
+}
+
+interface HomeStructuredDataProps {
+  artists: ArtistListItem[];
   baseUrl: string;
 }
 
@@ -102,6 +108,64 @@ export function ArtworkStructuredData({ artwork, artist, baseUrl }: ArtworkStruc
         "name": artist.user.name
       }
     }
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+
+export function HomeStructuredData({ artists, baseUrl }: HomeStructuredDataProps) {
+  const publishedArtworks = artists.flatMap(artist => 
+    artist.artworks.map(artwork => ({
+      ...artwork,
+      artist: artist
+    }))
+  );
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Medical Artists - Discover Amazing Medical & Scientific Art",
+    "description": "Explore portfolios from talented creators in the medical and scientific fields. Discover digital art, illustrations, and creative works from medical artists worldwide.",
+    "url": baseUrl,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Medical Artists",
+      "url": baseUrl
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": publishedArtworks.length,
+      "itemListElement": publishedArtworks.slice(0, 20).map((artwork, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "CreativeWork",
+          "name": artwork.title,
+          "description": `${artwork.title} by ${artwork.artist.user.name}`,
+          "url": `${baseUrl}/${artwork.artist.user.username}/artworks/${artwork.slug}`,
+          "creator": {
+            "@type": "Person",
+            "name": artwork.artist.user.name,
+            "alternateName": `@${artwork.artist.user.username}`,
+            "url": `${baseUrl}/${artwork.artist.user.username}`
+          },
+          "genre": "Digital Art",
+          "artform": "Digital Illustration"
+        }
+      }))
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Medical Art",
+      "description": "Digital art and illustrations in the medical and scientific fields"
+    },
+    "keywords": ["medical art", "scientific illustration", "medical illustration", "digital art", "art portfolio", "medical artists", "healthcare art", "biomedical art"],
+    "inLanguage": "en"
   };
 
   return (

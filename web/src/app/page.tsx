@@ -1,6 +1,59 @@
 import { serverTrpc } from "@/lib/server-trpc";
 import { ArtistCard } from "@/components/artist-card";
-import { generateOptimizedServerUrl } from "@/lib/utils";
+import { generateOptimizedServerUrl, generateOptimizedClientUrl } from "@/lib/utils";
+import { Metadata } from "next";
+import { HomeStructuredData } from "@/components/structured-data";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const artists = await serverTrpc.artist.list.query();
+  // Note: artist.list only returns artists with published artworks, so all artworks are published
+  const publishedArtworks = artists.flatMap(artist => artist.artworks);
+  const totalArtists = artists.length;
+  const totalArtworks = publishedArtworks.length;
+
+  // Get featured artwork for OG image if available
+  const featuredArtwork = publishedArtworks.find(artwork => artwork.coverImage?.key);
+  const ogImageUrl = featuredArtwork?.coverImage?.key
+    ? await generateOptimizedClientUrl(featuredArtwork.coverImage.key, {
+        width: 1200,
+        height: 630,
+        format: 'jpeg',
+        quality: 80,
+      })
+    : undefined;
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://medicalartists.co';
+  
+  return {
+    title: "Medical Artists - Discover Amazing Medical & Scientific Art",
+    description: `Explore ${totalArtworks > 0 ? `${totalArtworks} ${totalArtworks === 1 ? 'artwork' : 'artworks'} from ${totalArtists} ${totalArtists === 1 ? 'artist' : 'talented artists'}` : 'portfolios from talented creators'} in the medical and scientific fields. Discover digital art, illustrations, and creative works from medical artists worldwide.`,
+    keywords: ["medical art", "scientific illustration", "medical illustration", "digital art", "art portfolio", "medical artists", "healthcare art", "biomedical art"],
+    openGraph: {
+      title: "Medical Artists - Discover Amazing Medical & Scientific Art",
+      description: `Explore ${totalArtworks > 0 ? `${totalArtworks} ${totalArtworks === 1 ? 'artwork' : 'artworks'} from ${totalArtists} ${totalArtists === 1 ? 'artist' : 'talented artists'}` : 'portfolios from talented creators'} in the medical and scientific fields.`,
+      type: "website",
+      url: baseUrl,
+      siteName: "Medical Artists",
+      images: ogImageUrl ? [
+        {
+          url: ogImageUrl,
+          alt: featuredArtwork?.title || "Medical Artists Homepage",
+          width: 1200,
+          height: 630,
+        },
+      ] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Medical Artists - Discover Amazing Medical & Scientific Art",
+      description: `Explore ${totalArtworks > 0 ? `${totalArtworks} ${totalArtworks === 1 ? 'artwork' : 'artworks'} from ${totalArtists} ${totalArtists === 1 ? 'artist' : 'talented artists'}` : 'portfolios from talented creators'} in the medical and scientific fields.`,
+      images: ogImageUrl ? [ogImageUrl] : undefined,
+    },
+    alternates: {
+      canonical: baseUrl,
+    },
+  };
+}
 
 export default async function Home() {
   const artists = await serverTrpc.artist.list.query();
@@ -18,8 +71,12 @@ export default async function Home() {
       : `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}&flip=true`
   }));
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://medicalartists.com';
+
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <>
+      <HomeStructuredData artists={artists} baseUrl={baseUrl} />
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
           Discover Amazing Artists
@@ -43,6 +100,7 @@ export default async function Home() {
             </p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
