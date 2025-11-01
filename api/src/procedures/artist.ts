@@ -64,6 +64,13 @@ export const artistRouter = router({
       select: {
         id: true,
         slug: true,
+        profilePic: {
+          select: {
+            key: true,
+            width: true,
+            height: true,
+          },
+        },
         user: {
           select: {
             id: true,
@@ -527,6 +534,59 @@ export const artistRouter = router({
       return {
         success: true,
         message: 'Profile picture updated successfully.',
+      };
+    }),
+
+  /**
+   * Protected procedure to remove the profile picture for the authenticated artist.
+   */
+  removeProfilePicture: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      if (!ctx.user?.artist?.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have an artist profile.',
+        });
+      }
+
+      const artistId = ctx.user.artist.id;
+
+      await ctx.prisma.$transaction(async (tx) => {
+        // 1. Get the current artist to find the profile picture ID
+        const currentArtist = await tx.artist.findUnique({
+          where: { id: artistId },
+          select: { profilePicImageId: true },
+        });
+
+        const oldImageId = currentArtist?.profilePicImageId;
+
+        // If there's no profile picture to remove, we're done.
+        if (!oldImageId) {
+          return;
+        }
+
+        // 2. Set the artist's profilePicImageId to null
+        await tx.artist.update({
+          where: { id: artistId },
+          data: { profilePicImageId: null },
+        });
+
+        // 3. Delete the old image record if it's not used elsewhere (e.g., as an artwork cover)
+        const oldImage = await tx.image.findUnique({
+          where: { id: oldImageId },
+          select: { originalArtworkId: true }
+        });
+
+        if (oldImage && !oldImage.originalArtworkId) {
+          await tx.image.delete({
+            where: { id: oldImageId },
+          });
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Profile picture removed successfully.',
       };
     }),
 });

@@ -44,6 +44,60 @@ function ArtworkImage({ artwork }: { artwork: ArtistWithArtworks['artworks'][0] 
   );
 }
 
+function ArtistAvatar({ artist, artwork }: { artist: ArtistWithArtworks; artwork: ArtistWithArtworks['artworks'][0] }) {
+  const [avatarUrl, setAvatarUrl] = useState(
+    `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}`
+  );
+
+  useEffect(() => {
+    let isActive = true;
+    async function getUrl() {
+      if (artist.profilePic?.key) {
+        const url = await generateOptimizedImageUrl(artist.profilePic.key, {
+          width: 40,
+          height: 40,
+          format: 'webp',
+          quality: 80,
+        });
+        if (isActive) setAvatarUrl(url);
+      } else {
+        const diceBearUrl = `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}`;
+        if (isActive) setAvatarUrl(diceBearUrl);
+      }
+    }
+    getUrl();
+    return () => { isActive = false; };
+  }, [artist.profilePic, artist.user.name]);
+
+  const isDiceBearAvatar = !artist.profilePic?.key;
+
+  return (
+    <div className="flex flex-1 flex-col p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0">
+          <Avatar className="size-10 border">
+            <Image
+              src={avatarUrl}
+              alt={`${artist.user.name}'s avatar`}
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
+              unoptimized={isDiceBearAvatar}
+            />
+            <AvatarFallback>{artist.user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <h3 className="truncate font-semibold leading-tight">{artwork.title}</h3>
+          <p className="truncate text-sm text-muted-foreground">
+            {artist.user.name}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ArtistCard({ artist }: { artist: ArtistWithArtworks }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -123,29 +177,7 @@ export function ArtistCard({ artist }: { artist: ArtistWithArtworks }) {
         </>
       )}
 
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-            <Avatar className="size-10 border">
-              <Image
-                src={`https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artist.user.name)}`}
-                alt={`${artist.user.name}'s avatar`}
-                width={40}
-                height={40}
-                className="rounded-full"
-                unoptimized
-              />
-              <AvatarFallback>{artist.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <h3 className="truncate font-semibold leading-tight">{currentArtwork.title}</h3>
-            <p className="truncate text-sm text-muted-foreground">
-              {artist.user.name}
-            </p>
-          </div>
-        </div>
-      </div>
+      <ArtistAvatar artist={artist} artwork={currentArtwork} />
     </Link>
   );
 }

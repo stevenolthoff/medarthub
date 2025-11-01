@@ -14,9 +14,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { trpc } from '@/lib/trpc';
-import { Loader2, Pencil } from 'lucide-react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 
-export function ProfileAvatarEditor() {
+export function ProfileAvatarEditor({ profilePic }: { 
+  profilePic: { key: string } | null 
+}) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -24,8 +26,11 @@ export function ProfileAvatarEditor() {
   
   const createUploadUrlMutation = trpc.image.createUploadUrl.useMutation();
   const setProfilePicMutation = trpc.artist.setProfilePicture.useMutation();
+  const removeProfilePicMutation = trpc.artist.removeProfilePicture.useMutation();
   
-  const isLoading = createUploadUrlMutation.isPending || setProfilePicMutation.isPending;
+  const isUploading = createUploadUrlMutation.isPending || setProfilePicMutation.isPending;
+  const isRemoving = removeProfilePicMutation.isPending;
+  const isLoading = isUploading || isRemoving;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -77,6 +82,21 @@ export function ProfileAvatarEditor() {
     }
   };
 
+  const handleRemove = async () => {
+    if (!window.confirm('Are you sure you want to remove your profile picture?')) {
+      return;
+    }
+    setError(null);
+    try {
+      await removeProfilePicMutation.mutateAsync();
+      setIsOpen(false);
+      router.refresh();
+    } catch (err: any) {
+      console.error('Failed to remove profile picture:', err);
+      setError(err.message || 'An unexpected error occurred.');
+    }
+  };
+
   return (
     <>
       <Button
@@ -94,12 +114,12 @@ export function ProfileAvatarEditor() {
           <DialogHeader>
             <DialogTitle>Change Profile Picture</DialogTitle>
             <DialogDescription>
-              Upload a new image. Recommended: 400x400px, Max 5MB.
+              Upload a new image or remove the current one. Recommended: 400x400px, Max 5MB.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <Field>
-              <FieldLabel htmlFor="avatar-upload">New Avatar Image</FieldLabel>
+              <FieldLabel htmlFor="avatar-upload">Upload New Image</FieldLabel>
               <Input
                 id="avatar-upload"
                 type="file"
@@ -109,14 +129,33 @@ export function ProfileAvatarEditor() {
               />
             </Field>
             {error && <FieldError>{error}</FieldError>}
-            <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!file || isLoading}>
-                {isLoading && <Loader2 className="mr-2 size-4 animate-spin" />}
-                Save Changes
-              </Button>
+            <DialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-between sm:items-center">
+              <div>
+                {profilePic && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleRemove}
+                    disabled={isLoading}
+                  >
+                    {isRemoving ? (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="mr-2 size-4" />
+                    )}
+                    Remove Current Photo
+                  </Button>
+                )}
+              </div>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={!file || isLoading}>
+                  {isUploading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  Upload New
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>

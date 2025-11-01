@@ -78,7 +78,7 @@ export function ProfileAvatar({ name, email, username, profilePic, isOwner }: Pr
             </Avatar>
             {isOwner && (
               <Suspense fallback={null}>
-                <ProfileAvatarEditor />
+                <ProfileAvatarEditor profilePic={profilePic} />
               </Suspense>
             )}
           </div>
