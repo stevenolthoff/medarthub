@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+
+After completing a sizeable chunk of work (e.g., implementing a feature, fixing a bug, adding functionality), I will wait for the user to explicitly say "commit" before committing changes.
+
+When the user says "commit":
+1. Use `git add -A` to stage all changes
+2. Use `git commit -m "descriptive message"` with a one-liner but descriptive commit message that clearly explains what was done
+
+The commit message should be:
+- One line only
+- Concise but descriptive
+- Focused on what was accomplished
+- Use imperative mood when appropriate (e.g., "Add profile picture field to artist table" not "Added profile picture field")
+
+Example good messages:
+- "Add profile picture field to artist table"
+- "Implement user authentication with JWT tokens"
+- "Fix image upload validation bug"
+- "Add responsive layout for mobile devices"

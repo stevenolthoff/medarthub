@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+When creating Prisma migrations in a non-interactive environment, use `prisma migrate dev --create-only` to generate migration files without applying them or requiring user interaction. Then apply with `prisma migrate deploy` and generate the client.
+
+Example workflow:
+1. Make schema changes in `api/prisma/schema.prisma`
+2. Generate migration files: `cd api && bun prisma migrate dev --create-only --name migration_name`
+3. Apply the migration: `bun prisma migrate deploy`
+4. Generate Prisma client: `bun prisma generate`
+
+Note: The `--create-only` flag allows non-interactive migration generation without applying changes to the database.

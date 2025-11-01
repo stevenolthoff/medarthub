@@ -21,13 +21,15 @@ model User {
 }
 
 model Artist {
-  id        String    @id @default(uuid())
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    String    @unique
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  artworks  Artwork[]
+  id               String    @id @default(uuid())
+  slug             String    @unique
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profilePicImageId String?   @unique
+  profilePic       Image?    @relation("ArtistProfilePic", fields: [profilePicImageId], references: [id])
+  artworks         Artwork[]
 
   @@map("artists")
 }
@@ -60,6 +62,7 @@ model Image {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   originalArtwork   Artwork? @relation("ArtworkCover")
+  profilePicForArtist Artist? @relation("ArtistProfilePic")
 
   @@map("images")
 }
