@@ -80,12 +80,6 @@ export function SiteHeader() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/project-briefs" className="cursor-pointer">
-                      <Folder className="mr-2 size-4" />
-                      <span>Project Briefs</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link href="/settings" className="cursor-pointer">
                       <Settings className="mr-2 size-4" />
                       <span>Settings</span>
