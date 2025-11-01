@@ -17,6 +17,7 @@ type Artist = NonNullable<RouterOutputs['artist']['getBySlug']>;
 // Extended type to include pre-generated URLs from server
 type ArtistWithUrls = Artist & {
   profilePicUrl: string;
+  bannerImageUrl: string | null;
   artworks: Array<Artist['artworks'][0] & { coverImageUrl: string }>;
 };
 
@@ -64,7 +65,11 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
 
   return (
     <div className="flex flex-1 flex-col">
-      <HeroBanner />
+      <HeroBanner
+        bannerImage={artistProfile.bannerImage}
+        bannerImageUrl={artistProfile.bannerImageUrl}
+        isOwner={isOwner}
+      />
       
       <ProfileAvatar 
         name={profileData.name}

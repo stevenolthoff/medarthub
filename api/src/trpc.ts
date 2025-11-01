@@ -30,6 +30,13 @@ const userWithArtistProfileSelect = {
           height: true,
         },
       },
+      bannerImage: {
+        select: {
+          key: true,
+          width: true,
+          height: true,
+        },
+      },
     },
   },
 } satisfies Prisma.UserSelect;

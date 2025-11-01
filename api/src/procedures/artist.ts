@@ -18,6 +18,13 @@ const setProfilePictureInput = z.object({
 });
 
 /**
+ * Zod schema for setting banner image.
+ */
+const setBannerImageInput = z.object({
+  imageId: z.string().uuid('Invalid image ID format'),
+});
+
+/**
  * Zod schema for creating artwork.
  */
 const createArtworkInput = z.object({
@@ -120,6 +127,13 @@ export const artistRouter = router({
           slug: true,
           createdAt: true,
           profilePic: {
+            select: {
+              key: true,
+              width: true,
+              height: true,
+            },
+          },
+          bannerImage: {
             select: {
               key: true,
               width: true,
@@ -493,10 +507,13 @@ export const artistRouter = router({
         });
 
          if (oldImageId && oldImageId !== imageId) {
-           const oldImageInUse = await tx.artwork.findFirst({
+           const oldImageInUseAsCover = await tx.artwork.findFirst({
              where: { coverImageId: oldImageId },
            });
-           if (!oldImageInUse) {
+           const oldImageInUseAsBanner = await tx.artist.findFirst({
+             where: { bannerImageId: oldImageId },
+           });
+           if (!oldImageInUseAsCover && !oldImageInUseAsBanner) {
              await tx.image.delete({
                where: { id: oldImageId },
              });
@@ -544,12 +561,15 @@ export const artistRouter = router({
           data: { profilePicImageId: null },
         });
 
-         // 3. Delete the old image record if it's not used elsewhere (e.g., as an artwork cover)
-         const oldImageInUse = await tx.artwork.findFirst({
+         // 3. Delete the old image record if it's not used elsewhere
+         const oldImageInUseAsCover = await tx.artwork.findFirst({
            where: { coverImageId: oldImageId },
          });
+         const oldImageInUseAsBanner = await tx.artist.findFirst({
+           where: { bannerImageId: oldImageId },
+         });
 
-         if (!oldImageInUse) {
+         if (!oldImageInUseAsCover && !oldImageInUseAsBanner) {
            await tx.image.delete({
              where: { id: oldImageId },
            });
@@ -561,4 +581,112 @@ export const artistRouter = router({
         message: 'Profile picture removed successfully.',
       };
     }),
+
+  /**
+   * Protected procedure to set the banner image for the authenticated artist.
+   */
+  setBannerImage: protectedProcedure
+    .input(setBannerImageInput)
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user?.artist?.id) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have an artist profile.',
+        });
+      }
+
+      const { imageId } = input;
+      const artistId = ctx.user.artist.id;
+
+      const image = await ctx.prisma.image.findUnique({
+        where: { id: imageId },
+      });
+
+      if (!image) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Image not found.',
+        });
+      }
+
+      await ctx.prisma.$transaction(async (tx) => {
+        const currentArtist = await tx.artist.findUnique({
+          where: { id: artistId },
+          select: { bannerImageId: true },
+        });
+        const oldImageId = currentArtist?.bannerImageId;
+
+        await tx.artist.update({
+          where: { id: artistId },
+          data: { bannerImageId: imageId },
+        });
+
+        if (oldImageId && oldImageId !== imageId) {
+          const oldImageInUseAsCover = await tx.artwork.findFirst({
+            where: { coverImageId: oldImageId },
+          });
+          const oldImageInUseAsProfile = await tx.artist.findFirst({
+            where: { profilePicImageId: oldImageId },
+          });
+
+          if (!oldImageInUseAsCover && !oldImageInUseAsProfile) {
+            await tx.image.delete({
+              where: { id: oldImageId },
+            });
+          }
+        }
+      });
+
+      return {
+        success: true,
+        message: 'Banner image updated successfully.',
+      };
+    }),
+
+  /**
+   * Protected procedure to remove the banner image for the authenticated artist.
+   */
+  removeBannerImage: protectedProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user?.artist?.id) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'User does not have an artist profile.',
+      });
+    }
+
+    const artistId = ctx.user.artist.id;
+
+    await ctx.prisma.$transaction(async (tx) => {
+      const currentArtist = await tx.artist.findUnique({
+        where: { id: artistId },
+        select: { bannerImageId: true },
+      });
+
+      const oldImageId = currentArtist?.bannerImageId;
+      if (!oldImageId) return;
+
+      await tx.artist.update({
+        where: { id: artistId },
+        data: { bannerImageId: null },
+      });
+
+      const oldImageInUseAsCover = await tx.artwork.findFirst({
+        where: { coverImageId: oldImageId },
+      });
+      const oldImageInUseAsProfile = await tx.artist.findFirst({
+        where: { profilePicImageId: oldImageId },
+      });
+
+      if (!oldImageInUseAsCover && !oldImageInUseAsProfile) {
+        await tx.image.delete({
+          where: { id: oldImageId },
+        });
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Banner image removed successfully.',
+    };
+  }),
 });

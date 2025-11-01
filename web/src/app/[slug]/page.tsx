@@ -92,6 +92,9 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
     profilePicUrl: artistProfile.profilePic?.key
       ? generateOptimizedServerUrl(artistProfile.profilePic.key, { width: 160, height: 160, format: 'webp', quality: 80 })
       : `https://api.dicebear.com/8.x/lorelei/svg?seed=${encodeURIComponent(artistProfile.user.name || artistProfile.user.email)}&flip=true`,
+    bannerImageUrl: artistProfile.bannerImage?.key
+      ? generateOptimizedServerUrl(artistProfile.bannerImage.key, { width: 1500, height: 500, format: 'webp', quality: 80 })
+      : null,
     artworks: artistProfile.artworks.map(art => ({
       ...art,
       coverImageUrl: art.coverImage?.key
