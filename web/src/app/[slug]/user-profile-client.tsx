@@ -97,6 +97,7 @@ export function UserProfileClient({ artistProfile, profileSlug }: UserProfileCli
                   company={artistProfile.company}
                   location={artistProfile.location}
                   websiteUrl={artistProfile.websiteUrl}
+                  about={artistProfile.about}
                   isOwner={isOwner}
                   isLoggedIn={isLoggedIn}
                 />
