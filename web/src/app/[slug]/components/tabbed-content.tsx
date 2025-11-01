@@ -221,8 +221,11 @@ export function TabbedContent({ isOwner, isLoggedIn, artistSlug, artistName, abo
                       <span className="absolute top-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs font-semibold rounded-full z-10">DRAFT</span>
                     )}
                     {/* Hover overlay with text */}
-                    <div className="absolute inset-0 bg-black/60 md:bg-black/0 md:group-hover:bg-black/60 transition-all duration-200 flex items-end rounded-lg">
-                      <div className="w-full p-4 transform translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-200">
+                    <div className="absolute inset-0 pointer-events-none rounded-lg overflow-hidden">
+                      <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 via-black/30 to-transparent md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                    <div className="absolute inset-0 flex items-end rounded-lg pointer-events-none">
+                      <div className="w-full p-4 transform translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-200 pointer-events-auto">
                         <h3 className="font-semibold text-white text-sm mb-1 line-clamp-1">
                           {item.title}
                         </h3>
