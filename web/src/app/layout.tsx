@@ -34,11 +34,11 @@ export default function RootLayout({
         <TRPCReactProvider>
           <AuthProvider> {/* Wrap children with AuthProvider */}
             <div className="flex min-h-svh flex-col">
-              <SiteHeader /> {/* Render the header */}
+              {/* <SiteHeader /> */}
               <main className="flex flex-1 flex-col">
                 {children}
               </main>
-              <SiteFooter /> {/* Render the footer */}
+              <SiteFooter />
             </div>
           </AuthProvider>
         </TRPCReactProvider>
