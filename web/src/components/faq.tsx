@@ -1,6 +1,6 @@
 export function FAQ() {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+    <div id="faq" className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
         <div className="grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-2">
           <div>

@@ -5,9 +5,9 @@ import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
-  { name: 'But why?', href: '#' },
-  { name: 'Request Early Access', href: '#' },
-  { name: 'Q&A', href: '#' },
+  { name: 'But why?', href: '#but-why' },
+  { name: 'Request Early Access', href: '#request-access' },
+  { name: 'Q&A', href: '#faq' },
 ]
 
 export function LandingHeader() {
@@ -77,7 +77,8 @@ export function LandingHeader() {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 cursor-pointer"
                   >
                     {item.name}
                   </a>
