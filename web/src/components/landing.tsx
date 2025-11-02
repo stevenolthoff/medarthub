@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { RequestAccess } from './request-access'
+import { FAQ } from './faq'
 
 const navigation = [
   { name: 'But why?', href: '#' },
@@ -161,6 +162,7 @@ export function Landing() {
           />
         </div>
         <RequestAccess />
+        <FAQ />
       </div>
     </div>
   )
