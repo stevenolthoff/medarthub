@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Landing } from "@/components/landing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://medicalartists.co';
@@ -29,6 +30,7 @@ export default function Home() {
   return (
     <div>
       {/* Landing page content will go here */}
+      <Landing />
     </div>
   );
 }
