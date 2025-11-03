@@ -1,4 +1,5 @@
 import { RequestAccess } from './request-access'
+import { HowToGetAccess } from './how-to-get-access'
 import { Rationale } from './rationale'
 import { FAQ } from './faq'
 import { LaunchNotification } from './launch-notification'
@@ -64,6 +65,7 @@ export function Landing() {
           />
         </div>
         <RequestAccess />
+        <HowToGetAccess />
         <Rationale />
         <FAQ />
         <LaunchNotification />
