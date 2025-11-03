@@ -8,6 +8,7 @@ const navigation = [
   { name: 'But why?', href: '#but-why' },
   { name: 'Request Early Access', href: '#request-access' },
   { name: 'Q&A', href: '#faq' },
+  { name: 'Get notified when we launch', href: '#launch-notification' },
 ]
 
 export function LandingHeader() {

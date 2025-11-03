@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookiePreferencesButton } from "./cookie-preferences-button";
 
 export function SiteFooter() {
   return (
@@ -196,7 +197,7 @@ export function SiteFooter() {
                 Terms of Use
               </Link>
               <div className="hidden sm:block w-px h-4 bg-gray-700"></div>
-              <Link href="#" className="hover:text-gray-300 transition-colors">
+              <Link href="/privacy" className="hover:text-gray-300 transition-colors">
                 Privacy
               </Link>
               <div className="hidden sm:block w-px h-4 bg-gray-700"></div>
@@ -204,9 +205,9 @@ export function SiteFooter() {
                 Community
               </Link>
               <div className="hidden sm:block w-px h-4 bg-gray-700"></div>
-              <Link href="#" className="hover:text-gray-300 transition-colors">
+              <CookiePreferencesButton>
                 Cookie preferences
-              </Link>
+              </CookiePreferencesButton>
               <div className="hidden sm:block w-px h-4 bg-gray-700"></div>
               <Link href="#" className="hover:text-gray-300 transition-colors">
                 Do not sell or share my personal information

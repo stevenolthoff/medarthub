@@ -13,7 +13,7 @@ A full-stack application with tRPC API backend, Vite React testing client, and N
 
 ### Environment Variables
 
-Create a `.env` file in the project root (monorepo root) with your Cloudflare R2 credentials:
+Create a `.env` file in the project root (monorepo root) with your configuration:
 
 ```bash
 # Cloudflare R2 Configuration
@@ -23,7 +23,23 @@ R2_ACCESS_KEY_ID=your-access-key-id
 R2_SECRET_ACCESS_KEY=your-secret-access-key
 
 # API Server Configuration
-PORT=3001 # API server listens on this port
+PORT=3001
+
+# Database Configuration
+DATABASE_URL=postgresql://user:password@localhost:5432/database_name
+
+# JWT Secret (generate a secure random string for production)
+JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long
+
+# Public URLs (for Next.js web app)
+NEXT_PUBLIC_R2_PUBLIC_ENDPOINT=https://your-r2-public-url.com
+NEXT_PUBLIC_IMGPROXY_URL=http://localhost:8080
+NEXT_PUBLIC_BASE_URL=https://medicalartists.co
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# Analytics (optional - for Google Analytics and Hotjar)
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=your-google-analytics-id
+NEXT_PUBLIC_HOTJAR_ID=your-hotjar-id
 ```
 
 **To get your R2 credentials:**
