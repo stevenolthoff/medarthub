@@ -19,34 +19,68 @@ export function FAQ() {
             <dl className="w-full max-w-xl space-y-8">
               <div>
                 <dt className="text-base font-semibold leading-7 text-gray-900">
-                  How do you make holy water?
+                  What do early access artists get?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  You boil the hell out of it. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.
+                  1. A really pretty portfolio page that will up your odds of clients finding you. This page will be optimized for Google so you are maximally findable.
+                  <br />
+                  2. The option to shape a showcase that YOU want and one that helps medical illustrators get jobs.
                 </dd>
               </div>
               <div>
                 <dt className="text-base font-semibold leading-7 text-gray-900">
-                  What's the best thing about Switzerland?
+                What will the showcase look like?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.
+                Like Dribbble or Behance but exclusively for medical illustrators.
                 </dd>
               </div>
               <div>
                 <dt className="text-base font-semibold leading-7 text-gray-900">
-                  What do you call someone with no body and no nose?
+                  Will this cost money?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  Nobody knows. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.
+                  No.
                 </dd>
               </div>
               <div>
                 <dt className="text-base font-semibold leading-7 text-gray-900">
-                  Why do you never see elephants hiding in trees?
+                  Then how will you run this?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  Because they're so good at it. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.
+                  If this gets expensive, then maybe we can setup a featured artist section that's paid.
+                </dd>
+              </div>
+              <div>
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  How do you decide if I get early access?
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  I can only handle 10 right now, and I need artists in a variety of mediums and subject matter. So that's the criteria. Nothing personal. Eventually, the doors will be wide open.
+                </dd>
+              </div>
+              <div>
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  Why are you doing this?
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  Because I am personally annoyed by the situation. A more level playing field would be nice.
+                </dd>
+              </div>
+              <div>
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  When will this be available?
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  I don't know. If this is actually valuable to you all, then it'll happen. If not, bye.
+                </dd>
+              </div>
+              <div>
+                <dt className="text-base font-semibold leading-7 text-gray-900">
+                  WHO are you?
+                </dt>
+                <dd className="mt-2 text-base leading-7 text-gray-600">
+                  Steven Olthoff: <a href="https://www.linkedin.com/in/steven-william-o/" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">LinkedIn</a>
                 </dd>
               </div>
             </dl>
