@@ -59,7 +59,7 @@ NEXT_PUBLIC_HOTJAR_ID=your-hotjar-id
 
 ### Development
 
-1. From repo root: `npm run dev`
+1. From repo root: `bun run dev`
 2. `client` (React) will be available at `http://localhost:5173`.
 3. `web` (Next.js) will be available at `http://localhost:3000`.
 4. `api` (Express) will be available at `http://localhost:3001`.
@@ -67,8 +67,8 @@ NEXT_PUBLIC_HOTJAR_ID=your-hotjar-id
 
 ### Production
 
-1. From repo root: `npm run build`
-2. `npm start`
+1. From repo root: `bun run build`
+2. `bun start`
 3. Visit `http://localhost:3001` → This will serve the built `client` (React) SPA, and API routes will also be available under `/api`.
 
 ## Example of how to manually upload image to R2:
