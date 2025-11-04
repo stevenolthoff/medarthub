@@ -13,7 +13,6 @@ A full-stack application with tRPC API, Next.js, Postgres, Docker.
 - **web** - The main UI (Next.js application)
 - **client** - Testing ground (Vite React application) 
 - **api** - tRPC backend with shared types
-- **types** - Connected between web and tRPC for type safety
 
 ## Setup
 
