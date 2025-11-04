@@ -1,5 +1,11 @@
 # MedArtHub
 
+## Project purpose
+
+**MedicalArtists.co** is a work in progress — a platform being built to help medical illustrators and 3D artists get found by biotech and healthcare companies. Each artist will have an SEO-optimized profile page so their work can show up on Google, without the high costs of existing directories.
+
+## Tech
+
 A full-stack application with tRPC API backend, Vite React testing client, and Next.js web UI.
 
 ## Architecture

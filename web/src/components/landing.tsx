@@ -25,11 +25,8 @@ export function Landing() {
         </div>
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-            <div className="relative rounded-full px-3 py-1 text-sm/6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-              Accepting 10 medical illustrators for early access.{' '}
-              <a href="#request-access" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
-                Request early access <span aria-hidden="true">&rarr;</span>
-              </a>
+            <div className="relative rounded-full px-3 py-1 text-sm/6 ring-1 ring-indigo-900/10 hover:ring-indigo-900/20 font-semibold text-indigo-600">
+              Seeking 10 medical illustrators for early access.{' '}
             </div>
           </div>
           <div className="text-center">
