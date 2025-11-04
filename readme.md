@@ -1,4 +1,4 @@
-# MedArtHub
+# MedicalArtists.co
 
 ## Project purpose
 
