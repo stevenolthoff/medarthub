@@ -6,7 +6,7 @@
 
 ## Tech
 
-A full-stack application with tRPC API backend, Vite React testing client, and Next.js web UI.
+A full-stack application with tRPC API, Next.js, Postgres, Docker.
 
 ## Architecture
 
