@@ -12,7 +12,7 @@ export function HowToGetAccess() {
             </div>
             <div className="flex-1">
               <p className="text-base leading-8 text-gray-600 sm:text-lg">
-                Send in basic info and an art example.
+                Send in basic info and an art example, in the form above.
               </p>
             </div>
           </div>
@@ -22,7 +22,10 @@ export function HowToGetAccess() {
             </div>
             <div className="flex-1">
               <p className="text-base leading-8 text-gray-600 sm:text-lg">
-                I'll send you an email shortly. We'll try to pick 10 folks who cover a variety of mediums and subject matters.
+                You'll get an email. We'll start the process of setting up your portfolio page.
+              </p>
+              <p className="text-base leading-8 text-gray-600 sm:text-lg">
+              We'll try to pick 10 artists who cover a variety of mediums and subject matters.
               </p>
             </div>
           </div>
@@ -32,7 +35,7 @@ export function HowToGetAccess() {
             </div>
             <div className="flex-1">
               <p className="text-base leading-8 text-gray-600 sm:text-lg">
-                We'll set up a pretty portfolio page for you and hear feedback on what you need.
+                We'll listen to your feedback and shape a platform tailored to you.
               </p>
             </div>
           </div>

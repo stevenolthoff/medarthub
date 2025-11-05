@@ -68,7 +68,8 @@ export function RequestAccess() {
       </div>
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">Request early access</h2>
-        <p className="mt-2 text-lg/8 text-gray-600">We're accepting 10 medical illustrators to shape a showcase that actually gets you a job.</p>
+        <p className="mt-2 text-lg/8 text-gray-600">We're looking for 10 medical illustrators for early access.</p>
+        <p className="mt-2 text-lg/8 text-gray-600">You get a beautiful portfolio page and your opinions will shape a platform for up and coming medical illustrators.</p>
       </div>
       <form onSubmit={handleSubmit} className="mx-auto mt-16 max-w-xl sm:mt-20">
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">

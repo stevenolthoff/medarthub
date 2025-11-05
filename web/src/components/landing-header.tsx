@@ -6,7 +6,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'But why?', href: '#but-why' },
-  { name: 'Request Early Access', href: '#request-access' },
   { name: 'Q&A', href: '#faq' },
   { name: 'Get notified when we launch', href: '#launch-notification' },
 ]
@@ -41,8 +40,8 @@ export function LandingHeader() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm/6 font-semibold text-gray-900">
-            Log in <span aria-hidden="true">&rarr;</span>
+          <a href="#request-access" className="text-sm/6 font-semibold text-gray-900">
+            Request early access <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </nav>
@@ -79,10 +78,10 @@ export function LandingHeader() {
               </div>
               <div className="py-6">
                 <a
-                  href="#"
+                  href="#request-access"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                 >
-                  Log in
+                  Request early access
                 </a>
               </div>
             </div>

@@ -8,9 +8,9 @@ export function FAQ() {
               Frequently asked questions
             </h2>
             <p className="mt-4 text-base leading-7 text-gray-600">
-              Can't find the answer you're looking for? Reach out to our{' '}
-              <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
-                customer support team
+              Can't find the answer you're looking for? Reach out to {' '}
+              <a href="mailto:steven@medicalartists.co" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+                steven@medicalartists.co
               </a>
               .
             </p>
