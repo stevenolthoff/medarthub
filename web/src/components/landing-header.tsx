@@ -19,12 +19,8 @@ export function LandingHeader() {
       <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
-            <span className="sr-only">Your Company</span>
-            <img
-              alt=""
-              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-              className="h-8 w-auto"
-            />
+            <span className="sr-only">MedicalArtists.co</span>
+            <span className="text-xl font-semibold text-gray-900">MedicalArtists.co</span>
           </a>
         </div>
         <div className="flex lg:hidden">
@@ -55,12 +51,8 @@ export function LandingHeader() {
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
-              <img
-                alt=""
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                className="h-8 w-auto"
-              />
+              <span className="sr-only">MedicalArtists.co</span>
+              <span className="text-xl font-semibold text-gray-900">MedicalArtists.co</span>
             </a>
             <button
               type="button"
