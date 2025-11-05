@@ -4,6 +4,7 @@ import { authRouter } from './procedures/auth';
 import { userRouter } from './procedures/user'; // Import the new user router
 import { artistRouter } from './procedures/artist'; // Import the new artist router
 import { imageRouter } from './procedures/image'; // Import the new image router
+import { accessRequestRouter } from './procedures/accessRequest';
 
 /**
  * The main tRPC application router.
@@ -20,6 +21,7 @@ export const appRouter = router({
   user: userRouter, // Mount the new user router under the 'user' namespace
   artist: artistRouter, // Mount the new artist router under the 'artist' namespace
   image: imageRouter, // Mount the new image router under the 'image' namespace
+  accessRequest: accessRequestRouter,
   // Add other feature-specific routers here as your API grows, e.g.:
   // items: itemRouter,
 });

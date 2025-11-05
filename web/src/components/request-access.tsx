@@ -1,6 +1,57 @@
-import { ChevronDownIcon } from '@heroicons/react/16/solid'
+'use client';
+
+import { useState } from 'react';
+import { Loader2, CheckCircle } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
+import { FieldError } from './ui/field';
+import { Button } from './ui/button';
 
 export function RequestAccess() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [artworkExampleUrl, setArtworkExampleUrl] = useState('');
+  const [message, setMessage] = useState('');
+  const [agreedToPolicies, setAgreedToPolicies] = useState(false);
+
+  const submitRequestMutation = trpc.accessRequest.submit.useMutation({
+    onSuccess: () => {
+      // Clear form on success
+      setName('');
+      setEmail('');
+      setArtworkExampleUrl('');
+      setMessage('');
+      setAgreedToPolicies(false);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitRequestMutation.isPending || !agreedToPolicies) return;
+
+    submitRequestMutation.mutate({
+      name,
+      email,
+      artworkExampleUrl,
+      message,
+    });
+  };
+
+  if (submitRequestMutation.isSuccess) {
+    return (
+      <div id="request-access" className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">
+            Request Submitted!
+          </h2>
+          <p className="mt-2 text-lg/8 text-gray-600">
+            Thank you for your interest. We'll review your submission and get back to you shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div id="request-access" className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div
@@ -19,7 +70,7 @@ export function RequestAccess() {
         <h2 className="text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">Request early access</h2>
         <p className="mt-2 text-lg/8 text-gray-600">We're accepting 10 medical illustrators to shape a showcase that actually gets you a job.</p>
       </div>
-      <form action="#" method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
+      <form onSubmit={handleSubmit} className="mx-auto mt-16 max-w-xl sm:mt-20">
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label htmlFor="name" className="block text-sm/6 font-semibold text-gray-900">
@@ -30,21 +81,10 @@ export function RequestAccess() {
                 id="name"
                 name="name"
                 type="text"
-                autoComplete="given-name"
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
-              />
-            </div>
-          </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="company" className="block text-sm/6 font-semibold text-gray-900">
-              Company
-            </label>
-            <div className="mt-2.5">
-              <input
-                id="company"
-                name="company"
-                type="text"
-                autoComplete="organization"
+                autoComplete="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               />
             </div>
@@ -59,6 +99,9 @@ export function RequestAccess() {
                 name="email"
                 type="email"
                 autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               />
             </div>
@@ -71,8 +114,11 @@ export function RequestAccess() {
               <input
                 id="artwork-example"
                 name="artwork-example"
-                type="artwork-example"
-                autoComplete="website-url"
+                type="url"
+                autoComplete="url"
+                required
+                value={artworkExampleUrl}
+                onChange={(e) => setArtworkExampleUrl(e.target.value)}
                 className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               />
             </div>
@@ -86,25 +132,25 @@ export function RequestAccess() {
                 id="message"
                 name="message"
                 rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
-                defaultValue={''}
               />
             </div>
           </div>
           <div className="flex gap-x-4 sm:col-span-2">
             <div className="flex h-6 items-center">
-              <div className="group relative inline-flex w-8 shrink-0 rounded-full bg-gray-200 p-px inset-ring inset-ring-gray-900/5 outline-offset-2 outline-indigo-600 transition-colors duration-200 ease-in-out has-checked:bg-indigo-600 has-focus-visible:outline-2">
-                <span className="size-4 rounded-full bg-white shadow-xs ring-1 ring-gray-900/5 transition-transform duration-200 ease-in-out group-has-checked:translate-x-3.5" />
-                <input
-                  id="agree-to-policies"
-                  name="agree-to-policies"
-                  type="checkbox"
-                  aria-label="Agree to policies"
-                  className="absolute inset-0 appearance-none focus:outline-hidden"
-                />
-              </div>
+              <input
+                id="agree-to-policies"
+                name="agree-to-policies"
+                type="checkbox"
+                checked={agreedToPolicies}
+                onChange={(e) => setAgreedToPolicies(e.target.checked)}
+                required
+                className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
+              />
             </div>
-            <label htmlFor="agree-to-policies" className="text-sm/6 text-gray-600">
+            <label htmlFor="agree-to-policies" className="text-sm/6 text-gray-600 cursor-pointer">
               By selecting this, you agree to our{' '}
               <a href="/privacy" className="font-semibold whitespace-nowrap text-indigo-600 cursor-pointer">
                 privacy policy
@@ -113,13 +159,22 @@ export function RequestAccess() {
             </label>
           </div>
         </div>
+        
+        {submitRequestMutation.isError && (
+          <FieldError className="mt-4 text-center">
+            {submitRequestMutation.error.message}
+          </FieldError>
+        )}
+
         <div className="mt-10">
-          <button
+          <Button
             type="submit"
-            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="block w-full"
+            disabled={submitRequestMutation.isPending || !agreedToPolicies}
           >
-            Let's talk
-          </button>
+            {submitRequestMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Submit request
+          </Button>
         </div>
       </form>
     </div>
