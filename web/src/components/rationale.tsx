@@ -7,16 +7,16 @@ export function Rationale() {
         </h2>
         <div className="mt-10 space-y-6 text-base leading-8 text-gray-600 sm:text-lg">
           <p>
-            Early medical illustrators built careers by drawing for textbooks. It is now 2025. There are only so many textbooks to draw but hundreds of new medical illustrators graduate each year.
+            Early medical illustrators built careers by drawing for textbooks. It is now <strong>2025</strong>. There are only so many textbooks to draw but <strong>hundreds of new medical illustrators graduate each year</strong>.
           </p>
           <p>
-            But there is still plenty of work! US biotech investment alone has grown from X in YEAR to Y in YEAR. Countless companies need to show their mechanisms of action, devices, and more. They need you. The problem? They can't find you.
+            U.S. biotech investment has <strong>exploded</strong> - from about <strong>$15 billion in 2014</strong> to over <strong>$160 billion in 2024</strong>. Last year alone, more than <strong>700 early-stage biotechs and med-device companies</strong> raised new funding in the U.S. Nearly all of them need to communicate their science - <em>mechanisms of action, devices, data</em> - but <strong>few have in-house artists</strong>. <strong>They contract that work out</strong>. The problem? <strong>They can't find you</strong>.
           </p>
           <p>
-            Why can't they find you? You likely have Behance, Instagram, and your own site on Squarespace. But if a biotech marketer Googles "3D device animator" you'll never show. Each artist is an island. All business funnels to the same 10 big players.
+            Why can't they find you? You likely have <strong>Behance, Instagram, and your own site on Squarespace</strong>. But if a biotech marketer Googles <em>"3D device animator"</em> you'll never show. <strong>Each artist is an island</strong>. All business funnels to the same <strong>10 big players</strong>.
           </p>
           <p>
-            The aim of this platform is to level the playing field. If enough artists join, Google will be <strong>wayyy</strong> more likely to show you to the right people.
+            The aim of this platform is to <strong>level the playing field</strong>. If enough artists join, Google will be <strong>wayyy</strong> more likely to show you to the right people and get you business.
           </p>
         </div>
       </div>
