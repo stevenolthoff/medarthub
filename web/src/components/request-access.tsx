@@ -1,4 +1,55 @@
+'use client'
+
+import { useState } from 'react'
+import { CheckCircle } from 'lucide-react'
+
 export function RequestAccess() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    const form = e.currentTarget
+    const formData = new FormData(form)
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData as any).toString(),
+      })
+
+      if (response.ok) {
+        setIsSuccess(true)
+        form.reset()
+      } else {
+        alert('There was an error submitting your request. Please try again.')
+      }
+    } catch (error) {
+      alert('There was an error submitting your request. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isSuccess) {
+    return (
+      <div id="request-access" className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
+          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">
+            Request Submitted!
+          </h2>
+          <p className="mt-2 text-lg/8 text-gray-600">
+            Thank you for your interest. We'll review your submission and get back to you shortly.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div id="request-access" className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
       <div
@@ -21,6 +72,7 @@ export function RequestAccess() {
         name="request-access"
         method="POST"
         data-netlify="true"
+        onSubmit={handleSubmit}
         className="mx-auto mt-16 max-w-xl sm:mt-20"
       >
         <input type="hidden" name="form-name" value="request-access" />
@@ -106,9 +158,10 @@ export function RequestAccess() {
         <div className="mt-10">
           <button
             type="submit"
-            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+            disabled={isSubmitting}
+            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Submit request
+            {isSubmitting ? 'Submitting...' : 'Submit request'}
           </button>
         </div>
       </form>
