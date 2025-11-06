@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react"; // Removed Plus, ThumbsUp, Eye, Trash2 a
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { type RouterOutputs } from "@/lib/server-trpc";
-import { ImageUploadZone } from "@/components/ImageUploadZone"; // Import the new ImageUploadZone component
+import { ImageUploadZone } from "./ImageUploadZone"; // Import the new ImageUploadZone component
 
 // Use inferred type directly for artwork, now includes coverImage
 type ArtworkData = NonNullable<RouterOutputs['artist']['getBySlug']>['artworks'][0];
