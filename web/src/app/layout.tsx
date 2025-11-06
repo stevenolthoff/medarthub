@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { TRPCReactProvider } from "@/lib/trpc-provider";
-import { SiteHeader } from "@/components/site-header"; // Import the new header
-import { SiteFooter } from "@/components/site-footer"; // Import the footer
-import { AuthProvider } from "@/hooks/use-auth"; // Import the AuthProvider
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+// import { TRPCReactProvider } from "@/lib/trpc-provider";
+// import { SiteHeader } from "@/components/site-header"; // Import the new header
+// import { SiteFooter } from "@/components/site-footer"; // Import the footer
+// import { AuthProvider } from "@/hooks/use-auth"; // Import the AuthProvider
+// import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +32,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TRPCReactProvider>
-          <AuthProvider> {/* Wrap children with AuthProvider */}
+        {/* <TRPCReactProvider>
+          <AuthProvider>
             <div className="flex min-h-svh flex-col">
-              {/* <SiteHeader /> */}
+              <SiteHeader />
               <main className="flex flex-1 flex-col">
                 {children}
               </main>
@@ -43,7 +43,8 @@ export default function RootLayout({
             </div>
             <CookieConsentBanner />
           </AuthProvider>
-        </TRPCReactProvider>
+        </TRPCReactProvider> */}
+        {children}
       </body>
     </html>
   );
