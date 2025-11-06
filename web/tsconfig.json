@@ -23,7 +23,7 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src/app/_slug/**", "src/app/_login/**", "src/app/_signup/**", "src/app/_settings/**", "src/app/_api/**", "src/app/_excluded-components/**"],
+  "exclude": ["node_modules", "src/app/_slug/**", "src/app/_login/**", "src/app/_signup/**", "src/app/_settings/**", "src/app/_api/**", "src/app/_excluded-components/**", "src/hooks/**", "src/lib/trpc.ts", "src/lib/server-trpc.ts", "src/lib/trpc-provider.tsx"],
   "references": [
     { "path": "../api" }
   ]
