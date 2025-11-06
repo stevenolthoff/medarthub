@@ -18,7 +18,9 @@ const r2PublicHostname = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  output: "export",
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
