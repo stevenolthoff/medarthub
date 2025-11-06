@@ -1,9 +1,9 @@
 export function HowToGetAccess() {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+    <div id="how-does-it-work" className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl lg:max-w-4xl">
         <h2 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl text-center">
-          How do I get early access?
+          How does it work?
         </h2>
         <div className="mt-16 space-y-12 sm:mt-20">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">

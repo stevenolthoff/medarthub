@@ -66,7 +66,17 @@ export function RequestAccess() {
       </div>
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">Request early access</h2>
-        <p className="mt-2 text-lg/8 text-gray-600">We're accepting 10 medical illustrators to shape a showcase that actually gets you a job.</p>
+        <p className="mt-2 text-lg/8 text-gray-600">We're looking for ~10 medical illustrators to join early.</p>
+        <p className="text-lg/8 text-gray-600">You'll get a free portfolio page optimized to be found on Google.</p>
+        <p className="text-lg/8 text-gray-600">
+          <a href="#how-does-it-work" className="font-semibold whitespace-nowrap text-indigo-800 cursor-pointer">
+          How does it work?
+          </a>
+          <span className="px-8"></span>
+          <a href="#but-why" className="font-semibold whitespace-nowrap text-indigo-800 cursor-pointer">
+          But why?
+          </a>
+        </p>
       </div>
       <form
         name="request-access"

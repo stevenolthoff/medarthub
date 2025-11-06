@@ -19,6 +19,20 @@ export function Rationale() {
             The aim of this platform is to <strong>level the playing field</strong>. If enough artists join, Google will be <strong>wayyy</strong> more likely to show you to the right people and get you business.
           </p>
         </div>
+        <div className="mt-12 flex justify-center gap-x-6">
+          <a
+            href="#request-access"
+            className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+          >
+            Request early access
+          </a>
+          <a
+            href="#faq"
+            className="rounded-md bg-gray-200 px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+          >
+            Learn more
+          </a>
+        </div>
       </div>
     </div>
   )

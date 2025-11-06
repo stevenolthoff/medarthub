@@ -9,11 +9,19 @@ export function FAQ() {
             </h2>
             <p className="mt-4 text-base leading-7 text-gray-600">
               Can't find the answer you're looking for? Reach out to {' '}
-              <a href="mailto:steven@medicalartists.co" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
-                steven@medicalartists.co
+              <a href="mailto:stef@magicwords.dev" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+                stef@magicwords.dev
               </a>
               .
             </p>
+            <div className="mt-12 flex justify-center gap-x-6 md:justify-start">
+              <a
+                href="#request-access"
+                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+              >
+                Request early access
+              </a>
+            </div>
           </div>
           <div className="w-full max-w-xl lg:ml-auto">
             <dl className="w-full max-w-xl space-y-8">
