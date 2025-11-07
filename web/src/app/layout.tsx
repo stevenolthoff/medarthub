@@ -5,7 +5,7 @@ import "./globals.css";
 // import { SiteHeader } from "@/components/site-header"; // Import the new header
 // import { SiteFooter } from "@/components/site-footer"; // Import the footer
 // import { AuthProvider } from "@/hooks/use-auth"; // Import the AuthProvider
-// import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -78,10 +78,10 @@ export default function RootLayout({
               </main>
               <SiteFooter />
             </div>
-            <CookieConsentBanner />
           </AuthProvider>
         </TRPCReactProvider> */}
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   );
