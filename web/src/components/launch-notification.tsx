@@ -80,24 +80,24 @@ export function LaunchNotification() {
                 type="email"
                 autoComplete="email"
                 required
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500"
                 placeholder="you@example.com"
               />
             </div>
           </div>
           <div className="flex gap-x-4">
             <div className="flex h-6 items-center">
-               <input
+              <input
                 id="agree-to-policies-launch"
                 name="agree-to-policies-launch"
                 type="checkbox"
                 required
-                className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
+                className="size-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
               />
             </div>
             <label htmlFor="agree-to-policies-launch" className="text-sm/6 text-gray-600 cursor-pointer">
               By selecting this, you agree to our{' '}
-              <a href="/privacy" className="font-semibold whitespace-nowrap text-indigo-600 hover:text-indigo-500 cursor-pointer">
+              <a href="/privacy" className="font-semibold whitespace-nowrap text-orange-600 hover:text-orange-500 cursor-pointer">
                 privacy policy
               </a>
               .
@@ -108,7 +108,7 @@ export function LaunchNotification() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="block w-full rounded-md bg-orange-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Submitting...' : 'Notify me'}
           </button>

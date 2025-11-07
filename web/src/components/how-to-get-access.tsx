@@ -7,7 +7,7 @@ export function HowToGetAccess() {
         </h2>
         <div className="mt-16 space-y-12 sm:mt-20">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-lg font-semibold">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 text-white text-lg font-semibold">
               1
             </div>
             <div className="flex-1">
@@ -17,7 +17,7 @@ export function HowToGetAccess() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-lg font-semibold">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 text-white text-lg font-semibold">
               2
             </div>
             <div className="flex-1">
@@ -30,7 +30,7 @@ export function HowToGetAccess() {
             </div>
           </div>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white text-lg font-semibold">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 text-white text-lg font-semibold">
               3
             </div>
             <div className="flex-1">
@@ -43,7 +43,7 @@ export function HowToGetAccess() {
         <div className="mt-12 flex justify-center">
           <a
             href="#request-access"
-            className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+            className="rounded-md bg-orange-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 cursor-pointer"
           >
             Request early access
           </a>

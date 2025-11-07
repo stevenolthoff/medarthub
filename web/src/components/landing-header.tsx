@@ -26,7 +26,7 @@ export function LandingHeader() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 hover:text-orange-600"
           >
             <span className="sr-only">Open main menu</span>
             <Bars3Icon aria-hidden="true" className="size-6" />
@@ -34,13 +34,13 @@ export function LandingHeader() {
         </div>
         <div className="hidden lg:flex lg:gap-x-12">
           {navigation.map((item) => (
-            <a key={item.name} href={item.href} className="text-sm/6 font-semibold text-gray-900">
+            <a key={item.name} href={item.href} className="text-sm/6 font-semibold text-gray-900 transition-colors hover:text-orange-600">
               {item.name}
             </a>
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#request-access" className="text-sm/6 font-semibold text-gray-900">
+          <a href="#request-access" className="text-sm/6 font-semibold text-gray-900 transition-colors hover:text-orange-600">
             Request early access <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
@@ -56,7 +56,7 @@ export function LandingHeader() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="-m-2.5 rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 rounded-md p-2.5 text-gray-700 hover:text-orange-600"
             >
               <span className="sr-only">Close menu</span>
               <XMarkIcon aria-hidden="true" className="size-6" />
@@ -70,7 +70,7 @@ export function LandingHeader() {
                     key={item.name}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 cursor-pointer"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 hover:text-orange-600 cursor-pointer"
                   >
                     {item.name}
                   </a>
@@ -79,7 +79,7 @@ export function LandingHeader() {
               <div className="py-6">
                 <a
                   href="#request-access"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 hover:text-orange-600"
                 >
                   Request early access
                 </a>

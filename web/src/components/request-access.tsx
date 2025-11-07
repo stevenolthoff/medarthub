@@ -61,7 +61,7 @@ export function RequestAccess() {
             clipPath:
               'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
           }}
-          className="relative left-1/2 -z-10 aspect-1155/678 w-144.5 max-w-none -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-288.75"
+          className="relative left-1/2 -z-10 aspect-1155/678 w-144.5 max-w-none -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff9a44] to-[#ff4e00] opacity-30 sm:left-[calc(50%-40rem)] sm:w-288.75"
         />
       </div>
       <div className="mx-auto max-w-2xl text-center">
@@ -69,11 +69,11 @@ export function RequestAccess() {
         <p className="mt-2 text-lg/8 text-gray-600">We're looking for ~10 medical illustrators to join early.</p>
         <p className="text-lg/8 text-gray-600">You'll get a free portfolio page optimized to be found on Google.</p>
         <p className="text-lg/8 text-gray-600">
-          <a href="#how-does-it-work" className="font-semibold whitespace-nowrap text-indigo-800 cursor-pointer">
+          <a href="#how-does-it-work" className="font-semibold whitespace-nowrap text-orange-700 hover:text-orange-600 cursor-pointer">
           How does it work?
           </a>
           <span className="px-8"></span>
-          <a href="#but-why" className="font-semibold whitespace-nowrap text-indigo-800 cursor-pointer">
+          <a href="#but-why" className="font-semibold whitespace-nowrap text-orange-700 hover:text-orange-600 cursor-pointer">
           But why?
           </a>
         </p>
@@ -98,7 +98,7 @@ export function RequestAccess() {
                 type="text"
                 autoComplete="name"
                 required
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500"
               />
             </div>
           </div>
@@ -113,7 +113,7 @@ export function RequestAccess() {
                 type="email"
                 autoComplete="email"
                 required
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500"
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ export function RequestAccess() {
                 type="url"
                 autoComplete="url"
                 required
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export function RequestAccess() {
                 id="message"
                 name="message"
                 rows={4}
-                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-orange-500"
                 defaultValue={''}
               />
             </div>
@@ -153,12 +153,12 @@ export function RequestAccess() {
                 name="agree-to-policies"
                 type="checkbox"
                 required
-                className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
+                className="size-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
               />
             </div>
             <label htmlFor="agree-to-policies" className="text-sm/6 text-gray-600 cursor-pointer">
               By selecting this, you agree to our{' '}
-              <a href="/privacy" className="font-semibold whitespace-nowrap text-indigo-600 cursor-pointer">
+              <a href="/privacy" className="font-semibold whitespace-nowrap text-orange-600 hover:text-orange-500 cursor-pointer">
                 privacy policy
               </a>
               .
@@ -169,7 +169,7 @@ export function RequestAccess() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="block w-full rounded-md bg-orange-500 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Submitting...' : 'Submit request'}
           </button>

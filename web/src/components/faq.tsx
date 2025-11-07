@@ -9,7 +9,7 @@ export function FAQ() {
             </h2>
             <p className="mt-4 text-base leading-7 text-gray-600">
               Can't find the answer you're looking for? Reach out to {' '}
-              <a href="mailto:stef@magicwords.dev" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+              <a href="mailto:stef@magicwords.dev" className="font-semibold text-orange-600 hover:text-orange-500 cursor-pointer">
                 stef@magicwords.dev
               </a>
               .
@@ -17,7 +17,7 @@ export function FAQ() {
             <div className="mt-12 flex justify-center gap-x-6 md:justify-start">
               <a
                 href="#request-access"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
+                className="rounded-md bg-orange-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 cursor-pointer"
               >
                 Request early access
               </a>
@@ -80,7 +80,7 @@ export function FAQ() {
                   WHO are you?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  Steven Olthoff: <a href="https://www.linkedin.com/in/steven-william-o/" className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">LinkedIn</a>
+                  Steven Olthoff: <a href="https://www.linkedin.com/in/steven-william-o/" className="font-semibold text-orange-600 hover:text-orange-500 cursor-pointer">LinkedIn</a>
                 </dd>
               </div>
             </dl>

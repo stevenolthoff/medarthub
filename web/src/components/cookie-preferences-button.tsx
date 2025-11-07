@@ -78,7 +78,7 @@ export function CookiePreferencesButton({ children }: { children: React.ReactNod
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="hover:text-gray-300 transition-colors cursor-pointer">
+      <button onClick={() => setIsOpen(true)} className="hover:text-orange-600 transition-colors cursor-pointer">
         {children}
       </button>
 
@@ -97,7 +97,7 @@ export function CookiePreferencesButton({ children }: { children: React.ReactNod
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h4 className="font-semibold text-gray-900">Necessary Cookies</h4>
-                  <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Always Active</span>
+                  <span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded">Always Active</span>
                 </div>
                 <p className="text-sm text-gray-600">
                   These cookies are essential for the website to function properly. They enable core functionality like authentication,
@@ -153,7 +153,7 @@ export function CookiePreferencesButton({ children }: { children: React.ReactNod
             </Button>
             <Button
               onClick={handleAcceptAll}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white"
+              className="flex-1 bg-orange-500 hover:bg-orange-400 text-white"
             >
               Accept All
             </Button>
@@ -167,7 +167,7 @@ export function CookiePreferencesButton({ children }: { children: React.ReactNod
 
           <p className="text-xs text-gray-500 text-center pt-4 border-t">
             For more information, please review our{' '}
-            <a href="/privacy" className="text-indigo-600 hover:text-indigo-500 underline cursor-pointer">
+            <a href="/privacy" className="text-orange-600 hover:text-orange-500 underline cursor-pointer">
               Privacy Policy
             </a>
           </p>
