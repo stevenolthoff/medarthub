@@ -48,15 +48,7 @@ export function FAQ() {
                   Will this cost money?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  No.
-                </dd>
-              </div>
-              <div>
-                <dt className="text-base font-semibold leading-7 text-gray-900">
-                  Then how will you run this?
-                </dt>
-                <dd className="mt-2 text-base leading-7 text-gray-600">
-                  If this gets expensive, then maybe we can setup a featured artist section that's paid.
+                  Free accounts for everyone. Paid ad spots.
                 </dd>
               </div>
               <div>
@@ -64,7 +56,7 @@ export function FAQ() {
                   How do you decide if I get early access?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  I can only handle 10 right now, and I need artists in a variety of mediums and subject matter. So that's the criteria. Nothing personal. Eventually, the doors will be wide open.
+                  I can only handle 10 right now, and I need artists in a variety of mediums and subject matter. That's the criteria. With enough interest, the doors will be wide open.
                 </dd>
               </div>
               <div>
@@ -72,7 +64,7 @@ export function FAQ() {
                   Why are you doing this?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  Because I am personally annoyed by the situation. A more level playing field would be nice.
+                  Because I am personally annoyed by the situation. Let's level the playing field.
                 </dd>
               </div>
               <div>
@@ -80,7 +72,7 @@ export function FAQ() {
                   When will this be available?
                 </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  I don't know. If this is actually valuable to you all, then it'll happen. If not, bye.
+                  I don't know. Depends on how much interest there is.
                 </dd>
               </div>
               <div>
