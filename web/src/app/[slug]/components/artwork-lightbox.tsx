@@ -135,142 +135,97 @@ export function ArtworkLightbox({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogPortal>
-        <DialogOverlay className="bg-transparent" />
-        <DialogContent className="max-w-none max-h-none w-screen h-screen p-0 m-0 rounded-none border-0 bg-transparent">
-          <DialogTitle className="sr-only">Artwork Lightbox - {currentArtwork.title}</DialogTitle>
-          {/* Full-screen artwork with overlay */}
-          <div className="relative w-full h-full bg-transparent">
-          {/* Full-screen artwork */}
-          {currentOptimizedImageUrl && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Image
-                src={currentOptimizedImageUrl}
-                alt={currentArtwork.title}
-                width={currentArtwork.coverImage?.width || 1920}
-                height={currentArtwork.coverImage?.height || 1080}
-                className="object-contain max-h-full"
-                priority
-              />
-            </div>
-          )}
-          
-          {/* Top overlay with title and close button */}
-          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4 md:p-6">
-            {/* Mobile layout: X button top right, content below */}
-            <div className="md:hidden">
-              <div className="flex justify-end mb-4">
-                <DialogClose asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white" 
-                    aria-label="Close lightbox"
+        <DialogOverlay className="bg-black/80 backdrop-blur-sm" />
+        <DialogContent className="fixed inset-0 z-50 flex h-screen w-screen max-w-none translate-x-0 translate-y-0 items-center justify-center border-0 bg-transparent p-0 shadow-none">
+          <DialogTitle className="sr-only">
+            Artwork Lightbox - {currentArtwork.title}
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-4 top-4 z-50 h-12 w-12 rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+              aria-label="Close lightbox"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          </DialogClose>
+          <div className="relative flex h-full w-full max-w-screen-lg flex-col">
+            <div
+              className="relative flex w-full flex-shrink-0 items-center justify-center p-4"
+              style={{ height: "65%" }}
+            >
+              {currentOptimizedImageUrl && (
+                <Image
+                  src={currentOptimizedImageUrl}
+                  alt={currentArtwork.title}
+                  width={currentArtwork.coverImage?.width || 1920}
+                  height={currentArtwork.coverImage?.height || 1080}
+                  className="max-h-full max-w-full object-contain"
+                  priority
+                />
+              )}
+              {artworks.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 top-1/2 h-12 w-12 -translate-y-1/2 rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                    onClick={handlePrev}
+                    disabled={isFirstArtwork}
+                    aria-label="Previous artwork"
                   >
-                    <X className="h-5 w-5" />
+                    <ChevronLeft className="h-6 w-6" />
                   </Button>
-                </DialogClose>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white mb-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-4 top-1/2 h-12 w-12 -translate-y-1/2 rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                    onClick={handleNext}
+                    disabled={isLastArtwork}
+                    aria-label="Next artwork"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
+                </>
+              )}
+            </div>
+            <div
+              className="w-full overflow-y-auto bg-[#212121] text-white"
+              style={{ height: "35%" }}
+            >
+              <div className="mx-auto max-w-3xl p-4 md:p-6">
+                <h1 className="text-xl font-bold md:text-2xl">
                   {currentArtwork.title}
                 </h1>
-                <p className="text-sm text-white/80 mb-4">
-                  {currentArtwork.description || "No description provided."}
-                </p>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCopyPermalink}
-                  className={`h-12 w-12 rounded-full text-white transition-all duration-200 ${
-                    linkCopied 
-                      ? 'bg-green-500/70 hover:bg-green-600/80' 
-                      : 'bg-white/20 hover:bg-white/30'
-                  }`}
-                  aria-label={linkCopied ? "Link copied!" : "Copy permalink"}
-                >
-                  {linkCopied ? (
-                    <Check className="h-5 w-5" />
-                  ) : (
-                    <Link className="h-5 w-5" />
-                  )}
-                </Button>
+                <div className="mt-2 flex items-center gap-4 text-sm text-neutral-400">
+                  <span>
+                    Created: {new Date(currentArtwork.createdAt).toLocaleDateString()}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyPermalink}
+                    className={`-ml-2 text-neutral-400 transition-colors hover:bg-neutral-700/50 hover:text-white ${
+                      linkCopied ? "text-green-400" : ""
+                    }`}
+                  >
+                    {linkCopied ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <Link className="mr-2 h-4 w-4" />
+                    )}
+                    {linkCopied ? "Copied!" : "Copy Link"}
+                  </Button>
+                </div>
+                <div className="mt-4 border-t border-neutral-700/50 pt-4">
+                  <p className="whitespace-pre-wrap text-base text-neutral-200">
+                    {currentArtwork.description || "No description provided."}
+                  </p>
+                </div>
               </div>
             </div>
-
-            {/* Desktop layout: side by side */}
-            <div className="hidden md:flex items-center justify-between">
-              <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
-                  {currentArtwork.title}
-                </h1>
-                <p className="text-sm md:text-base text-white/80 mb-3">
-                  {currentArtwork.description || "No description provided."}
-                </p>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCopyPermalink}
-                  className={`h-8 w-8 rounded-full text-white transition-all duration-200 ${
-                    linkCopied 
-                      ? 'bg-green-500/70 hover:bg-green-600/80' 
-                      : 'bg-white/20 hover:bg-white/30'
-                  }`}
-                  aria-label={linkCopied ? "Link copied!" : "Copy permalink"}
-                >
-                  {linkCopied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Link className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <DialogClose asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white ml-4" 
-                  aria-label="Close lightbox"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </DialogClose>
-            </div>
           </div>
-
-          {/* Navigation Buttons */}
-          {artworks.length > 1 && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full h-12 w-12"
-                onClick={handlePrev}
-                disabled={isFirstArtwork}
-                aria-label="Previous artwork"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full h-12 w-12"
-                onClick={handleNext}
-                disabled={isLastArtwork}
-                aria-label="Next artwork"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            </>
-          )}
-
-          {/* Bottom overlay with additional info */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-            <div className="text-white/80 text-sm">
-              <p>Created: {new Date(currentArtwork.createdAt).toLocaleDateString()}</p>
-              <p>Status: {currentArtwork.status}</p>
-            </div>
-          </div>
-        </div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
