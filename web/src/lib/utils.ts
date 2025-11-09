@@ -6,6 +6,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const DEFAULT_R2_PUBLIC_ENDPOINT = 'https://images.medicalartists.co';
+
 export interface ArtworkImageInfo {
   id: string;
   key: string;
@@ -24,13 +26,9 @@ export function getArtworkImageUrl(imageKey: string | null | undefined): string 
     return "/placeholder-artwork.svg";
   }
   
-  const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
-  if (r2PublicEndpoint) {
-    const prefix = r2PublicEndpoint.replace(/\/$/, '');
-    return `${prefix}/${imageKey}`;
-  }
-  
-  return "/placeholder-artwork.svg";
+  const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || DEFAULT_R2_PUBLIC_ENDPOINT;
+  const prefix = r2PublicEndpoint.replace(/\/$/, '');
+  return `${prefix}/${imageKey}`;
 }
 
 interface ImageOptimizationOptions {
@@ -51,7 +49,7 @@ export function generateOptimizedServerUrl(
   const IMGPROXY_KEY = process.env.IMGPROXY_KEY;
   const IMGPROXY_SALT = process.env.IMGPROXY_SALT;
   const IMGPROXY_URL = process.env.NEXT_PUBLIC_IMGPROXY_URL;
-  const R2_PUBLIC_ENDPOINT = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
+  const R2_PUBLIC_ENDPOINT = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || DEFAULT_R2_PUBLIC_ENDPOINT;
 
   if (!IMGPROXY_URL || !IMGPROXY_KEY || !IMGPROXY_SALT || !R2_PUBLIC_ENDPOINT) {
     return `${(R2_PUBLIC_ENDPOINT || '').replace(/\/$/, '')}/${r2Key}`;
@@ -106,12 +104,9 @@ export async function generateOptimizedClientUrl(
     const data = await response.json();
     return data.url;
   } catch (error) {
-    const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
-    if (r2PublicEndpoint) {
-      // Endpoint points directly to the bucket; never append bucket name
-      const prefix = r2PublicEndpoint.replace(/\/$/, '');
-      return `${prefix}/${imageKey}`;
-    }
-    return "/placeholder-artwork.svg";
+    const r2PublicEndpoint = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || DEFAULT_R2_PUBLIC_ENDPOINT;
+    // Endpoint points directly to the bucket; never append bucket name
+    const prefix = r2PublicEndpoint.replace(/\/$/, '');
+    return `${prefix}/${imageKey}`;
   }
 }

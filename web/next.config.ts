@@ -8,7 +8,7 @@ const imgproxyHostname = (() => {
   }
 })();
 
-const r2PublicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || 'http://localhost';
+const r2PublicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || 'https://images.medicalartists.co';
 const r2PublicHostname = (() => {
   try {
     return new URL(r2PublicUrl).hostname;

@@ -4,7 +4,8 @@ import crypto from 'crypto';
 const IMGPROXY_KEY = process.env.IMGPROXY_KEY;
 const IMGPROXY_SALT = process.env.IMGPROXY_SALT;
 const IMGPROXY_URL = process.env.NEXT_PUBLIC_IMGPROXY_URL;
-const R2_PUBLIC_ENDPOINT = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT;
+const DEFAULT_R2_PUBLIC_ENDPOINT = 'https://images.medicalartists.co';
+const R2_PUBLIC_ENDPOINT = process.env.NEXT_PUBLIC_R2_PUBLIC_ENDPOINT || DEFAULT_R2_PUBLIC_ENDPOINT;
 
 function toUrlSafeBase64(buffer: Buffer): string {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
