@@ -6,17 +6,19 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldLabel, FieldGroup } from '@/components/ui/field';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Loader2 } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import type { RouterOutputs } from '@/lib/server-trpc';
 import { cn } from '@/lib/utils';
 
 const sections = [
   { id: 'basic-information', label: 'Basic Information' },
+  { id: 'profile-url', label: 'Profile URL' },
   { id: 'about-me', label: 'About Me' },
 ] as const;
+
+const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function SettingsNav({ activeSection }: { activeSection: string }) {
   return (
@@ -49,20 +51,48 @@ export default function SettingsPage() {
   const [location, setLocation] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [about, setAbout] = useState('');
+  const [slug, setSlug] = useState('');
+  const [slugFeedback, setSlugFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [activeSection, setActiveSection] = useState<string>(sections[0]?.id ?? '');
 
+  const artistSlug = user?.artist?.slug ?? null;
+
   const { data: profile, isLoading: isProfileLoading } = trpc.artist.getBySlug.useQuery(
-    { slug: user?.artist?.slug! },
-    { enabled: !!user?.artist?.slug }
+    { slug: artistSlug as string },
+    { enabled: Boolean(artistSlug) }
   );
 
   const updateProfileMutation = trpc.artist.updateProfile.useMutation({
     onSuccess: () => {
-      utils.artist.getBySlug.invalidate({ slug: user?.artist?.slug! });
+      const currentSlug = profile?.slug ?? artistSlug;
+      if (currentSlug) {
+        void utils.artist.getBySlug.invalidate({ slug: currentSlug });
+      }
+      void utils.auth.me.invalidate();
     },
     onError: (error) => {
       console.error('Failed to update profile:', error);
     }
+  });
+
+  const updateSlugMutation = trpc.artist.updateSlug.useMutation({
+    onSuccess: (data) => {
+      setSlugFeedback({ type: 'success', message: data.message });
+      void utils.auth.me.invalidate();
+
+      if (artistSlug) {
+        void utils.artist.getBySlug.invalidate({ slug: artistSlug });
+      }
+      if (data.slug && data.slug !== artistSlug) {
+        void utils.artist.getBySlug.invalidate({ slug: data.slug });
+      }
+      if (data.slug) {
+        setSlug(data.slug);
+      }
+    },
+    onError: (error) => {
+      setSlugFeedback({ type: 'error', message: error.message });
+    },
   });
 
   useEffect(() => {
@@ -72,15 +102,17 @@ export default function SettingsPage() {
   }, [isLoggedIn, isAuthLoading, router]);
 
   useEffect(() => {
-    if (profile) {
-      setName(profile.user.name || '');
-      setHeadline(profile.headline || '');
-      setCompany(profile.company || '');
-      setLocation(profile.location || '');
-      setWebsiteUrl(profile.websiteUrl || '');
-      setAbout(profile.about || '');
+    if (profile || artistSlug) {
+      setName(profile?.user.name || '');
+      setHeadline(profile?.headline || '');
+      setCompany(profile?.company || '');
+      setLocation(profile?.location || '');
+      setWebsiteUrl(profile?.websiteUrl || '');
+      setAbout(profile?.about || '');
+      setSlug(profile?.slug ?? artistSlug ?? '');
+      setSlugFeedback(null);
     }
-  }, [profile]);
+  }, [profile, artistSlug]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -115,7 +147,7 @@ export default function SettingsPage() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleBasicInfoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate({
       name,
@@ -123,9 +155,56 @@ export default function SettingsPage() {
       company,
       location,
       websiteUrl,
+    });
+  };
+
+  const handleAboutSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfileMutation.mutate({
       about,
     });
   };
+
+  const handleSlugSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSlugFeedback(null);
+
+    const trimmedSlug = slug.trim();
+    const isValid =
+      trimmedSlug.length >= 3 &&
+      trimmedSlug.length <= 50 &&
+      slugRegex.test(trimmedSlug);
+
+    if (!isValid) {
+      setSlugFeedback({
+        type: 'error',
+        message: 'Slug must be 3-50 characters using lowercase letters, numbers, and hyphens (no leading, trailing, or consecutive hyphens).',
+      });
+      return;
+    }
+
+    const currentSlugValue = profile?.slug ?? artistSlug ?? '';
+    if (trimmedSlug === currentSlugValue) {
+      setSlugFeedback({
+        type: 'success',
+        message: 'Slug is unchanged.',
+      });
+      return;
+    }
+
+    updateSlugMutation.mutate({
+      slug: trimmedSlug,
+    });
+  };
+
+  const trimmedSlug = slug.trim();
+  const isSlugValid =
+    trimmedSlug.length >= 3 &&
+    trimmedSlug.length <= 50 &&
+    slugRegex.test(trimmedSlug);
+  const currentSlugValue = profile?.slug ?? artistSlug ?? '';
+  const isSlugChanged = trimmedSlug !== currentSlugValue;
+  const disableSlugSubmit = updateSlugMutation.isPending || !isSlugValid || !isSlugChanged;
 
   const isLoading = isAuthLoading || isProfileLoading;
 
@@ -143,8 +222,8 @@ export default function SettingsPage() {
         <aside className="hidden md:block md:w-1/4 lg:w-1/5">
           <SettingsNav activeSection={activeSection} />
         </aside>
-        <main className="flex-1">
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <main className="flex-1 space-y-8">
+          <form onSubmit={handleBasicInfoSubmit}>
             <section id="basic-information" className="scroll-mt-24">
               <Card className="border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-sm">
                 <CardHeader className="px-0 pb-2 sm:px-6 sm:pb-6">
@@ -191,8 +270,82 @@ export default function SettingsPage() {
                     </Field>
                   </FieldGroup>
                 </CardContent>
+                <CardFooter className="flex justify-end px-0 sm:px-6">
+                  <Button type="submit" disabled={updateProfileMutation.isPending}>
+                    {updateProfileMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                    Save Basic Info
+                  </Button>
+                </CardFooter>
               </Card>
             </section>
+          </form>
+
+          <form onSubmit={handleSlugSubmit}>
+            <section id="profile-url" className="scroll-mt-24">
+              <Card className="border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-sm">
+                <CardHeader className="px-0 pb-2 sm:px-6 sm:pb-6">
+                  <CardTitle className="text-lg sm:text-xl">Profile URL</CardTitle>
+                  <CardDescription className="hidden sm:block">
+                    Customize the link to your portfolio to match your personal brand.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-0 sm:px-6">
+                  <FieldGroup>
+                    <Field>
+                      <FieldLabel htmlFor="slug">Your Slug</FieldLabel>
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+                          medicalartists.co/
+                        </span>
+                        <Input
+                          id="slug"
+                          value={slug}
+                          onChange={(e) => {
+                            const nextValue = e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9-]/g, '-')
+                              .replace(/-{2,}/g, '-');
+                            setSlug(nextValue);
+                            setSlugFeedback(null);
+                          }}
+                          maxLength={50}
+                          className="pl-[150px] sm:pl-[166px]"
+                          aria-describedby="slug-description"
+                        />
+                      </div>
+                      <FieldDescription id="slug-description">
+                        3-50 characters. Lowercase letters, numbers, and single hyphens only.
+                      </FieldDescription>
+                      {!slugFeedback && slug.length > 0 && !isSlugValid ? (
+                        <FieldError>
+                          Slug must use lowercase letters, numbers, and single hyphens. It cannot start or end with a hyphen.
+                        </FieldError>
+                      ) : null}
+                      {slugFeedback && (
+                        <div
+                          className={cn(
+                            'text-sm',
+                            slugFeedback.type === 'error' ? 'text-destructive' : 'text-green-600'
+                          )}
+                          role="status"
+                        >
+                          {slugFeedback.message}
+                        </div>
+                      )}
+                    </Field>
+                  </FieldGroup>
+                </CardContent>
+                <CardFooter className="flex justify-end px-0 sm:px-6">
+                  <Button type="submit" disabled={disableSlugSubmit}>
+                    {updateSlugMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                    Save URL
+                  </Button>
+                </CardFooter>
+              </Card>
+            </section>
+          </form>
+
+          <form onSubmit={handleAboutSubmit}>
             <section id="about-me" className="scroll-mt-24">
               <Card className="border-0 bg-transparent shadow-none sm:min-h-[420px] sm:border sm:bg-card sm:shadow-sm md:min-h-[480px]">
                 <CardHeader className="px-0 pb-2 sm:px-6 sm:pb-6">
@@ -212,14 +365,14 @@ export default function SettingsPage() {
                     <div className="mt-2 text-right text-sm text-muted-foreground">{about.length} / 2000</div>
                   </Field>
                 </CardContent>
+                <CardFooter className="flex justify-end px-0 sm:px-6">
+                  <Button type="submit" disabled={updateProfileMutation.isPending}>
+                    {updateProfileMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                    Save About
+                  </Button>
+                </CardFooter>
               </Card>
             </section>
-            <div className="flex justify-end">
-              <Button type="submit" disabled={updateProfileMutation.isPending}>
-                {updateProfileMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-                Save Changes
-              </Button>
-            </div>
           </form>
         </main>
       </div>

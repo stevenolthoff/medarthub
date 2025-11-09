@@ -72,6 +72,21 @@ const updateProfileInput = z.object({
 });
 
 /**
+ * Zod schema for updating the artist slug.
+ */
+const updateSlugInput = z.object({
+  slug: z
+    .string()
+    .trim()
+    .min(3, 'Slug must be at least 3 characters.')
+    .max(50, 'Slug cannot be more than 50 characters.')
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      'Slug can only contain lowercase letters, numbers, and hyphens, and cannot start, end, or have consecutive hyphens.'
+    ),
+});
+
+/**
  * Router for artist-related procedures.
  */
 export const artistRouter = router({
@@ -243,6 +258,57 @@ export const artistRouter = router({
       });
 
       return { success: true, message: 'Profile updated successfully.' };
+    }),
+
+  /**
+   * Protected procedure for an artist to update their own profile slug.
+   */
+  updateSlug: protectedProcedure
+    .input(updateSlugInput)
+    .mutation(async ({ input, ctx }) => {
+      const artistId = ctx.user!.artist?.id;
+      const currentSlug = ctx.user!.artist?.slug;
+
+      if (!artistId) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'User does not have an artist profile.',
+        });
+      }
+
+      const nextSlug = input.slug.trim();
+
+      if (nextSlug === currentSlug) {
+        return {
+          success: true,
+          message: 'Slug is unchanged.',
+          slug: currentSlug,
+        };
+      }
+
+      const existingArtist = await ctx.prisma.artist.findUnique({
+        where: { slug: nextSlug },
+        select: { id: true },
+      });
+
+      if (existingArtist && existingArtist.id !== artistId) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'This slug is already taken. Please choose another one.',
+        });
+      }
+
+      const updatedArtist = await ctx.prisma.artist.update({
+        where: { id: artistId },
+        data: { slug: nextSlug },
+        select: { slug: true },
+      });
+
+      return {
+        success: true,
+        message: 'Slug updated successfully.',
+        slug: updatedArtist.slug,
+      };
     }),
 
   /**
