@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "@/lib/trpc-provider";
 import { SiteHeader } from "@/components/site-header"; // Import the new header
-import { SiteFooter } from "@/components/site-footer"; // Import the footer
+// import { SiteFooter } from "@/components/site-footer"; // Import the footer
 import { AuthProvider } from "@/hooks/use-auth"; // Import the AuthProvider
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
@@ -33,13 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TRPCReactProvider>
-          <AuthProvider> {/* Wrap children with AuthProvider */}
+          <AuthProvider>
             <div className="flex min-h-svh flex-col">
-              {/* <SiteHeader /> */}
+              <SiteHeader />
               <main className="flex flex-1 flex-col">
                 {children}
               </main>
-              <SiteFooter />
+              {/* <SiteFooter /> */}
             </div>
             <CookieConsentBanner />
           </AuthProvider>

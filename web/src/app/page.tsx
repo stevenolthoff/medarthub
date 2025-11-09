@@ -29,8 +29,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <div>
-      {/* Landing page content will go here */}
-      <Landing />
     </div>
   );
 }
