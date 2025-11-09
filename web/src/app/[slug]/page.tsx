@@ -41,11 +41,16 @@ export async function generateMetadata({ params }: ArtistProfilePageProps): Prom
   const publishedArtworks = artistProfile.artworks.filter(artwork => artwork.status === 'PUBLISHED');
   const artworkCount = publishedArtworks.length;
   
+  const locationDisplay = artistProfile.location?.trim();
+  const artistTitle = locationDisplay
+    ? `${artistProfile.user.name} in ${locationDisplay} - Medical Artists`
+    : artistProfile.user.name;
+
   return {
-    title: `${artistProfile.user.name} (@${artistProfile.user.username}) - Medical Artists`,
+    title: artistTitle,
     description: `View ${artistProfile.user.name}'s art portfolio on Medical Artists. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available. Discover digital art, illustrations, and creative works.`,
     openGraph: {
-      title: `${artistProfile.user.name} (@${artistProfile.user.username})`,
+      title: artistTitle,
       description: `View ${artistProfile.user.name}'s art portfolio on Medical Artists. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available.`,
       type: "profile",
       images: publishedArtworks.length > 0 && publishedArtworks[0].coverImage?.key ? [ // Use coverImage.key
@@ -57,7 +62,7 @@ export async function generateMetadata({ params }: ArtistProfilePageProps): Prom
     },
     twitter: {
       card: "summary_large_image",
-      title: `${artistProfile.user.name} (@${artistProfile.user.username})`,
+      title: artistTitle,
       description: `View ${artistProfile.user.name}'s art portfolio on Medical Artists. ${artworkCount} ${artworkCount === 1 ? 'artwork' : 'artworks'} available.`,
       images: publishedArtworks.length > 0 && publishedArtworks[0].coverImage?.key ? [getArtworkImageUrl(publishedArtworks[0].coverImage.key)] : undefined, // Use coverImage.key
     },
