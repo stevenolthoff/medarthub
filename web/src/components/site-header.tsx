@@ -14,12 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Menu, Settings, User, X } from "lucide-react";
 import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
+import { Dialog, DialogPanel } from "@headlessui/react";
 
 export function SiteHeader() {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleOpen = useCallback(() => {
@@ -67,12 +69,18 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center space-x-2">
           <span className="inline-block font-bold">Medical Artists</span>
         </Link>
-        <nav className="flex items-center space-x-6">
+        <nav className="flex items-center">
           {isLoading ? (
             <div className="size-9 animate-pulse rounded-full bg-muted" />
           ) : (
-            isLoggedIn ? (
-              <div className="-mx-4 -my-3 rounded-full px-4 py-3 cursor-pointer">
+            <>
+              <div className="hidden items-center gap-3 lg:flex">
+                {isLoggedIn ? (
+                  <div
+                    onMouseEnter={handleOpen}
+                    onMouseLeave={handleClose}
+                    className="-mx-4 -my-3 rounded-full px-4 py-3 cursor-pointer"
+                  >
                 <DropdownMenu
                   open={isMenuOpen}
                   onOpenChange={setIsMenuOpen}
@@ -81,8 +89,6 @@ export function SiteHeader() {
                   <DropdownMenuTrigger
                     asChild
                     onMouseDown={(event) => event.preventDefault()}
-                    onMouseEnter={handleOpen}
-                    onMouseLeave={handleClose}
                   >
                     <Link
                       href={user?.artist?.slug ? `/${user.artist.slug}` : "/settings"}
@@ -97,7 +103,9 @@ export function SiteHeader() {
                           seed={user?.name || user?.email || "user"}
                           unoptimized={isDiceBearAvatar}
                         />
-                        <AvatarFallback>{getInitials(user?.name, user?.email)}</AvatarFallback>
+                            <AvatarFallback>
+                              {getInitials(user?.name, user?.email)}
+                            </AvatarFallback>
                       </Avatar>
                       <span
                         className="absolute bottom-0 right-0 size-2 rounded-full bg-green-500 ring-2 ring-background"
@@ -161,7 +169,131 @@ export function SiteHeader() {
                   <Link href="/signup">Sign Up</Link>
                 </Button>
               </div>
-            )
+                )}
+              </div>
+
+              <div className="lg:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(true)}
+                  aria-label="Open main menu"
+                  className="cursor-pointer"
+                >
+                  <Menu className="size-6" />
+                </Button>
+                <Dialog
+                  open={isMobileMenuOpen}
+                  onClose={setMobileMenuOpen}
+                  className="relative z-50 lg:hidden"
+                >
+                  <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+                  <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full max-w-sm overflow-y-auto bg-background p-6 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href="/"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center space-x-2"
+                      >
+                        <span className="inline-block font-bold">Medical Artists</span>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-label="Close menu"
+                        className="cursor-pointer"
+                      >
+                        <X className="size-6" />
+                      </Button>
+                    </div>
+                    <div className="mt-6 flow-root">
+                      <div className="-my-6 divide-y divide-border">
+                        {isLoggedIn && user ? (
+                          <div className="space-y-4 py-6">
+                            <Link
+                              href={`/${user.artist?.slug}`}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center gap-4 rounded-md px-3 py-2 hover:bg-accent transition-colors cursor-pointer"
+                            >
+                              <Avatar className="size-12">
+                                <OptimizedAvatarImage
+                                  imageKey={user.artist?.profilePic?.key}
+                                  alt="User Avatar"
+                                  seed={user.name || user.email || "user"}
+                                  unoptimized={isDiceBearAvatar}
+                                />
+                                <AvatarFallback className="text-xl">
+                                  {getInitials(user.name, user.email)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col space-y-1">
+                                <p className="text-base font-medium leading-none">
+                                  {user.name || user.email}
+                                </p>
+                                <p className="text-muted-foreground text-sm leading-none">
+                                  {user.email}
+                                </p>
+                              </div>
+                            </Link>
+                            <nav className="flex flex-col space-y-1">
+                              <Link
+                                href={`/${user.artist?.slug}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium hover:bg-accent"
+                              >
+                                <User className="size-5" />
+                                View Profile
+                              </Link>
+                              <Link
+                                href="/settings"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium hover:bg-accent"
+                              >
+                                <Settings className="size-5" />
+                                Settings
+                              </Link>
+                            </nav>
+                          </div>
+                        ) : (
+                          <div className="space-y-2 py-6">
+                            <Button asChild className="w-full text-base">
+                              <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                                Sign Up
+                              </Link>
+                            </Button>
+                            <Button
+                              asChild
+                              variant="outline"
+                              className="w-full text-base"
+                            >
+                              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                                Login
+                              </Link>
+                            </Button>
+                          </div>
+                        )}
+                        {isLoggedIn && (
+                          <div className="py-6">
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                logout();
+                                setMobileMenuOpen(false);
+                              }}
+                              className="w-full justify-start gap-3 px-3 py-2 text-base font-medium text-destructive focus:text-destructive"
+                            >
+                              <LogOut className="size-5" />
+                              Sign Out
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </DialogPanel>
+                </Dialog>
+              </div>
+            </>
           )}
         </nav>
       </div>
