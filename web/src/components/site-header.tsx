@@ -37,7 +37,7 @@ export function SiteHeader() {
     hoverTimeoutRef.current = setTimeout(() => {
       setIsMenuOpen(false);
       hoverTimeoutRef.current = null;
-    }, 180);
+    }, 300);
   }, []);
 
   useEffect(() => {
@@ -72,27 +72,21 @@ export function SiteHeader() {
             <div className="size-9 animate-pulse rounded-full bg-muted" />
           ) : (
             isLoggedIn ? (
-              <div
-                className="-mx-4 -my-3 rounded-full px-4 py-3 cursor-pointer"
-                onMouseEnter={handleOpen}
-                onMouseLeave={handleClose}
-              >
+              <div className="-mx-4 -my-3 rounded-full px-4 py-3 cursor-pointer">
                 <DropdownMenu
                   open={isMenuOpen}
-                  onOpenChange={(next) => {
-                    if (!next) {
-                      setIsMenuOpen(false);
-                    }
-                  }}
+                  onOpenChange={setIsMenuOpen}
+                  modal={false}
                 >
                   <DropdownMenuTrigger
                     asChild
                     onMouseDown={(event) => event.preventDefault()}
+                    onMouseEnter={handleOpen}
+                    onMouseLeave={handleClose}
                   >
                     <Link
                       href={user?.artist?.slug ? `/${user.artist.slug}` : "/settings"}
                       className="relative flex h-9 w-9 items-center justify-center rounded-full p-0 cursor-pointer"
-                      onMouseEnter={handleOpen}
                       onClick={() => setIsMenuOpen(false)}
                       aria-label="Open account menu"
                     >
