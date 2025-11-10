@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Menu, Settings, User, X } from "lucide-react";
+import { LogOut, Menu, Settings, ShieldCheck, User, X } from "lucide-react";
 import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
 import { Dialog, DialogPanel } from "@headlessui/react";
 
@@ -79,96 +79,103 @@ export function SiteHeader() {
                   <div
                     onMouseEnter={handleOpen}
                     onMouseLeave={handleClose}
-                    className="-mx-4 -my-3 rounded-full px-4 py-3 cursor-pointer"
+                    className="-mx-4 -my-3 rounded-full px-4 py-3"
                   >
-                <DropdownMenu
-                  open={isMenuOpen}
-                  onOpenChange={setIsMenuOpen}
-                  modal={false}
-                >
-                  <DropdownMenuTrigger
-                    asChild
-                    onMouseDown={(event) => event.preventDefault()}
-                  >
-                    <Link
-                      href={user?.artist?.slug ? `/${user.artist.slug}` : "/settings"}
-                      className="relative flex h-9 w-9 items-center justify-center rounded-full p-0 cursor-pointer"
-                      onClick={() => setIsMenuOpen(false)}
-                      aria-label="Open account menu"
-                    >
-                      <Avatar className="size-9">
-                        <OptimizedAvatarImage
-                          imageKey={user?.artist?.profilePic?.key}
-                          alt="User Avatar"
-                          seed={user?.name || user?.email || "user"}
-                          unoptimized={isDiceBearAvatar}
-                        />
-                            <AvatarFallback>
-                              {getInitials(user?.name, user?.email)}
-                            </AvatarFallback>
-                      </Avatar>
-                      <span
-                        className="absolute bottom-0 right-0 size-2 rounded-full bg-green-500 ring-2 ring-background"
-                        aria-label="Online status"
-                      ></span>
-                    </Link>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-56"
-                    align="end"
-                    forceMount
-                    onMouseEnter={handleOpen}
-                    onMouseLeave={handleClose}
-                    sideOffset={8}
-                  >
-                    <DropdownMenuLabel className="font-normal">
-                      <Link
-                        href={`/${user?.artist?.slug}`}
-                        className="flex flex-col space-y-1 hover:bg-accent hover:text-accent-foreground rounded-sm p-1 -m-1 transition-colors cursor-pointer"
+                    <div className="flex items-center gap-3">
+                      {user?.role === "ADMIN" && (
+                        <Button asChild variant="outline" className="cursor-pointer">
+                          <Link href="/admin">Admin</Link>
+                        </Button>
+                      )}
+                      <DropdownMenu
+                        open={isMenuOpen}
+                        onOpenChange={setIsMenuOpen}
+                        modal={false}
                       >
-                        <p className="text-sm font-medium leading-none">
-                          {user?.name || user?.email}
-                        </p>
-                        <p className="text-muted-foreground text-xs leading-none">
-                          {user?.email}
-                        </p>
-                      </Link>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/${user?.artist?.slug}`} className="cursor-pointer">
-                          <User className="mr-2 size-4" />
-                          <span>View Profile</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/settings" className="cursor-pointer">
-                          <Settings className="mr-2 size-4" />
-                          <span>Settings</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={logout}
-                      className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-                    >
-                      <LogOut className="mr-2 size-4" />
-                      <span>Sign Out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Button asChild variant="outline">
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/request-access">Request Access</Link>
-                </Button>
-              </div>
+                        <DropdownMenuTrigger
+                          asChild
+                          onMouseDown={(event) => event.preventDefault()}
+                        >
+                          <Link
+                            href={user?.artist?.slug ? `/${user.artist.slug}` : "/settings"}
+                            className="relative flex h-9 w-9 items-center justify-center rounded-full p-0 cursor-pointer"
+                            onClick={() => setIsMenuOpen(false)}
+                            aria-label="Open account menu"
+                          >
+                            <Avatar className="size-9">
+                              <OptimizedAvatarImage
+                                imageKey={user?.artist?.profilePic?.key}
+                                alt="User Avatar"
+                                seed={user?.name || user?.email || "user"}
+                                unoptimized={isDiceBearAvatar}
+                              />
+                              <AvatarFallback>
+                                {getInitials(user?.name, user?.email)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span
+                              className="absolute bottom-0 right-0 size-2 rounded-full bg-green-500 ring-2 ring-background"
+                              aria-label="Online status"
+                            ></span>
+                          </Link>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          className="w-56"
+                          align="end"
+                          forceMount
+                          onMouseEnter={handleOpen}
+                          onMouseLeave={handleClose}
+                          sideOffset={8}
+                        >
+                          <DropdownMenuLabel className="font-normal">
+                            <Link
+                              href={`/${user?.artist?.slug}`}
+                              className="flex flex-col space-y-1 hover:bg-accent hover:text-accent-foreground rounded-sm p-1 -m-1 transition-colors cursor-pointer"
+                            >
+                              <p className="text-sm font-medium leading-none">
+                                {user?.name || user?.email}
+                              </p>
+                              <p className="text-muted-foreground text-xs leading-none">
+                                {user?.email}
+                              </p>
+                            </Link>
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/${user?.artist?.slug}`} className="cursor-pointer">
+                                <User className="mr-2 size-4" />
+                                <span>View Profile</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href="/settings" className="cursor-pointer">
+                                <Settings className="mr-2 size-4" />
+                                <span>Settings</span>
+                              </Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={logout}
+                            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                          >
+                            <LogOut className="mr-2 size-4" />
+                            <span>Sign Out</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <Button asChild variant="outline">
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/request-access">Request Access</Link>
+                    </Button>
+                  </div>
                 )}
               </div>
 
@@ -237,6 +244,16 @@ export function SiteHeader() {
                               </div>
                             </Link>
                             <nav className="flex flex-col space-y-1">
+                              {user.role === "ADMIN" && (
+                                <Link
+                                  href="/admin"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                  className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium hover:bg-accent"
+                                >
+                                  <ShieldCheck className="size-5" />
+                                  Admin
+                                </Link>
+                              )}
                               <Link
                                 href={`/${user.artist?.slug}`}
                                 onClick={() => setMobileMenuOpen(false)}
