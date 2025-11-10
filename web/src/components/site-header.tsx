@@ -166,7 +166,7 @@ export function SiteHeader() {
                   <Link href="/login">Login</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/signup">Sign Up</Link>
+                  <Link href="/request-access">Request Access</Link>
                 </Button>
               </div>
                 )}
@@ -258,8 +258,8 @@ export function SiteHeader() {
                         ) : (
                           <div className="space-y-2 py-6">
                             <Button asChild className="w-full text-base">
-                              <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                                Sign Up
+                              <Link href="/request-access" onClick={() => setMobileMenuOpen(false)}>
+                                Request Access
                               </Link>
                             </Button>
                             <Button

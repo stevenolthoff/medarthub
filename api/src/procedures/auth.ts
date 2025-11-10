@@ -33,6 +33,7 @@ const signupInput = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   confirmPassword: z.string().min(1, 'Confirm password is required'),
+  inviteCode: z.string().min(1, 'Invite code is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"], // Point the error specifically to the confirmPassword field
@@ -58,7 +59,33 @@ export const authRouter = router({
   signup: publicProcedure
     .input(signupInput)
     .mutation(async ({ input, ctx }) => {
-      const { username, name, email, password } = input;
+      if (!config.inviteOnlySignup) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Public signups are currently disabled.',
+        });
+      }
+
+      const { username, name, email, password, inviteCode } = input;
+
+      const code = await ctx.prisma.inviteCode.findUnique({
+        where: { code: inviteCode.toUpperCase() },
+        include: { accessRequest: true },
+      });
+
+      if (!code || code.isUsed || code.expiresAt < new Date()) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'This invite code is invalid or has expired.',
+        });
+      }
+
+      if (code.accessRequest.email.toLowerCase() !== email.toLowerCase()) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'This invite code is for a different email address.',
+        });
+      }
 
       // Check if user with this email or username already exists
       const existingUser = await ctx.prisma.user.findFirst({
@@ -120,6 +147,14 @@ export const authRouter = router({
             id: true,
             slug: true,
             createdAt: true,
+          },
+        });
+
+        await tx.inviteCode.update({
+          where: { id: code.id },
+          data: {
+            isUsed: true,
+            usedByUserId: newUser.id,
           },
         });
 

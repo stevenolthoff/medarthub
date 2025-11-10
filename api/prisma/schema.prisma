@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  username     String   @unique
-  artist       Artist?
+  id             String      @id @default(uuid())
+  name           String
+  email          String      @unique
+  passwordHash   String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  username       String      @unique
+  artist         Artist?
+  usedInviteCode InviteCode?
+  role           Role        @default(USER)
 
   @@map("users")
 }
@@ -80,6 +82,11 @@ enum ArtworkStatus {
   ARCHIVED
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model AccessRequest {
   id                String              @id @default(uuid())
   name              String
@@ -89,6 +96,7 @@ model AccessRequest {
   status            AccessRequestStatus @default(PENDING)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
+  inviteCode        InviteCode?
 
   @@map("access_requests")
 }
@@ -105,4 +113,18 @@ model LaunchSubscriber {
   createdAt DateTime @default(now())
 
   @@map("launch_subscribers")
+}
+
+model InviteCode {
+  id              String        @id @default(uuid())
+  code            String        @unique
+  expiresAt       DateTime
+  isUsed          Boolean       @default(false)
+  accessRequestId String        @unique
+  accessRequest   AccessRequest @relation(fields: [accessRequestId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  usedByUserId    String?       @unique
+  usedByUser      User?         @relation(fields: [usedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("invite_codes")
 }

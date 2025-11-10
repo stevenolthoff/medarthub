@@ -20,6 +20,7 @@ const userWithArtistProfileSelect = {
   username: true,
   email: true,
   name: true,
+  role: true,
   createdAt: true,
   artist: {
     select: {
@@ -153,3 +154,12 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure: typeof t.procedure = t.procedure.use(isAuthed);
+
+const isAdmin = t.middleware(({ ctx, next }) => {
+  if (ctx.user.role !== 'ADMIN') {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to perform this action.' });
+  }
+  return next();
+});
+
+export const adminProcedure: typeof t.procedure = protectedProcedure.use(isAdmin);

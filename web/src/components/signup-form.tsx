@@ -17,8 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
-import { useRouter } from "next/navigation";
-import { SetStateAction, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { SetStateAction, useEffect, useState } from "react";
 import { FieldError } from "./ui/field";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -28,7 +28,16 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [generalError, setGeneralError] = useState("");
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const codeFromQuery = searchParams.get("code");
+    if (codeFromQuery) {
+      setInviteCode(codeFromQuery.toUpperCase());
+    }
+  }, [searchParams]);
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: () => {
@@ -44,8 +53,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     e.preventDefault();
     setGeneralError("");
     
-    if (!username || !name || !email || !password || !confirmPassword) {
-      setGeneralError("Please fill in all required fields");
+    if (!username || !name || !email || !password || !confirmPassword || !inviteCode) {
+      setGeneralError(!inviteCode ? "An invite code is required." : "Please fill in all required fields");
       return;
     }
 
@@ -75,7 +84,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       return;
     }
 
-    signupMutation.mutate({ username, name, email, password, confirmPassword });
+    signupMutation.mutate({ username, name, email, password, confirmPassword, inviteCode });
   };
 
   return (
@@ -94,6 +103,22 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <FieldError>{generalError}</FieldError>
               </Field>
             )}
+            <Field>
+              <FieldLabel htmlFor="inviteCode">Invite Code</FieldLabel>
+              <Input
+                id="inviteCode"
+                type="text"
+                placeholder="Received in your approval email"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                required
+                readOnly={!!searchParams.get("code")}
+                aria-describedby="invite-code-description"
+              />
+              <FieldDescription id="invite-code-description">
+                This code is required to create an account.
+              </FieldDescription>
+            </Field>
             <Field>
               <FieldLabel htmlFor="username">Username</FieldLabel>
               <Input 

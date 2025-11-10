@@ -5,6 +5,7 @@ import { userRouter } from './procedures/user'; // Import the new user router
 import { artistRouter } from './procedures/artist'; // Import the new artist router
 import { imageRouter } from './procedures/image'; // Import the new image router
 import { accessRequestRouter } from './procedures/accessRequest';
+import { adminRouter } from './procedures/admin';
 import { launchNotificationRouter } from './procedures/launchNotification';
 
 /**
@@ -24,6 +25,7 @@ export const appRouter = router({
   image: imageRouter, // Mount the new image router under the 'image' namespace
   accessRequest: accessRequestRouter,
   launchNotification: launchNotificationRouter,
+  admin: adminRouter,
   // Add other feature-specific routers here as your API grows, e.g.:
   // items: itemRouter,
 });

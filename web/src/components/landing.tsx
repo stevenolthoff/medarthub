@@ -1,9 +1,9 @@
-import { RequestAccess } from './request-access'
 import { HowToGetAccess } from './how-to-get-access'
 import { Rationale } from './rationale'
 import { FAQ } from './faq'
 import { LaunchNotification } from './launch-notification'
 import { LandingHeader } from './landing-header'
+import Link from 'next/link'
 
 export function Landing() {
 
@@ -37,19 +37,18 @@ export function Landing() {
               Behance for medical illustrators - and free.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
-                href="#request-access"
+              <Link
+                href="/request-access"
                 className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
               >
                 Request early access
-              </a>
+              </Link>
               <a href="#but-why" className="text-sm/6 font-semibold text-gray-900 cursor-pointer">
                 But why? <span aria-hidden="true">→</span>
               </a>
             </div>
           </div>
         </div>
-        <RequestAccess />
         <HowToGetAccess />
         <Rationale />
         <FAQ />

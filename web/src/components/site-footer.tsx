@@ -11,7 +11,7 @@ export function SiteFooter() {
           </div>
           
           <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
-            <Link href="#request-access" className="text-purple-600 hover:text-purple-700 transition-colors cursor-pointer">
+            <Link href="/request-access" className="text-purple-600 hover:text-purple-700 transition-colors cursor-pointer">
               Request Access
             </Link>
             <Link href="#but-why" className="text-purple-600 hover:text-purple-700 transition-colors cursor-pointer">

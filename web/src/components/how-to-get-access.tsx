@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function HowToGetAccess() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
@@ -12,7 +14,7 @@ export function HowToGetAccess() {
             </div>
             <div className="flex-1">
               <p className="text-base leading-8 text-gray-600 sm:text-lg">
-                Send in basic info and an art example, in the form above.
+                Share your info and a sample of your work using our request form.
               </p>
             </div>
           </div>
@@ -41,12 +43,12 @@ export function HowToGetAccess() {
           </div>
         </div>
         <div className="mt-12 flex justify-center">
-          <a
-            href="#request-access"
+          <Link
+            href="/request-access"
             className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
           >
             Request early access
-          </a>
+          </Link>
         </div>
       </div>
     </div>
