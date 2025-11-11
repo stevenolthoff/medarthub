@@ -119,6 +119,23 @@ export default function Home() {
       </section>
       <section className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <HomeGallery />
+        <div className="mt-16 flex flex-col items-center justify-center gap-6 rounded-3xl bg-primary/5 px-6 py-14 text-center sm:px-10">
+          <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
+            Ready to showcase your medical art?
+          </h2>
+          <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+            Join the private beta to secure your portfolio spot, receive launch day updates, and help shape the next home for medical illustrators.
+          </p>
+          <Button
+            asChild
+            size="lg"
+            className="h-12 rounded-full px-8 font-semibold shadow-md transition-transform hover:-translate-y-0.5"
+          >
+            <Link href="/request-access" className="cursor-pointer">
+              Request Access to Continue
+            </Link>
+          </Button>
+        </div>
       </section>
     </>
   );
