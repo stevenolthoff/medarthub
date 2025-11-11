@@ -115,6 +115,12 @@ export function LoginForm({
                     Request access
                   </Link>
                 </FieldDescription>
+                <FieldDescription className="text-center">
+                  Already invited?{" "}
+                  <Link href="/signup" className="underline">
+                    Redeem your code and sign up
+                  </Link>
+                </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
