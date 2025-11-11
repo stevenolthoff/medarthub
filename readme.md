@@ -4,6 +4,16 @@
 
 **MedicalArtists.co** is a work in progress — a platform being built to help medical illustrators and 3D artists get found by biotech and healthcare companies. Each artist will have an SEO-optimized profile page so their work can show up on Google, without the high costs of existing directories.
 
+## Screenshots
+
+### Homepage
+
+![homepage](./readme-images/ss0.png)
+
+### Artist Portfolio
+
+![portfolio](./readme-images/ss1.png)
+
 ## Tech
 
 A full-stack application with tRPC API, Next.js, Postgres, Docker.
